@@ -60,14 +60,33 @@ try {
 
 // 2. Ensure users table exists & insert admin and demo users
 try {
-    @$conn->query("ALTER TABLE `users` MODIFY COLUMN `expiration_date` DATETIME DEFAULT NULL");
+    $conn->query("
+        CREATE TABLE IF NOT EXISTS `users` (
+            `id` int NOT NULL AUTO_INCREMENT,
+            `business_name` varchar(100) NOT NULL,
+            `email` varchar(100) NOT NULL,
+            `password` varchar(255) NOT NULL,
+            `phone` varchar(20) DEFAULT NULL,
+            `address` text,
+            `telegram_sent` tinyint(1) NOT NULL DEFAULT '0',
+            `status` enum('pending','approved','rejected') NOT NULL DEFAULT 'approved',
+            `package_id` int DEFAULT '1',
+            `expiration_date` datetime DEFAULT NULL,
+            `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            `approved_at` datetime DEFAULT NULL,
+            `ai_balance` decimal(10,2) NOT NULL DEFAULT '0.00',
+            `support_balance` decimal(10,3) NOT NULL DEFAULT '0.000',
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `email` (`email`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ");
 
     $conn->query("
         INSERT INTO `users` (`id`, `business_name`, `email`, `password`, `phone`, `address`, `status`, `package_id`, `expiration_date`, `created_at`, `approved_at`, `ai_balance`, `support_balance`)
         VALUES 
-        (1, 'فرۆشگای نموونە', 'demo@kashery.local', '{$hashed}', '07501234567', 'هەولێر', 'approved', 1, '2037-12-31 23:59:59', NOW(), NOW(), 100.00, 10000.000),
-        (2, 'Nexora Master Admin', 'admin@kashery.local', '{$hashed}', '07500000000', 'کوردستان', 'approved', 1, '2037-12-31 23:59:59', NOW(), NOW(), 1000.00, 100000.000)
-        ON DUPLICATE KEY UPDATE `password` = '{$hashed}', `status` = 'approved', `expiration_date` = '2037-12-31 23:59:59';
+        (1, 'فرۆشگای نموونە', 'demo@kashery.local', '{$hashed}', '07501234567', 'هەولێر', 'approved', 1, '2099-12-31 23:59:59', NOW(), NOW(), 100.00, 10000.000),
+        (2, 'Nexora Master Admin', 'admin@kashery.local', '{$hashed}', '07500000000', 'کوردستان', 'approved', 1, '2099-12-31 23:59:59', NOW(), NOW(), 1000.00, 100000.000)
+        ON DUPLICATE KEY UPDATE `password` = '{$hashed}', `status` = 'approved', `expiration_date` = '2099-12-31 23:59:59';
     ");
     $notices[] = "✔ Passwords for both admin@kashery.local and demo@kashery.local are set to: 123456";
 } catch (Throwable $e) {

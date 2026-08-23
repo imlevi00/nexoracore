@@ -214,12 +214,11 @@ $stats = [
 
 
 
-// گشتی کاڵاکان و ئامارە سەرەکییەکان
-try {
-    $result = $conn->query("SELECT COUNT(*) as count FROM products WHERE user_id = $userId");
-    if ($result) {
-        $stats['total_products'] = $result->fetch_assoc()['count'];
-    }
+// گشتی کاڵاکان
+$result = $conn->query("SELECT COUNT(*) as count FROM products WHERE user_id = $userId");
+if ($result) {
+    $stats['total_products'] = $result->fetch_assoc()['count'];
+}
 
 // کاڵا کەمەکان
 $result = $conn->query("
@@ -628,11 +627,8 @@ $result = $conn->query("
     FROM sales 
     WHERE user_id = $userId AND final_amount > 0
 ");
-    if ($result) {
-        $stats['average_sale_amount'] = $result->fetch_assoc()['avg_sale'] ?? 0;
-    }
-} catch (Throwable $e) {
-    error_log("Dashboard main stats error: " . $e->getMessage());
+if ($result) {
+    $stats['average_sale_amount'] = $result->fetch_assoc()['avg_sale'] ?? 0;
 }
 
 

@@ -172,9 +172,9 @@ $hashedPass = password_hash('123456', PASSWORD_BCRYPT, ['cost' => 12]);
 $conn->query("
     INSERT INTO `users` (`id`, `business_name`, `email`, `password`, `phone`, `address`, `telegram_sent`, `status`, `package_id`, `expiration_date`, `created_at`, `approved_at`, `ai_balance`, `support_balance`)
     VALUES 
-    (1, 'فرۆشگای نموونە', 'demo@kashery.local', '{$hashedPass}', '07501234567', 'هەولێر', 0, 'approved', 1, '2037-12-31 23:59:59', NOW(), NOW(), 100.00, 10000.000),
-    (2, 'Nexora Master Admin', 'admin@kashery.local', '{$hashedPass}', '07500000000', 'کوردستان', 0, 'approved', 1, '2037-12-31 23:59:59', NOW(), NOW(), 1000.00, 100000.000)
-    ON DUPLICATE KEY UPDATE `password` = VALUES(`password`), `status` = 'approved', `expiration_date` = '2037-12-31 23:59:59'
+    (1, 'فرۆشگای نموونە', 'demo@kashery.local', '{$hashedPass}', '07501234567', 'هەولێر', 0, 'approved', 1, '2099-12-31 23:59:59', NOW(), NOW(), 100.00, 10000.000),
+    (2, 'Nexora Master Admin', 'admin@kashery.local', '{$hashedPass}', '07500000000', 'کوردستان', 0, 'approved', 1, '2099-12-31 23:59:59', NOW(), NOW(), 1000.00, 100000.000)
+    ON DUPLICATE KEY UPDATE `password` = VALUES(`password`), `status` = 'approved', `expiration_date` = '2099-12-31 23:59:59'
 ");
 
 $conn->query("SET FOREIGN_KEY_CHECKS = 1");

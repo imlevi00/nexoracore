@@ -12,7 +12,7 @@ require_once __DIR__ . '/env.php';
 
 // ڕێکخستنەکانی سایت
 define('SITE_NAME', 'NexoraCore');
-if (!defined('SITE_URL')) define('SITE_URL', 'http://169.58.215.11/Ka.sheryAi/'); // سێرڤەر production ـە، دۆمین ڕاستەقینە
+if (!defined('SITE_URL')) define('SITE_URL', 'https://kasheryai.com/');
 define('SITE_VERSION', '1.0.8'); // بۆ cache busting
 
 // ڕێگاکانی فایلەکان
@@ -94,13 +94,9 @@ class Config {
     
     /**
      * وەرگرتنی ڕێکخستن
-     * 
-     * @param string $key
-     * @param mixed $default
-     * @return mixed
      */
     public static function get($key, $default = null) {
-        $keys = explode('.', (string)$key);
+        $keys = explode('.', $key);
         $value = self::$settings;
         
         foreach ($keys as $k) {
@@ -116,13 +112,9 @@ class Config {
     
     /**
      * دانانی ڕێکخستن
-     * 
-     * @param string $key
-     * @param mixed $value
-     * @return void
      */
     public static function set($key, $value) {
-        $keys = explode('.', (string)$key);
+        $keys = explode('.', $key);
         $setting = &self::$settings;
         
         foreach ($keys as $k) {
@@ -164,22 +156,18 @@ function path($path = '') {
  * گەڕاندنەوەی version خۆکار بۆ فایلێکی static (cache busting)
  * کاتی دوایین گۆڕانکاری فایلەکە (filemtime) بەکاردێت — بۆیە هەر جارێک
  * فایلەکە بگۆڕیت، version خۆکارانە دەگۆڕێت و پێویست ناکات بە دەستی هیچ بگۆڕیت.
- * 
- * @param string $absFile ڕێگای تەواوی فایلەکە لەسەر دیسک
- * @return string|int
+ * $absFile: ڕێگای تەواوی فایلەکە لەسەر دیسک
  */
 function file_version($absFile) {
-    return is_file((string)$absFile) ? filemtime((string)$absFile) : SITE_VERSION;
+    return is_file($absFile) ? filemtime($absFile) : SITE_VERSION;
 }
 
 /**
  * گەڕاندنەوەی URL ی assets بە versioning خۆکار بۆ cache busting
- * 
- * @param string $path نسبت بە بوخچەی /assets، وەک 'css/style.css'
- * @return string
+ * $path: نسبت بە بوخچەی /assets، وەک 'css/style.css'
  */
 function asset($path = '') {
-    $path = ltrim((string)$path, '/');
+    $path = ltrim($path, '/');
     $url  = rtrim(ASSETS_PATH, '/') . '/' . $path;
     // version خۆکار لە filemtime ـی فایلە ڕاستەقینەکەوە
     $ver  = file_version(ROOT_PATH . '/assets/' . $path);
@@ -189,24 +177,19 @@ function asset($path = '') {
 
 /**
  * URL ـی فایلێکی static (CSS/JS) لە هەر شوێنێکی پڕۆژە بە version خۆکار
- * 
- * @param string $path نسبت بە ڕەگی پڕۆژە، وەک 'user/pos/css/pos-design.css'
- * @return string
+ * $path: نسبت بە ڕەگی پڕۆژە، وەک 'user/pos/css/pos-design.css'
  */
 function asset_url($path = '') {
-    $path = ltrim((string)$path, '/');
+    $path = ltrim($path, '/');
     $ver  = file_version(ROOT_PATH . '/' . $path);
     return rtrim(SITE_URL, '/') . '/' . $path . '?v=' . $ver;
 }
 
 /**
  * تاقیکردنەوەی URL ـی دەرەکی
- * 
- * @param string $string
- * @return bool
  */
 function is_url($string) {
-    return filter_var((string)$string, FILTER_VALIDATE_URL) !== false;
+    return filter_var($string, FILTER_VALIDATE_URL) !== false;
 }
 
 /**
@@ -253,29 +236,22 @@ function getCurrentAdmin() {
 
 /**
  * ڕیدایڕێکت کردن
- * 
- * @param string $url
- * @return void
  */
 function redirect($url) {
     if (headers_sent()) {
-        echo "<script>window.location.href='" . addslashes((string)$url) . "';</script>";
+        echo "<script>window.location.href='$url';</script>";
     } else {
-        header("Location: " . (string)$url);
+        header("Location: $url");
     }
     exit();
 }
 
 /**
  * پیشاندانی پەیام
- * 
- * @param string $message
- * @param string $type
- * @return void
  */
 function setMessage($message, $type = 'success') {
-    $_SESSION['flash_message'] = (string)$message;
-    $_SESSION['flash_type'] = (string)$type;
+    $_SESSION['flash_message'] = $message;
+    $_SESSION['flash_type'] = $type;
 }
 
 function getMessage() {
@@ -293,10 +269,6 @@ function getMessage() {
 
 /**
  * فۆرماتکردنی پارە
- * 
- * @param int|float|string|null $amount
- * @param string $currency
- * @return string
  */
 function formatMoney($amount, $currency = DEFAULT_CURRENCY) {
     // Handle null or empty values
@@ -315,30 +287,16 @@ function formatMoney($amount, $currency = DEFAULT_CURRENCY) {
 
 /**
  * فۆرماتکردنی بەروار
- * 
- * @param string|DateTimeInterface|null $date
- * @param string $format
- * @return string
  */
 function formatDate($date, $format = 'Y-m-d H:i:s') {
-    if (empty($date)) {
-        return '';
+    if (is_string($date)) {
+        $date = new DateTime($date, new DateTimeZone(DEFAULT_TIMEZONE));
     }
-    try {
-        if (is_string($date)) {
-            $date = new DateTime($date, new DateTimeZone(DEFAULT_TIMEZONE));
-        }
-        return ($date instanceof DateTimeInterface) ? $date->format($format) : '';
-    } catch (Throwable $e) {
-        return (string)$date;
-    }
+    return $date->format($format);
 }
 
 /**
  * وەرگرتنی کاتی ئێستا بە timezone ی دروست
- * 
- * @param string $format
- * @return string
  */
 function getCurrentDateTime($format = 'Y-m-d H:i:s') {
     $now = new DateTime('now', new DateTimeZone(DEFAULT_TIMEZONE));
@@ -347,18 +305,13 @@ function getCurrentDateTime($format = 'Y-m-d H:i:s') {
 
 /**
  * دروستکردنی کۆدی بارکۆد
- * 
- * @param string $prefix
- * @return string
  */
 function generateBarcode($prefix = 'POS') {
-    return $prefix . date('Ymd') . str_pad((string)mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
+    return $prefix . date('Ymd') . str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
 }
 
 /**
  * دروستکردنی ژمارەی پسوولە
- * 
- * @return string
  */
 function generateInvoiceNumber() {
     // Add microseconds and increase randomness range to reduce collision probability
@@ -369,53 +322,40 @@ function generateInvoiceNumber() {
 
 /**
  * پاککردنەوەی HTML
- * 
- * @param mixed $data
- * @return string
  */
 function clean($data) {
-    return htmlspecialchars(trim((string)($data ?? '')), ENT_QUOTES, 'UTF-8');
+    return htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
 }
 
 /**
  * تاقیکردنی ئیمەیڵ
- * 
- * @param string $email
- * @return mixed
  */
 function isValidEmail($email) {
-    return filter_var((string)$email, FILTER_VALIDATE_EMAIL);
+    return filter_var($email, FILTER_VALIDATE_EMAIL);
 }
 
 /**
  * تاقیکردنی ژمارەی مۆبایل
- * 
- * @param string $phone
- * @return int|false
  */
 function isValidPhone($phone) {
-    return preg_match('/^[0-9+\-\s()]{10,20}$/', (string)$phone);
+    return preg_match('/^[0-9+\-\s()]{10,20}$/', $phone);
 }
 
 /**
  * دروستکردنی log
- * 
- * @param string $message
- * @param string $level
- * @return void
  */
 function writeLog($message, $level = 'INFO') {
     $logFile = ROOT_PATH . '/logs/' . date('Y-m-d') . '.log';
     $logDir = dirname($logFile);
     
     if (!is_dir($logDir)) {
-        @mkdir($logDir, 0775, true);
+        mkdir($logDir, 0755, true);
     }
     
     $timestamp = date('Y-m-d H:i:s');
-    $logMessage = "[$timestamp] [$level] " . (string)$message . PHP_EOL;
+    $logMessage = "[$timestamp] [$level] $message" . PHP_EOL;
     
-    @file_put_contents($logFile, $logMessage, FILE_APPEND | LOCK_EX);
+    file_put_contents($logFile, $logMessage, FILE_APPEND | LOCK_EX);
 }
 
 // دانانی HTTP Headers بۆ ئامنیەت و cache control

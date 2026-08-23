@@ -50,9 +50,8 @@ class Database {
                 // دانانی timezone بۆ MySQL
                 $this->connection->query("SET time_zone = '+03:00'");
                 
-            } catch (Throwable $e) {
-                error_log("Database connection failed: " . $e->getMessage());
-                die("هەڵەی پەیوەندی بە داتابەیس: " . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8'));
+            } catch (Exception $e) {
+                die("هەڵەی پەیوەندی: " . $e->getMessage());
             }
         }
         
@@ -80,8 +79,7 @@ class Database {
      * پاککردنەوەی داتا بۆ ئاسایشی
      */
     public function escape($data) {
-        $conn = $this->getConnection();
-        return $conn ? $conn->real_escape_string((string)$data) : addslashes((string)$data);
+        return $this->connection->real_escape_string($data);
     }
     
     /**
@@ -136,10 +134,7 @@ $conn = $db->connect();
  */
 function cleanInput($data) {
     global $conn;
-    if (!$conn) {
-        return addslashes(trim((string)($data ?? '')));
-    }
-    return mysqli_real_escape_string($conn, trim((string)($data ?? '')));
+    return mysqli_real_escape_string($conn, trim($data));
 }
 
 /**
@@ -147,41 +142,33 @@ function cleanInput($data) {
  */
 function selectQuery($sql, $params = []) {
     global $conn;
-    if (!$conn) {
-        return false;
-    }
     
-    try {
-        if (!empty($params)) {
-            $stmt = $conn->prepare($sql);
-            if (!$stmt) {
-                return false;
-            }
-            
-            $types = '';
-            $values = [];
-            
-            foreach ($params as $param) {
-                if (is_int($param)) {
-                    $types .= 'i';
-                } elseif (is_float($param)) {
-                    $types .= 'd';
-                } else {
-                    $types .= 's';
-                }
-                $values[] = $param;
-            }
-            
-            $stmt->bind_param($types, ...$values);
-            $stmt->execute();
-            
-            return $stmt->get_result();
-        } else {
-            return $conn->query($sql);
+    if (!empty($params)) {
+        $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            return false;
         }
-    } catch (Throwable $e) {
-        error_log("selectQuery Error: " . $e->getMessage() . " - SQL: " . $sql);
-        return false;
+        
+        $types = '';
+        $values = [];
+        
+        foreach ($params as $param) {
+            if (is_int($param)) {
+                $types .= 'i';
+            } elseif (is_float($param)) {
+                $types .= 'd';
+            } else {
+                $types .= 's';
+            }
+            $values[] = $param;
+        }
+        
+        $stmt->bind_param($types, ...$values);
+        $stmt->execute();
+        
+        return $stmt->get_result();
+    } else {
+        return $conn->query($sql);
     }
 }
 
@@ -190,48 +177,37 @@ function selectQuery($sql, $params = []) {
  */
 function executeQuery($sql, $params = []) {
     global $conn;
-    if (!$conn) {
-        return false;
-    }
     
-    try {
-        if (!empty($params)) {
-            $stmt = $conn->prepare($sql);
-            if (!$stmt) {
-                return false;
-            }
-            
-            $types = '';
-            $values = [];
-            
-            foreach ($params as $param) {
-                if (is_int($param)) {
-                    $types .= 'i';
-                } elseif (is_float($param)) {
-                    $types .= 'd';
-                } else {
-                    $types .= 's';
-                }
-                $values[] = $param;
-            }
-            
-            $stmt->bind_param($types, ...$values);
-            $result = $stmt->execute();
-            
-            if ($result) {
-                $affected = $stmt->affected_rows;
-                $stmt->close();
-                return $affected;
-            }
-            $stmt->close();
+    if (!empty($params)) {
+        $stmt = $conn->prepare($sql);
+        if (!$stmt) {
             return false;
-        } else {
-            $res = $conn->query($sql);
-            return $res ? $conn->affected_rows : false;
         }
-    } catch (Throwable $e) {
-        error_log("executeQuery Error: " . $e->getMessage() . " - SQL: " . $sql);
+        
+        $types = '';
+        $values = [];
+        
+        foreach ($params as $param) {
+            if (is_int($param)) {
+                $types .= 'i';
+            } elseif (is_float($param)) {
+                $types .= 'd';
+            } else {
+                $types .= 's';
+            }
+            $values[] = $param;
+        }
+        
+        $stmt->bind_param($types, ...$values);
+        $result = $stmt->execute();
+        
+        if ($result) {
+            return $stmt->affected_rows;
+        }
+        
         return false;
+    } else {
+        return $conn->query($sql);
     }
 }
 
@@ -240,11 +216,7 @@ function executeQuery($sql, $params = []) {
  */
 function testConnection() {
     global $conn;
-    try {
-        return $conn && @$conn->ping();
-    } catch (Throwable $e) {
-        return false;
-    }
+    return $conn && $conn->ping();
 }
 
 ?>

@@ -72,73 +72,137 @@ if (!defined('KASHER_IS_LOCAL')) {
  * ٣) کرێدێنشاڵی داتابەیسەکان
  *    هەموویان بە `if (!defined())` بۆ ئەوەی env.local.php بتوانێت زۆرەملێ بکات.
  * ------------------------------------------------------------------------- */
-/* ===== داتابەیسی یەکگرتوو (nexoracore_db) =====
- * هەموو پەیوەندییەکانی ئەپ (سەرەکی، پلاتفۆرم، زانیاری، لۆگ، میدیا)
- * دەچنە سەر هەمان داتابەیس و هەمان یوزەر — لە لۆکاڵ و لە سێرڤەر.
- */
-$dbHost     = 'localhost';
-$dbUser     = 'itsmelevi';
-$dbPassword = 'levi12345';
-$dbName     = 'nexoracore_db';
-$dbCharset  = 'utf8mb4';
+if (KASHER_IS_LOCAL) {
+    /* ===== ژینگەی لۆکاڵ (XAMPP) =====
+     * XAMPP بە بنەڕەت یوزەری root یان itsmelevi بەکاردەهێنێت.
+     * ناوی داتابەیس: nexoracore_db
+     */
 
-if (!defined('DB_HOST'))     define('DB_HOST', $dbHost);
-if (!defined('DB_USERNAME')) define('DB_USERNAME', $dbUser);
-if (!defined('DB_PASSWORD')) define('DB_PASSWORD', $dbPassword);
-if (!defined('DB_NAME'))     define('DB_NAME', $dbName);
-if (!defined('DB_CHARSET'))  define('DB_CHARSET', $dbCharset);
+    // ڕێکخستنی XAMPP: دەتوانرێت host/port/password لە env یان secrets.local.php دابنرێت.
+    $localDbHost = kasher_secret('local_db_host', 'DB_HOST', '127.0.0.1');
+    $localDbPort = kasher_secret('local_db_port', 'DB_PORT', '');
+    $localDbUser = kasher_secret('local_db_username', 'DB_USERNAME', 'itsmelevi');
+    $localDbPassword = kasher_secret(
+        'local_db_password',
+        'DB_PASSWORD',
+        kasher_secret('db_password', 'DB_PASSWORD', 'levi12345')
+    );
+    if ($localDbPort !== '' && strpos($localDbHost, ':') === false) {
+        $localDbHost .= ':' . $localDbPort;
+    }
 
-if (!defined('KASHER_PLATFORM_DB_HOST'))     define('KASHER_PLATFORM_DB_HOST', $dbHost);
-if (!defined('KASHER_PLATFORM_DB_USERNAME')) define('KASHER_PLATFORM_DB_USERNAME', $dbUser);
-if (!defined('KASHER_PLATFORM_DB_PASSWORD')) define('KASHER_PLATFORM_DB_PASSWORD', $dbPassword);
-if (!defined('KASHER_PLATFORM_DB_NAME'))     define('KASHER_PLATFORM_DB_NAME', $dbName);
-if (!defined('KASHER_PLATFORM_DB_CHARSET'))  define('KASHER_PLATFORM_DB_CHARSET', $dbCharset);
+    // -- داتابەیسی سەرەکی (nexoracore_db) --
+    if (!defined('DB_HOST'))     define('DB_HOST', $localDbHost);
+    if (!defined('DB_USERNAME')) define('DB_USERNAME', $localDbUser);
+    if (!defined('DB_PASSWORD')) define('DB_PASSWORD', $localDbPassword);
+    if (!defined('DB_NAME'))     define('DB_NAME', 'nexoracore_db');
+    if (!defined('DB_CHARSET'))  define('DB_CHARSET', 'utf8mb4');
 
-if (!defined('ZANYARI_DB_HOST'))     define('ZANYARI_DB_HOST', $dbHost);
-if (!defined('ZANYARI_DB_USERNAME')) define('ZANYARI_DB_USERNAME', $dbUser);
-if (!defined('ZANYARI_DB_PASSWORD')) define('ZANYARI_DB_PASSWORD', $dbPassword);
-if (!defined('ZANYARI_DB_NAME'))     define('ZANYARI_DB_NAME', $dbName);
-if (!defined('ZANYARI_DB_CHARSET'))  define('ZANYARI_DB_CHARSET', $dbCharset);
+    // -- kasher_platform --
+    if (!defined('KASHER_PLATFORM_DB_HOST'))     define('KASHER_PLATFORM_DB_HOST', $localDbHost);
+    if (!defined('KASHER_PLATFORM_DB_USERNAME')) define('KASHER_PLATFORM_DB_USERNAME', kasher_secret('local_db_username', 'KASHER_PLATFORM_DB_USERNAME', $localDbUser));
+    if (!defined('KASHER_PLATFORM_DB_PASSWORD')) define('KASHER_PLATFORM_DB_PASSWORD', kasher_secret('local_db_password', 'KASHER_PLATFORM_DB_PASSWORD', $localDbPassword));
+    if (!defined('KASHER_PLATFORM_DB_NAME'))     define('KASHER_PLATFORM_DB_NAME', 'nexoracore_db');
+    if (!defined('KASHER_PLATFORM_DB_CHARSET'))  define('KASHER_PLATFORM_DB_CHARSET', 'utf8mb4');
 
-if (!defined('KASHER_LOGS_DB_HOST'))     define('KASHER_LOGS_DB_HOST', $dbHost);
-if (!defined('KASHER_LOGS_DB_USERNAME')) define('KASHER_LOGS_DB_USERNAME', $dbUser);
-if (!defined('KASHER_LOGS_DB_PASSWORD')) define('KASHER_LOGS_DB_PASSWORD', $dbPassword);
-if (!defined('KASHER_LOGS_DB_NAME'))     define('KASHER_LOGS_DB_NAME', $dbName);
-if (!defined('KASHER_LOGS_DB_CHARSET'))  define('KASHER_LOGS_DB_CHARSET', $dbCharset);
+    // -- kasher_zanyari (kasher_z) --
+    if (!defined('ZANYARI_DB_HOST'))     define('ZANYARI_DB_HOST', $localDbHost);
+    if (!defined('ZANYARI_DB_USERNAME')) define('ZANYARI_DB_USERNAME', kasher_secret('local_db_username', 'ZANYARI_DB_USERNAME', $localDbUser));
+    if (!defined('ZANYARI_DB_PASSWORD')) define('ZANYARI_DB_PASSWORD', kasher_secret('local_db_password', 'ZANYARI_DB_PASSWORD', $localDbPassword));
+    if (!defined('ZANYARI_DB_NAME'))     define('ZANYARI_DB_NAME', 'nexoracore_db');
+    if (!defined('ZANYARI_DB_CHARSET'))  define('ZANYARI_DB_CHARSET', 'utf8mb4');
 
-if (!defined('IMAGES_DB_HOST'))     define('IMAGES_DB_HOST', $dbHost);
-if (!defined('IMAGES_DB_USERNAME')) define('IMAGES_DB_USERNAME', $dbUser);
-if (!defined('IMAGES_DB_PASSWORD')) define('IMAGES_DB_PASSWORD', $dbPassword);
-if (!defined('IMAGES_DB_NAME'))     define('IMAGES_DB_NAME', $dbName);
-if (!defined('IMAGES_DB_CHARSET'))  define('IMAGES_DB_CHARSET', $dbCharset);
+    // -- kasher_logs --
+    if (!defined('KASHER_LOGS_DB_HOST'))     define('KASHER_LOGS_DB_HOST', $localDbHost);
+    if (!defined('KASHER_LOGS_DB_USERNAME')) define('KASHER_LOGS_DB_USERNAME', kasher_secret('local_db_username', 'KASHER_LOGS_DB_USERNAME', $localDbUser));
+    if (!defined('KASHER_LOGS_DB_PASSWORD')) define('KASHER_LOGS_DB_PASSWORD', kasher_secret('local_db_password', 'KASHER_LOGS_DB_PASSWORD', $localDbPassword));
+    if (!defined('KASHER_LOGS_DB_NAME'))     define('KASHER_LOGS_DB_NAME', 'nexoracore_db');
+    if (!defined('KASHER_LOGS_DB_CHARSET'))  define('KASHER_LOGS_DB_CHARSET', 'utf8mb4');
 
-if (!defined('VIDEOS_DB_HOST'))     define('VIDEOS_DB_HOST', $dbHost);
-if (!defined('VIDEOS_DB_USERNAME')) define('VIDEOS_DB_USERNAME', $dbUser);
-if (!defined('VIDEOS_DB_PASSWORD')) define('VIDEOS_DB_PASSWORD', $dbPassword);
-if (!defined('VIDEOS_DB_NAME'))     define('VIDEOS_DB_NAME', $dbName);
-if (!defined('VIDEOS_DB_CHARSET'))  define('VIDEOS_DB_CHARSET', $dbCharset);
+    // -- kasher_media (وێنەکان) --
+    if (!defined('IMAGES_DB_HOST'))     define('IMAGES_DB_HOST', $localDbHost);
+    if (!defined('IMAGES_DB_USERNAME')) define('IMAGES_DB_USERNAME', kasher_secret('local_db_username', 'IMAGES_DB_USERNAME', $localDbUser));
+    if (!defined('IMAGES_DB_PASSWORD')) define('IMAGES_DB_PASSWORD', kasher_secret('local_db_password', 'IMAGES_DB_PASSWORD', $localDbPassword));
+    if (!defined('IMAGES_DB_NAME'))     define('IMAGES_DB_NAME', 'nexoracore_db');
+    if (!defined('IMAGES_DB_CHARSET'))  define('IMAGES_DB_CHARSET', 'utf8mb4');
+
+    // -- kasher_media (ڤیدیۆکان — هەمان داتابەیسی media) --
+    if (!defined('VIDEOS_DB_HOST'))     define('VIDEOS_DB_HOST', $localDbHost);
+    if (!defined('VIDEOS_DB_USERNAME')) define('VIDEOS_DB_USERNAME', kasher_secret('local_db_username', 'VIDEOS_DB_USERNAME', $localDbUser));
+    if (!defined('VIDEOS_DB_PASSWORD')) define('VIDEOS_DB_PASSWORD', kasher_secret('local_db_password', 'VIDEOS_DB_PASSWORD', $localDbPassword));
+    if (!defined('VIDEOS_DB_NAME'))     define('VIDEOS_DB_NAME', 'nexoracore_db');
+    if (!defined('VIDEOS_DB_CHARSET'))  define('VIDEOS_DB_CHARSET', 'utf8mb4');
+
+} else {
+    /* ===== ژینگەی سێرڤەر (Production) =====
+     */
+
+    // -- داتابەیسی سەرەکی (nexoracore_db) --
+    if (!defined('DB_HOST'))     define('DB_HOST', 'localhost');
+    if (!defined('DB_USERNAME')) define('DB_USERNAME', 'itsmelevi');
+    if (!defined('DB_PASSWORD')) define('DB_PASSWORD', kasher_secret('db_password', 'DB_PASSWORD', 'levi12345'));
+    if (!defined('DB_NAME'))     define('DB_NAME', 'nexoracore_db');
+    if (!defined('DB_CHARSET'))  define('DB_CHARSET', 'utf8mb4');
+
+    // -- kasher_platform --
+    if (!defined('KASHER_PLATFORM_DB_HOST'))     define('KASHER_PLATFORM_DB_HOST', 'localhost');
+    if (!defined('KASHER_PLATFORM_DB_USERNAME')) define('KASHER_PLATFORM_DB_USERNAME', kasher_secret('kasher_platform_db_username', 'KASHER_PLATFORM_DB_USERNAME', 'itsmelevi'));
+    if (!defined('KASHER_PLATFORM_DB_PASSWORD')) define('KASHER_PLATFORM_DB_PASSWORD', kasher_secret('kasher_platform_db_password', 'KASHER_PLATFORM_DB_PASSWORD', 'levi12345'));
+    if (!defined('KASHER_PLATFORM_DB_NAME'))     define('KASHER_PLATFORM_DB_NAME', 'nexoracore_db');
+    if (!defined('KASHER_PLATFORM_DB_CHARSET'))  define('KASHER_PLATFORM_DB_CHARSET', 'utf8mb4');
+
+    // -- kasher_zanyari (kasher_z) --
+    if (!defined('ZANYARI_DB_HOST'))     define('ZANYARI_DB_HOST', 'localhost');
+    if (!defined('ZANYARI_DB_USERNAME')) define('ZANYARI_DB_USERNAME', kasher_secret('zanyari_db_username', 'ZANYARI_DB_USERNAME', 'itsmelevi'));
+    if (!defined('ZANYARI_DB_PASSWORD')) define('ZANYARI_DB_PASSWORD', kasher_secret('zanyari_db_password', 'ZANYARI_DB_PASSWORD', 'levi12345'));
+    if (!defined('ZANYARI_DB_NAME'))     define('ZANYARI_DB_NAME', 'nexoracore_db');
+    if (!defined('ZANYARI_DB_CHARSET'))  define('ZANYARI_DB_CHARSET', 'utf8mb4');
+
+    // -- kasher_logs --
+    if (!defined('KASHER_LOGS_DB_HOST'))     define('KASHER_LOGS_DB_HOST', 'localhost');
+    if (!defined('KASHER_LOGS_DB_USERNAME')) define('KASHER_LOGS_DB_USERNAME', kasher_secret('kasher_logs_db_username', 'KASHER_LOGS_DB_USERNAME', 'itsmelevi'));
+    if (!defined('KASHER_LOGS_DB_PASSWORD')) define('KASHER_LOGS_DB_PASSWORD', kasher_secret('kasher_logs_db_password', 'KASHER_LOGS_DB_PASSWORD', 'levi12345'));
+    if (!defined('KASHER_LOGS_DB_NAME'))     define('KASHER_LOGS_DB_NAME', 'nexoracore_db');
+    if (!defined('KASHER_LOGS_DB_CHARSET'))  define('KASHER_LOGS_DB_CHARSET', 'utf8mb4');
+
+    // -- kasher_media (وێنەکان) --
+    if (!defined('IMAGES_DB_HOST'))     define('IMAGES_DB_HOST', 'localhost');
+    if (!defined('IMAGES_DB_USERNAME')) define('IMAGES_DB_USERNAME', kasher_secret('media_db_username', 'IMAGES_DB_USERNAME', 'itsmelevi'));
+    if (!defined('IMAGES_DB_PASSWORD')) define('IMAGES_DB_PASSWORD', kasher_secret('media_db_password', 'IMAGES_DB_PASSWORD', 'levi12345'));
+    if (!defined('IMAGES_DB_NAME'))     define('IMAGES_DB_NAME', 'nexoracore_db');
+    if (!defined('IMAGES_DB_CHARSET'))  define('IMAGES_DB_CHARSET', 'utf8mb4');
+
+    // -- kasher_media (ڤیدیۆکان — هەمان داتابەیسی media) --
+    if (!defined('VIDEOS_DB_HOST'))     define('VIDEOS_DB_HOST', 'localhost');
+    if (!defined('VIDEOS_DB_USERNAME')) define('VIDEOS_DB_USERNAME', kasher_secret('media_db_username', 'VIDEOS_DB_USERNAME', 'itsmelevi'));
+    if (!defined('VIDEOS_DB_PASSWORD')) define('VIDEOS_DB_PASSWORD', kasher_secret('media_db_password', 'VIDEOS_DB_PASSWORD', 'levi12345'));
+    if (!defined('VIDEOS_DB_NAME'))     define('VIDEOS_DB_NAME', 'nexoracore_db');
+    if (!defined('VIDEOS_DB_CHARSET'))  define('VIDEOS_DB_CHARSET', 'utf8mb4');
+}
 
 /* ---------------------------------------------------------------------------
  * ٤) URL ـی سایت — لۆکاڵ خۆکارانە، سێرڤەر domain ـی ڕاستەقینە
  * ------------------------------------------------------------------------- */
 if (!defined('SITE_URL')) {
-    $scheme = (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off') ? 'https' : 'http';
-    $host   = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? (KASHER_IS_LOCAL ? 'localhost' : '169.58.215.11'));
+    if (KASHER_IS_LOCAL) {
+        $scheme = (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off') ? 'https' : 'http';
+        $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
 
-    // دۆزینەوەی base path خۆکارانە بەپێی شوێنی ئەپەکە لەناو docroot
-    $base = '';
-    if (!empty($_SERVER['DOCUMENT_ROOT'])) {
-        $docroot = str_replace('\\', '/', rtrim($_SERVER['DOCUMENT_ROOT'], '/'));
-        $approot = str_replace('\\', '/', dirname(__DIR__)); // ڕەگی ئەپەکە (config ـی باوان)
-        if ($docroot !== '' && stripos($approot, $docroot) === 0) {
-            $base = substr($approot, strlen($docroot));
+        // دۆزینەوەی base path خۆکارانە بەپێی شوێنی ئەپەکە لەناو docroot
+        $base = '';
+        if (!empty($_SERVER['DOCUMENT_ROOT'])) {
+            $docroot = str_replace('\\', '/', rtrim($_SERVER['DOCUMENT_ROOT'], '/'));
+            $approot = str_replace('\\', '/', dirname(__DIR__)); // ڕەگی ئەپەکە (config ـی باوان)
+            if ($docroot !== '' && stripos($approot, $docroot) === 0) {
+                $base = substr($approot, strlen($docroot));
+            }
         }
-    }
-    if ($base === '' || $base === false) {
-        $base = KASHER_IS_LOCAL ? '/systam/NexoraCore' : '/Ka.sheryAi';
-    }
+        if ($base === '' || $base === false) {
+            $base = '/systam/Kasher'; // fallback بۆ CLI / دۆخی نەزانراو
+        }
 
-    $basePath = trim((string)$base, '/');
-    define('SITE_URL', $scheme . '://' . $host . ($basePath !== '' ? '/' . $basePath : '') . '/');
+        define('SITE_URL', $scheme . '://' . $host . '/' . trim($base, '/') . '/');
+    } else {
+        define('SITE_URL', 'https://kasheryai.com/');
+    }
 }
-
