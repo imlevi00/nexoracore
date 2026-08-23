@@ -3,6 +3,10 @@
  * داشبۆردی بەکارهێنەر - user/dashboard/index.php
  */
 
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
+
 require_once __DIR__ . '/../../config/config.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../config/security.php';
@@ -210,11 +214,12 @@ $stats = [
 
 
 
-// گشتی کاڵاکان
-$result = $conn->query("SELECT COUNT(*) as count FROM products WHERE user_id = $userId");
-if ($result) {
-    $stats['total_products'] = $result->fetch_assoc()['count'];
-}
+// گشتی کاڵاکان و ئامارە سەرەکییەکان
+try {
+    $result = $conn->query("SELECT COUNT(*) as count FROM products WHERE user_id = $userId");
+    if ($result) {
+        $stats['total_products'] = $result->fetch_assoc()['count'];
+    }
 
 // کاڵا کەمەکان
 $result = $conn->query("
@@ -623,162 +628,207 @@ $result = $conn->query("
     FROM sales 
     WHERE user_id = $userId AND final_amount > 0
 ");
-if ($result) {
-    $stats['average_sale_amount'] = $result->fetch_assoc()['avg_sale'] ?? 0;
+    if ($result) {
+        $stats['average_sale_amount'] = $result->fetch_assoc()['avg_sale'] ?? 0;
+    }
+} catch (Throwable $e) {
+    error_log("Dashboard main stats error: " . $e->getMessage());
 }
 
 
 
 // ئامارەکانی کۆمپانیاکان (ماوەی قەرزی ژمێردراو وەک debts.php)
-$companyDebtDrSub = company_remaining_by_id_subquery_sql();
-$companyQuery = "SELECT 
-    COUNT(*) as total_companies,
-    COUNT(CASE WHEN c.status = 'active' THEN 1 END) as active_companies,
-    COALESCE(SUM(dr.remaining), 0) as total_debt,
-    COALESCE(AVG(dr.remaining), 0) as avg_debt
-    FROM companies c
-    LEFT JOIN $companyDebtDrSub dr ON dr.id = c.id
-    WHERE c.user_id = ?";
+$companyStats = ['total_companies' => 0, 'active_companies' => 0, 'total_debt' => 0, 'avg_debt' => 0];
+$debtStats = ['total_transactions' => 0, 'debt_transactions' => 0, 'payment_transactions' => 0, 'monthly_debt' => 0, 'monthly_payments' => 0];
+$recentDebts = [];
+$topDebtors = [];
 
-$companyStmt = $conn->prepare($companyQuery);
-$companyStmt->bind_param("ii", $userId, $userId);
-$companyStmt->execute();
-$companyStats = $companyStmt->get_result()->fetch_assoc();
+try {
+    if (function_exists('company_remaining_by_id_subquery_sql')) {
+        $companyDebtDrSub = company_remaining_by_id_subquery_sql();
+        $companyQuery = "SELECT 
+            COUNT(*) as total_companies,
+            COUNT(CASE WHEN c.status = 'active' THEN 1 END) as active_companies,
+            COALESCE(SUM(dr.remaining), 0) as total_debt,
+            COALESCE(AVG(dr.remaining), 0) as avg_debt
+            FROM companies c
+            LEFT JOIN $companyDebtDrSub dr ON dr.id = c.id
+            WHERE c.user_id = ?";
+
+        $companyStmt = $conn->prepare($companyQuery);
+        if ($companyStmt) {
+            $companyStmt->bind_param("ii", $userId, $userId);
+            $companyStmt->execute();
+            $companyStats = $companyStmt->get_result()->fetch_assoc() ?: $companyStats;
+            $companyStmt->close();
+        }
+    }
+} catch (Throwable $e) {
+    error_log("Dashboard company stats error: " . $e->getMessage());
+}
 
 // ئامارەکانی قەرزەکان (ئەم مانگە)
-$debtQuery = "SELECT 
-    COUNT(*) as total_transactions,
-    COUNT(CASE WHEN type = 'debt' THEN 1 END) as debt_transactions,
-    COUNT(CASE WHEN type = 'payment' THEN 1 END) as payment_transactions,
-    COALESCE(SUM(CASE WHEN type = 'debt' AND MONTH(date) = MONTH(CURDATE()) THEN amount ELSE 0 END), 0) as monthly_debt,
-    COALESCE(SUM(CASE WHEN type = 'payment' AND MONTH(date) = MONTH(CURDATE()) THEN amount ELSE 0 END), 0) as monthly_payments
-    FROM company_debts WHERE user_id = ?";
+try {
+    $debtQuery = "SELECT 
+        COUNT(*) as total_transactions,
+        COUNT(CASE WHEN type = 'debt' THEN 1 END) as debt_transactions,
+        COUNT(CASE WHEN type = 'payment' THEN 1 END) as payment_transactions,
+        COALESCE(SUM(CASE WHEN type = 'debt' AND MONTH(date) = MONTH(CURDATE()) THEN amount ELSE 0 END), 0) as monthly_debt,
+        COALESCE(SUM(CASE WHEN type = 'payment' AND MONTH(date) = MONTH(CURDATE()) THEN amount ELSE 0 END), 0) as monthly_payments
+        FROM company_debts WHERE user_id = ?";
 
-$debtStmt = $conn->prepare($debtQuery);
-$debtStmt->bind_param("i", $userId);
-$debtStmt->execute();
-$debtStats = $debtStmt->get_result()->fetch_assoc();
+    $debtStmt = $conn->prepare($debtQuery);
+    if ($debtStmt) {
+        $debtStmt->bind_param("i", $userId);
+        $debtStmt->execute();
+        $debtStats = $debtStmt->get_result()->fetch_assoc() ?: $debtStats;
+        $debtStmt->close();
+    }
+} catch (Throwable $e) {
+    error_log("Dashboard debt stats error: " . $e->getMessage());
+}
 
 // وەرگرتنی دوایین مامەڵەکانی کۆمپانیاکان
-$recentDebtsQuery = "SELECT cd.*, c.name as company_name 
-                     FROM company_debts cd 
-                     JOIN companies c ON cd.company_id = c.id 
-                     WHERE cd.user_id = ? 
-                     ORDER BY cd.created_at DESC 
-                     LIMIT 5";
+try {
+    $recentDebtsQuery = "SELECT cd.*, c.name as company_name 
+                         FROM company_debts cd 
+                         JOIN companies c ON cd.company_id = c.id 
+                         WHERE cd.user_id = ? 
+                         ORDER BY cd.created_at DESC 
+                         LIMIT 5";
 
-$recentDebtsStmt = $conn->prepare($recentDebtsQuery);
-$recentDebtsStmt->bind_param("i", $userId);
-$recentDebtsStmt->execute();
-$recentDebts = $recentDebtsStmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $recentDebtsStmt = $conn->prepare($recentDebtsQuery);
+    if ($recentDebtsStmt) {
+        $recentDebtsStmt->bind_param("i", $userId);
+        $recentDebtsStmt->execute();
+        $recentDebts = $recentDebtsStmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $recentDebtsStmt->close();
+    }
+} catch (Throwable $e) {
+    error_log("Dashboard recent debts error: " . $e->getMessage());
+}
 
 // کۆمپانیا قەرزدارەکان (بەپێی ماوەی قەرزی ژمێردراو)
-$debtorQuery = "SELECT c.name, dr.remaining AS debt_amount, c.phone 
-                FROM companies c
-                INNER JOIN $companyDebtDrSub dr ON dr.id = c.id
-                WHERE c.user_id = ? AND dr.remaining > 0 
-                ORDER BY dr.remaining DESC 
-                LIMIT 5";
+try {
+    if (function_exists('company_remaining_by_id_subquery_sql')) {
+        $companyDebtDrSub = company_remaining_by_id_subquery_sql();
+        $debtorQuery = "SELECT c.name, dr.remaining AS debt_amount, c.phone 
+                        FROM companies c
+                        INNER JOIN $companyDebtDrSub dr ON dr.id = c.id
+                        WHERE c.user_id = ? AND dr.remaining > 0 
+                        ORDER BY dr.remaining DESC 
+                        LIMIT 5";
 
-$debtorStmt = $conn->prepare($debtorQuery);
-$debtorStmt->bind_param("ii", $userId, $userId);
-$debtorStmt->execute();
-$topDebtors = $debtorStmt->get_result()->fetch_all(MYSQLI_ASSOC);
-
-
+        $debtorStmt = $conn->prepare($debtorQuery);
+        if ($debtorStmt) {
+            $debtorStmt->bind_param("ii", $userId, $userId);
+            $debtorStmt->execute();
+            $topDebtors = $debtorStmt->get_result()->fetch_all(MYSQLI_ASSOC);
+            $debtorStmt->close();
+        }
+    }
+} catch (Throwable $e) {
+    error_log("Dashboard top debtors error: " . $e->getMessage());
+}
 
 // ئاماری وەسڵە کڕدراوەکان
-$purchaseStats = [];
+$purchaseStats = [
+    'today_purchases' => 0,
+    'today_amount' => 0,
+    'monthly_count' => 0,
+    'monthly_amount' => 0,
+    'total_suppliers' => 0,
+    'total_products_purchased' => 0,
+    'total_purchase_amount' => 0,
+    'avg_receipt_amount' => 0
+];
 
-// کڕینی ئەمڕۆ
-$stmt = $conn->prepare("
-    SELECT COUNT(*) as count, COALESCE(SUM(final_amount), 0) as total
-    FROM purchase_receipts 
-    WHERE user_id = ? AND DATE(receipt_date) = CURDATE()
-");
-$stmt->bind_param("i", $userId);
-$stmt->execute();
-$todayPurchases = $stmt->get_result()->fetch_assoc();
-$purchaseStats['today_purchases'] = $todayPurchases['count'];
-$purchaseStats['today_amount'] = $todayPurchases['total'];
+try {
+    // کڕینی ئەمڕۆ
+    $stmt = $conn->prepare("
+        SELECT COUNT(*) as count, COALESCE(SUM(final_amount), 0) as total
+        FROM purchase_receipts 
+        WHERE user_id = ? AND DATE(receipt_date) = CURDATE()
+    ");
+    if ($stmt) {
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $todayPurchases = $stmt->get_result()->fetch_assoc();
+        if ($todayPurchases) {
+            $purchaseStats['today_purchases'] = $todayPurchases['count'];
+            $purchaseStats['today_amount'] = $todayPurchases['total'];
+        }
+        $stmt->close();
+    }
 
-// کڕینی مانگانە
-$stmt = $conn->prepare("
-    SELECT COUNT(*) as count, COALESCE(SUM(final_amount), 0) as total
-    FROM purchase_receipts 
-    WHERE user_id = ? AND YEAR(receipt_date) = YEAR(CURDATE()) AND MONTH(receipt_date) = MONTH(CURDATE())
-");
-$stmt->bind_param("i", $userId);
-$stmt->execute();
-$monthlyPurchases = $stmt->get_result()->fetch_assoc();
-$purchaseStats['monthly_count'] = $monthlyPurchases['count'];
-$purchaseStats['monthly_amount'] = $monthlyPurchases['total'];
+    // کڕینی مانگانە
+    $stmt = $conn->prepare("
+        SELECT COUNT(*) as count, COALESCE(SUM(final_amount), 0) as total
+        FROM purchase_receipts 
+        WHERE user_id = ? AND YEAR(receipt_date) = YEAR(CURDATE()) AND MONTH(receipt_date) = MONTH(CURDATE())
+    ");
+    if ($stmt) {
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $monthlyPurchases = $stmt->get_result()->fetch_assoc();
+        if ($monthlyPurchases) {
+            $purchaseStats['monthly_count'] = $monthlyPurchases['count'];
+            $purchaseStats['monthly_amount'] = $monthlyPurchases['total'];
+        }
+        $stmt->close();
+    }
 
-// ژمارەی کۆمپانیاکان کە وەسڵیان لەگەڵ هەیە
-$stmt = $conn->prepare("
-    SELECT COUNT(DISTINCT company_id) as count
-    FROM purchase_receipts 
-    WHERE user_id = ?
-");
-$stmt->bind_param("i", $userId);
-$stmt->execute();
-$result = $stmt->get_result()->fetch_assoc();
-$purchaseStats['total_suppliers'] = $result['count'];
+    // ژمارەی کۆمپانیاکان
+    $stmt = $conn->prepare("SELECT COUNT(DISTINCT company_id) as count FROM purchase_receipts WHERE user_id = ?");
+    if ($stmt) {
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $resSupplier = $stmt->get_result()->fetch_assoc();
+        if ($resSupplier) $purchaseStats['total_suppliers'] = $resSupplier['count'];
+        $stmt->close();
+    }
 
-// کۆی گشتی کاڵا کڕدراوەکان
-$stmt = $conn->prepare("
-    SELECT COUNT(*) as count
-    FROM purchase_receipt_items pri
-    INNER JOIN purchase_receipts pr ON pri.purchase_receipt_id = pr.id
-    WHERE pr.user_id = ?
-");
-$stmt->bind_param("i", $userId);
-$stmt->execute();
-$result = $stmt->get_result()->fetch_assoc();
-$purchaseStats['total_products_purchased'] = $result['count'];
+    // کۆی کڕین
+    $stmt = $conn->prepare("SELECT COALESCE(SUM(final_amount), 0) as total, COALESCE(AVG(final_amount), 0) as avg FROM purchase_receipts WHERE user_id = ?");
+    if ($stmt) {
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $totPurchases = $stmt->get_result()->fetch_assoc();
+        if ($totPurchases) {
+            $purchaseStats['total_purchase_amount'] = $totPurchases['total'];
+            $purchaseStats['avg_receipt_amount'] = $totPurchases['avg'];
+        }
+        $stmt->close();
+    }
+} catch (Throwable $e) {
+    error_log("Dashboard purchases stats error: " . $e->getMessage());
+}
 
-// کۆی گشتی بڕی کڕین
-$stmt = $conn->prepare("
-    SELECT COALESCE(SUM(final_amount), 0) as total, COALESCE(AVG(final_amount), 0) as avg
-    FROM purchase_receipts 
-    WHERE user_id = ?
-");
-$stmt->bind_param("i", $userId);
-$stmt->execute();
-$totalPurchases = $stmt->get_result()->fetch_assoc();
-$purchaseStats['total_purchase_amount'] = $totalPurchases['total'];
-$purchaseStats['avg_receipt_amount'] = $totalPurchases['avg'];
+// ئاماری دەفتەری تێبینی
+$stats['notebook_topics'] = 0;
+$stats['notebook_entries'] = 0;
+$stats['today_entries'] = 0;
+$stats['favorite_entries'] = 0;
 
+try {
+    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM notebook_topics WHERE user_id = ?");
+    if ($stmt) {
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $stats['notebook_topics'] = $stmt->get_result()->fetch_assoc()['count'] ?? 0;
+        $stmt->close();
+    }
 
-
-// آمار دفتر الملاحظات
-$stmt = $conn->prepare("SELECT COUNT(*) as count FROM notebook_topics WHERE user_id = ?");
-$stmt->bind_param("i", $userId);
-$stmt->execute();
-$stats['notebook_topics'] = $stmt->get_result()->fetch_assoc()['count'];
-
-$stmt = $conn->prepare("SELECT COUNT(*) as count FROM notebook_entries WHERE user_id = ? AND is_archived = 0");
-$stmt->bind_param("i", $userId);
-$stmt->execute();
-$stats['notebook_entries'] = $stmt->get_result()->fetch_assoc()['count'];
-
-$stmt = $conn->prepare("
-    SELECT COUNT(*) as count 
-    FROM notebook_entries 
-    WHERE user_id = ? AND is_archived = 0 AND created_at >= CURDATE()
-");
-$stmt->bind_param("i", $userId);
-$stmt->execute();
-$stats['today_entries'] = $stmt->get_result()->fetch_assoc()['count'];
-
-$stmt = $conn->prepare("
-    SELECT COUNT(*) as count 
-    FROM notebook_entries 
-    WHERE user_id = ? AND is_archived = 0 AND is_favorite = 1
-");
-$stmt->bind_param("i", $userId);
-$stmt->execute();
-$stats['favorite_entries'] = $stmt->get_result()->fetch_assoc()['count'];
+    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM notebook_entries WHERE user_id = ? AND is_archived = 0");
+    if ($stmt) {
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $stats['notebook_entries'] = $stmt->get_result()->fetch_assoc()['count'] ?? 0;
+        $stmt->close();
+    }
+} catch (Throwable $e) {
+    error_log("Dashboard notebook stats error: " . $e->getMessage());
+}
 
 
 
