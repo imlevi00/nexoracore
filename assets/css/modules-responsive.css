@@ -1,0 +1,457 @@
+/**
+ * Notebooks, Companies, Employees, Chatbot, Settings modules
+ * Mobile & tablet responsive — layout and touch targets only.
+ */
+
+/* ========== Shared hub-module layout ========== */
+.notebooks-module-page,
+.companies-module-page,
+.employees-module-page,
+.chatbot-module-page,
+.settings-module-page {
+    -webkit-text-size-adjust: 100%;
+    min-height: 100dvh;
+}
+
+.hub-page-content,
+.notebooks-module-page > .container-fluid,
+.notebooks-module-page > .container,
+.companies-module-page > .container-fluid,
+.companies-module-page > .container,
+.employees-module-page > .container-fluid,
+.employees-module-page > .container,
+.settings-module-page > .container-fluid,
+.settings-module-page > .container {
+    position: relative;
+    z-index: 1;
+}
+
+@media (max-width: 767.98px) {
+    .notebooks-module-page .container-fluid,
+    .companies-module-page .container-fluid,
+    .employees-module-page .container-fluid,
+    .settings-module-page .container-fluid,
+    .hub-page-content {
+        padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
+        padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
+        padding-top: 1rem !important;
+        padding-bottom: 1.25rem !important;
+    }
+
+    .notebooks-module-page > .container,
+    .companies-module-page > .container,
+    .employees-module-page > .container,
+    .settings-module-page > .container {
+        padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
+        padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
+    }
+
+    .hub-page-header,
+    .notebooks-module-page .d-flex.justify-content-between.align-items-center,
+    .companies-module-page .d-flex.justify-content-between.align-items-center,
+    .employees-module-page .d-flex.justify-content-between.align-items-center,
+    .settings-module-page .d-flex.justify-content-between.align-items-center {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 0.75rem;
+    }
+
+    .hub-page-header h1,
+    .hub-page-header h2,
+    .hub-page-header .h3,
+    .hub-page-header .h4,
+    .notebooks-module-page .notebook-header h1 {
+        font-size: 1.35rem;
+    }
+
+    .hub-page-header-actions,
+    .hub-page-header .btn,
+    .notebooks-module-page .d-flex.gap-2,
+    .companies-module-page .d-flex.gap-2,
+    .employees-module-page .d-flex.gap-2 {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.5rem !important;
+    }
+
+    .hub-page-header .btn,
+    .hub-page-header-actions .btn,
+    .notebooks-module-page .d-flex.gap-2 .btn,
+    .companies-module-page .d-flex.gap-2 .btn,
+    .employees-module-page .d-flex.gap-2 .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .notebooks-module-page .row.g-3 > [class*="col-"],
+    .notebooks-module-page .row.g-4 > [class*="col-"],
+    .companies-module-page .row.g-3 > [class*="col-"],
+    .employees-module-page .row.g-3 > [class*="col-"],
+    .settings-module-page .row.g-3 > [class*="col-"],
+    .settings-module-page .row.mb-4 > [class*="col-"] {
+        margin-bottom: 0.65rem;
+    }
+
+    .notebooks-module-page .table-responsive,
+    .companies-module-page .table-responsive,
+    .employees-module-page .table-responsive,
+    .settings-module-page .table-responsive {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .notebooks-module-page .modal-dialog,
+    .companies-module-page .modal-dialog,
+    .employees-module-page .modal-dialog,
+    .settings-module-page .modal-dialog {
+        margin: 0.75rem;
+        max-width: calc(100vw - 1.5rem);
+    }
+
+    .settings-module-page .settings-nav-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* ========== Hub cards (main.php pages) ========== */
+@media (max-width: 767.98px) {
+    .companies-hub-page h2,
+    .employees-hub-page h2,
+    .settings-hub-page h2 {
+        font-size: 1.45rem;
+    }
+
+    .companies-hub-page .dashboard-card,
+    .employees-hub-page .dashboard-card,
+    .settings-hub-page .dashboard-card {
+        min-height: 130px;
+    }
+
+    .companies-hub-page .dashboard-card h6,
+    .employees-hub-page .dashboard-card h6,
+    .settings-hub-page .dashboard-card h6 {
+        font-size: 0.92rem !important;
+        line-height: 1.35;
+    }
+
+    .companies-hub-page .card-icon,
+    .employees-hub-page .card-icon,
+    .settings-hub-page .card-icon {
+        width: 52px !important;
+        height: 52px !important;
+        font-size: 24px !important;
+        margin-bottom: 0.5rem !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .companies-hub-page .dashboard-card-wrapper,
+    .employees-hub-page .dashboard-card-wrapper,
+    .settings-hub-page .dashboard-card-wrapper {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        padding: 0.35rem !important;
+    }
+
+    .companies-hub-page .dashboard-card:hover,
+    .employees-hub-page .dashboard-card:hover,
+    .settings-hub-page .dashboard-card:hover {
+        transform: none;
+    }
+
+    .companies-hub-page a.text-decoration-none,
+    .employees-hub-page a.text-decoration-none,
+    .settings-hub-page a.text-decoration-none {
+        display: block;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0.08);
+    }
+}
+
+/* ========== Notebooks ========== */
+@media (max-width: 767.98px) {
+    .notebooks-module-page .notebook-header {
+        padding: 1.25rem !important;
+        border-radius: 12px !important;
+        margin-bottom: 1.25rem !important;
+    }
+
+    .notebooks-module-page .notebook-header .row {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .notebooks-module-page .notebook-header .col-md-4 {
+        text-align: start !important;
+    }
+
+    .notebooks-module-page .notebook-header .btn-lg {
+        width: 100%;
+        padding: 0.65rem 1rem;
+        font-size: 1rem;
+    }
+
+    .notebooks-module-page .topic-card {
+        margin-bottom: 0.5rem;
+    }
+
+    .notebooks-module-page .topic-card:hover {
+        transform: none;
+    }
+
+    .notebooks-module-page .stats-card {
+        padding: 1rem !important;
+        margin-bottom: 0.5rem;
+    }
+
+    .notebooks-module-page .entry-table {
+        min-width: 560px;
+        font-size: 0.85rem;
+    }
+}
+
+/* ========== Companies ========== */
+@media (min-width: 576px) and (max-width: 991.98px) {
+    .companies-list-page .companies-list-table {
+        min-width: 720px;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .companies-list-page .companies-filter-card .row > [class*="col-"] {
+        margin-bottom: 0.5rem;
+    }
+
+    .companies-list-page .card-header.d-flex {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 0.5rem;
+    }
+
+    .companies-list-page .card-header .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .companies-list-page .table-responsive {
+        overflow: visible;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .companies-list-page .companies-list-table {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        border: 0;
+        font-size: 0.9rem;
+    }
+
+    .companies-list-page .companies-list-table thead {
+        display: none;
+    }
+
+    .companies-list-page .companies-list-table tbody {
+        display: block;
+        width: 100%;
+    }
+
+    .companies-list-page .companies-list-table tbody tr {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid var(--border-default, #dee2e6);
+        border-radius: 0.65rem;
+        padding: 0.75rem 0.85rem;
+        margin-bottom: 0.65rem;
+        background: var(--bs-body-bg, #fff);
+    }
+
+    .companies-list-page .companies-list-table tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 0.75rem;
+        width: 100%;
+        box-sizing: border-box;
+        text-align: start !important;
+        border: none;
+        padding: 0.35rem 0;
+        background: transparent;
+        white-space: normal;
+    }
+
+    .companies-list-page .companies-list-table tbody td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--text-secondary, #6c757d);
+        flex: 0 0 40%;
+        font-size: 0.78rem;
+    }
+
+    .companies-list-page .companies-list-table tbody td.companies-actions-cell {
+        flex-direction: column;
+        align-items: stretch !important;
+        padding-top: 0.55rem;
+        gap: 0.5rem;
+    }
+
+    .companies-list-page .companies-list-table tbody td.companies-actions-cell::before {
+        margin-bottom: 0.15rem;
+    }
+
+    .companies-list-page .companies-list-table tbody td.companies-actions-cell .btn,
+    .companies-list-page .companies-list-table tbody td.companies-actions-cell .dropdown {
+        width: 100%;
+    }
+
+    .companies-list-page .companies-list-table tbody td.companies-actions-cell .dropdown .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    html[data-bs-theme='dark'] .companies-list-page .companies-list-table tbody tr {
+        border-color: #374151;
+        background: #111827;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .companies-debts-page .companies-debts-table,
+    .companies-debts-page .debts-table {
+        min-width: 680px;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .employees-list-page .page-header .d-flex {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 0.75rem;
+    }
+
+    .employees-list-page .page-header .text-end {
+        text-align: start !important;
+    }
+
+    .employees-list-page .chart-container {
+        padding: 1rem !important;
+    }
+
+    .employees-list-page .employee-card {
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* ========== Employees ========== */
+@media (max-width: 991.98px) {
+    .employees-list-page .employees-stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .employees-manage-page .employees-manage-table {
+        min-width: 640px;
+        font-size: 0.85rem;
+    }
+
+    .employees-sales-page .employees-sales-table {
+        min-width: 680px;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .employees-list-page .stat-card {
+        margin-bottom: 0.75rem;
+    }
+}
+
+/* ========== Chatbot AI ========== */
+@media (max-width: 767.98px) {
+    .chatbot-module-page .chat-container {
+        height: 100dvh;
+        max-height: 100dvh;
+    }
+
+    .chatbot-module-page .sidebar {
+        width: min(280px, 88vw);
+        right: -100%;
+    }
+
+    .chatbot-module-page .sidebar.active {
+        right: 0;
+        box-shadow: -4px 0 24px rgba(0, 0, 0, 0.35);
+    }
+
+    .chatbot-module-page .main-chat {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .chatbot-module-page .chat-header {
+        padding: 0.75rem 1rem !important;
+    }
+
+    .chatbot-module-page .messages-container {
+        padding: 0.75rem !important;
+    }
+
+    .chatbot-module-page .input-container {
+        padding: 0.65rem max(0.75rem, env(safe-area-inset-left, 0px)) max(0.75rem, env(safe-area-inset-bottom, 0px)) !important;
+    }
+
+    .chatbot-module-page .section-buttons {
+        grid-template-columns: 1fr !important;
+    }
+
+    .chatbot-module-page .mobile-menu-btn {
+        display: flex !important;
+    }
+}
+
+/* ========== Settings detail page ========== */
+@media (max-width: 767.98px) {
+    .settings-detail-page .card .row > [class*="col-md-"],
+    .settings-detail-page .card .row > [class*="col-lg-"] {
+        margin-bottom: 0.75rem;
+    }
+
+    .settings-detail-page .logo-preview-wrap {
+        max-width: 100%;
+    }
+
+    .exchange-page .exchange-card .row > [class*="col-"] {
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* ========== Full width ========== */
+@media (max-width: 767.98px) {
+    .notebooks-module-page,
+    .companies-module-page,
+    .employees-module-page,
+    .settings-module-page {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* ========== Touch ========== */
+@media (hover: none) and (pointer: coarse) {
+    .companies-hub-page .dashboard-card:hover,
+    .employees-hub-page .dashboard-card:hover,
+    .settings-hub-page .dashboard-card:hover,
+    .notebooks-module-page .topic-card:hover {
+        transform: none;
+    }
+
+    .notebooks-module-page .btn,
+    .companies-module-page .btn,
+    .employees-module-page .btn,
+    .settings-module-page .btn {
+        min-height: 44px;
+    }
+}

@@ -1,0 +1,84 @@
+/*
+ * Ka.sheryAi app landing (index.php) — slim fancy
+ */
+.landing-app-hero {
+  padding: var(--space-6, 1.5rem) var(--space-5, 1.25rem);
+  border-radius: var(--radius-lg, 14px);
+  background: var(--glass-bg, rgba(255, 255, 255, 0.72));
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--box-shadow);
+  margin-bottom: var(--space-5, 1.25rem);
+  position: relative;
+  overflow: hidden;
+}
+
+.landing-app-hero::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--gradient-primary);
+}
+
+.landing-app-hero h1 {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--space-2, 0.5rem);
+}
+
+.landing-app-hero p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.landing-app-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3, 0.75rem);
+  margin-top: var(--space-4, 1rem);
+}
+
+.landing-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-3, 0.75rem);
+}
+
+.landing-feature {
+  padding: var(--space-4, 1rem);
+  background: var(--surface-1);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg, 14px);
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.landing-feature:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+
+.landing-feature i {
+  font-size: 1.35rem;
+  color: var(--brand);
+  margin-bottom: var(--space-2, 0.5rem);
+  display: block;
+}
+
+.landing-feature h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.landing-feature p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}

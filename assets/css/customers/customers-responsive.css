@@ -1,0 +1,365 @@
+/**
+ * Customers module — mobile & tablet responsive
+ * Layout and touch targets only; no logic changes.
+ */
+
+/* ========== Shared layout ========== */
+.customers-module-page {
+    -webkit-text-size-adjust: 100%;
+    min-height: 100dvh;
+}
+
+.customers-module-page .customers-page-content,
+.customers-module-page > .container-fluid,
+.customers-module-page .container-fluid:first-of-type {
+    position: relative;
+    z-index: 1;
+}
+
+@media (max-width: 767.98px) {
+    .customers-module-page .container-fluid,
+    .customers-module-page .customers-page-content {
+        padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
+        padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
+        padding-top: 1rem !important;
+        padding-bottom: 1.25rem !important;
+    }
+
+    .customers-module-page > .container {
+        padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
+        padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
+    }
+
+    .customers-module-page .customers-page-header,
+    .customers-module-page .d-flex.justify-content-between.align-items-center.mb-4,
+    .customers-module-page .page-title-box {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 0.75rem;
+    }
+
+    .customers-module-page .customers-page-header h1,
+    .customers-module-page .customers-page-header h2,
+    .customers-module-page .customers-page-header .h3,
+    .customers-module-page .d-flex.justify-content-between.align-items-center.mb-4 h1,
+    .customers-module-page .page-title {
+        font-size: 1.35rem;
+        margin-bottom: 0;
+    }
+
+    .customers-module-page .customers-page-header-actions,
+    .customers-module-page .d-flex.justify-content-between.align-items-center.mb-4 > .d-flex,
+    .customers-module-page .d-flex.justify-content-between.align-items-center.mb-4 > .d-flex.gap-2 {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.5rem !important;
+    }
+
+    .customers-module-page .customers-page-header .btn,
+    .customers-module-page .d-flex.justify-content-between.align-items-center.mb-4 .btn,
+    .customers-module-page .page-title-right .breadcrumb {
+        width: 100%;
+    }
+
+    .customers-module-page .d-flex.justify-content-between.align-items-center.mb-4 .btn,
+    .customers-module-page .page-title-box .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .customers-module-page .row.g-3 > [class*="col-"],
+    .customers-module-page .row.mb-4 > [class*="col-"] {
+        margin-bottom: 0.65rem;
+    }
+
+    .customers-module-page .card-body .row.g-3 > [class*="col-"],
+    .customers-module-page .card-body .row > [class*="col-md-"],
+    .customers-module-page .card-body .row > [class*="col-lg-"] {
+        margin-bottom: 0.5rem;
+    }
+
+    .customers-module-page .table-responsive {
+        -webkit-overflow-scrolling: touch;
+        margin: 0 -0.25rem;
+        padding: 0 0.25rem;
+    }
+
+    .customers-module-page .pagination {
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        justify-content: center;
+    }
+
+    .customers-module-page .modal-dialog {
+        margin: 0.75rem;
+    }
+
+    .customers-module-page .modal-dialog.modal-lg,
+    .customers-module-page .modal-dialog.modal-xl {
+        max-width: calc(100vw - 1.5rem);
+    }
+
+    .customers-module-page .btn-group,
+    .customers-module-page .customers-row-actions {
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        justify-content: center;
+    }
+
+    .customers-module-page .page-title-right {
+        order: 2;
+        width: 100%;
+    }
+
+    .customers-module-page .page-title-box .page-title {
+        order: 1;
+    }
+}
+
+/* ========== Navbar ========== */
+@media (max-width: 991.98px) {
+    .customers-module-page .customers-module-navbar .navbar-brand {
+        font-size: 1rem;
+        max-width: calc(100% - 3.5rem);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .customers-module-page .customers-module-navbar .navbar-collapse {
+        padding: 0.65rem 0.5rem 0.25rem;
+        margin-top: 0.35rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .customers-module-page .customers-module-navbar .navbar-nav {
+        gap: 0.15rem;
+    }
+
+    .customers-module-page .customers-module-navbar .nav-link {
+        padding: 0.55rem 0.75rem;
+        border-radius: 0.5rem;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+
+    .customers-module-page .customers-module-navbar .nav-link:hover,
+    .customers-module-page .customers-module-navbar .nav-link:focus {
+        background: rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* ========== Hub (main.php) ========== */
+@media (max-width: 767.98px) {
+    .customers-hub-page .row.mb-4 .d-flex {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 0.5rem;
+    }
+
+    .customers-hub-page h2 {
+        font-size: 1.45rem;
+    }
+
+    .customers-hub-page .dashboard-card {
+        min-height: 130px;
+    }
+
+    .customers-hub-page .dashboard-card h6 {
+        font-size: 0.88rem !important;
+        line-height: 1.35;
+    }
+
+    .customers-hub-page .card-icon {
+        width: 48px !important;
+        height: 48px !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    .customers-hub-page .card-icon i {
+        font-size: 22px !important;
+        line-height: 48px !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .customers-hub-page .dashboard-card-wrapper {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        padding: 0.35rem !important;
+    }
+
+    .customers-hub-page .dashboard-card {
+        min-height: 118px;
+        padding: 1rem !important;
+    }
+
+    .customers-hub-page .dashboard-card:hover {
+        transform: none;
+    }
+
+    .customers-hub-page a.text-decoration-none {
+        display: block;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0.08);
+    }
+}
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+    .customers-hub-page .dashboard-card-wrapper {
+        flex: 0 0 50% !important;
+        max-width: 50% !important;
+    }
+}
+
+/* ========== Customer list (index.php) ========== */
+@media (max-width: 991.98px) {
+    .customers-list-page .customers-list-table {
+        min-width: 780px;
+        font-size: 0.85rem;
+    }
+
+    .customers-list-page .customers-list-table th,
+    .customers-list-page .customers-list-table td {
+        vertical-align: middle;
+    }
+
+    .customers-list-page .border-left-primary,
+    .customers-list-page .border-left-success,
+    .customers-list-page .border-left-info,
+    .customers-list-page .border-left-warning {
+        border-left-width: 0.2rem !important;
+    }
+}
+
+/* ========== Regions ========== */
+@media (max-width: 767.98px) {
+    .customers-regions-page .region-card .btn-group {
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .customers-regions-page .region-card .btn-group .btn {
+        flex: 1 1 auto;
+    }
+}
+
+/* ========== History ========== */
+@media (max-width: 767.98px) {
+    .customers-history-page .history-filter-card .row > [class*="col-"] {
+        margin-bottom: 0.5rem;
+    }
+
+    .customers-history-page .details-table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .customers-history-page .details-table {
+        min-width: 520px;
+        font-size: 0.85rem;
+    }
+}
+
+/* ========== Money debts / credit sales ========== */
+@media (max-width: 991.98px) {
+    .customers-debts-page .customers-debts-table {
+        min-width: 720px;
+        font-size: 0.85rem;
+    }
+
+    .customers-debts-page #transactionFormContainer .row > [class*="col-"] {
+        margin-bottom: 0.65rem;
+    }
+}
+
+/* ========== Cash purchases ========== */
+@media (max-width: 991.98px) {
+    .customers-cash-page .customers-cash-table {
+        min-width: 680px;
+        font-size: 0.85rem;
+    }
+}
+
+/* ========== Account statement ========== */
+@media (max-width: 767.98px) {
+    .customers-statement-page.statement-customer-page .statement-type-filters {
+        flex-wrap: wrap;
+        gap: 0.35rem;
+    }
+
+    .customers-statement-page .statement-type-filters .form-check {
+        flex: 1 1 calc(50% - 0.35rem);
+        min-width: 0;
+    }
+
+    .customers-statement-page #transactionsTable {
+        min-width: 640px;
+        font-size: 0.82rem;
+    }
+
+    .customers-statement-page .statement-print1-sheet {
+        overflow-x: auto;
+    }
+
+    .customers-statement-page .page-title-box + .row .col-md-3,
+    .customers-statement-page .page-title-box + .row .col-lg-3 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .customers-statement-page .statement-type-filters .form-check {
+        flex: 1 1 100%;
+    }
+
+    .customers-statement-page .btn-toolbar,
+    .customers-statement-page .d-flex.gap-2.flex-wrap {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .customers-statement-page .btn-toolbar .btn,
+    .customers-statement-page .d-flex.gap-2.flex-wrap .btn {
+        width: 100%;
+    }
+}
+
+/* ========== Print preview ========== */
+@media (max-width: 767.98px) {
+    .customers-print-page .container {
+        padding-left: max(0.5rem, env(safe-area-inset-left, 0px));
+        padding-right: max(0.5rem, env(safe-area-inset-right, 0px));
+    }
+}
+
+/* ========== Touch devices ========== */
+@media (hover: none) and (pointer: coarse) {
+    .customers-hub-page .dashboard-card:hover {
+        transform: none;
+    }
+
+    .customers-module-page .card:hover {
+        transform: none;
+    }
+
+    .customers-module-page .btn,
+    .customers-module-page .nav-link,
+    .customers-module-page .dashboard-card {
+        min-height: 44px;
+    }
+}
+
+/* Full-width on mobile — avoid narrow centered column feel */
+@media (max-width: 767.98px) {
+    .customers-module-page.customers-page {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .customers-module-page .container-fluid {
+        max-width: 100%;
+    }
+}

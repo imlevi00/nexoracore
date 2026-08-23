@@ -1,0 +1,26 @@
+[2026-08-18 13:16:14] [INFO] Main user login successful: demo@kashery.local from IP: ::1
+[2026-08-18 15:13:24] [INFO] Main user login successful: demo@kashery.local from IP: ::1
+[2026-08-18 15:19:10] [INFO] Theme mode updated by user demo@kashery.local: light
+[2026-08-18 15:20:43] [INFO] Sub-user deleted: amir_staff by main user: demo@kashery.local
+[2026-08-18 15:25:52] [INFO] Customer updated: ahmad (ID: 4) by user: demo@kashery.local
+[2026-08-18 15:26:03] [INFO] Customer updated: mhamad (ID: 5) by user: demo@kashery.local
+[2026-08-18 15:26:11] [INFO] Customer updated: salman (ID: 6) by user: demo@kashery.local
+[2026-08-18 15:26:54] [INFO] Debt payment: 2000 for debt ID: 2 by user: demo@kashery.local
+[2026-08-18 15:30:57] [INFO] Main user login successful: demo@kashery.local from IP: ::1
+[2026-08-18 15:31:08] [INFO] Theme mode updated by user demo@kashery.local: light
+[2026-08-18 15:31:19] [INFO] Business type updated by user demo@kashery.local: 3
+[2026-08-18 15:34:53] [INFO] User logout: demo@kashery.local from IP: ::1
+[2026-08-18 15:41:22] [INFO] Main user login successful: demo@kashery.local from IP: ::1
+[2026-08-18 15:41:50] [INFO] User logout: demo@kashery.local from IP: ::1
+[2026-08-18 15:42:38] [INFO] Main user login successful: demo@kashery.local from IP: ::1
+[2026-08-18 15:42:45] [INFO] Theme mode updated by user demo@kashery.local: light
+[2026-08-18 15:43:39] [INFO] Sale created: Invoice INV-20260818-3471-198934, Amount: 19000 by user: demo@kashery.local
+[2026-08-18 15:46:29] [INFO] Product added: فاسۆلیا (ID: 15) with units by user: demo@kashery.local
+[2026-08-18 15:48:37] [INFO] Debt payment: 10000 for debt ID: 1 by user: demo@kashery.local
+[2026-08-18 17:53:11] [INFO] Main user login successful: demo@kashery.local from IP: ::1
+[2026-08-18 17:53:17] [INFO] User logout: demo@kashery.local from IP: ::1
+[2026-08-18 17:53:40] [INFO] Main user login successful: demo@kashery.local from IP: ::1
+[2026-08-18 17:53:49] [INFO] Theme mode updated by user demo@kashery.local: light
+[2026-08-18 17:54:26] [INFO] Sale created: Invoice INV-20260818-8143-668717, Amount: 18000 by user: demo@kashery.local
+[2026-08-18 17:57:16] [INFO] Main user login successful: demo@kashery.local from IP: ::1
+[2026-08-18 17:57:24] [INFO] Theme mode updated by user demo@kashery.local: light

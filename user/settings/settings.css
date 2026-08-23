@@ -1,0 +1,309 @@
+/* Settings Page Custom Styles */
+
+.settings-page {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+}
+
+.settings-card {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.settings-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.settings-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    color: white;
+    margin: 0 auto 20px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.section-business {
+    background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.section-security {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+}
+
+.section-info {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+}
+
+.form-control {
+    border-radius: 15px;
+    border: 2px solid #e9ecef;
+    padding: 12px 20px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    transform: translateY(-2px);
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 8px;
+}
+
+.btn-save {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border: none;
+    color: white;
+    padding: 12px 40px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+.btn-save:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+    color: white;
+}
+
+.btn-danger-custom {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    border: none;
+    color: white;
+    padding: 12px 40px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+}
+
+.btn-danger-custom:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(220, 53, 69, 0.4);
+    color: white;
+}
+
+.btn-excel {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border: none;
+    color: white;
+    padding: 12px 40px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+.btn-excel:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+    color: white;
+}
+
+.btn-pdf {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    border: none;
+    color: white;
+    padding: 12px 40px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+}
+
+.btn-pdf:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(220, 53, 69, 0.4);
+    color: white;
+}
+
+.info-item {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 15px;
+    border-left: 5px solid #28a745;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.info-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.info-label {
+    font-weight: 700;
+    color: #495057;
+    margin-bottom: 8px;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-value {
+    color: #6c757d;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.alert {
+    border-radius: 15px;
+    border: none;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+    color: #155724;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+    color: #721c24;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 20px;
+}
+
+.navbar-brand:hover {
+    transform: translateX(-3px);
+    transition: all 0.3s ease;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .settings-card {
+        margin-bottom: 20px;
+    }
+    
+    .settings-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+    }
+    
+    .btn-save, .btn-danger-custom {
+        padding: 10px 30px;
+        font-size: 14px;
+    }
+    
+    .info-item {
+        padding: 15px;
+    }
+}
+
+/* Animation for page load */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.settings-card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.settings-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.settings-card:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #20c997, #28a745);
+}
+
+html[data-bs-theme='dark'] .settings-page {
+    background: linear-gradient(135deg, #0b1220 0%, #111827 100%);
+}
+
+html[data-bs-theme='dark'] .settings-card {
+    background: rgba(17, 24, 39, 0.95);
+    color: #e5e7eb;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+html[data-bs-theme='dark'] .form-control {
+    background: #1f2937;
+    color: #f3f4f6;
+    border-color: #4b5563;
+}
+
+html[data-bs-theme='dark'] .form-label,
+html[data-bs-theme='dark'] .info-label {
+    color: #d1d5db;
+}
+
+html[data-bs-theme='dark'] .info-item {
+    background: linear-gradient(135deg, #111827, #1f2937);
+    border-color: #374151;
+}
+
+html[data-bs-theme='dark'] .info-value,
+html[data-bs-theme='dark'] .text-muted {
+    color: #9ca3af !important;
+}
+
+html[data-bs-theme='dark'] .alert-success {
+    background: linear-gradient(135deg, #0f2e22, #14532d);
+    color: #bbf7d0;
+}
+
+html[data-bs-theme='dark'] .alert-danger {
+    background: linear-gradient(135deg, #3b1016, #4c1d1d);
+    color: #fecaca;
+}
+
+html[data-bs-theme='dark'] ::-webkit-scrollbar-track {
+    background: #111827;
+}
+
+html[data-bs-theme='dark'] ::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #1f2937, #374151);
+}

@@ -1,0 +1,30 @@
+<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="400" fill="#f8f9fa"/>
+  
+  <!-- Box/Package Icon -->
+  <g transform="translate(200, 200)">
+    <!-- Main box -->
+    <path d="M -80 -40 L 0 -80 L 80 -40 L 80 40 L 0 80 L -80 40 Z" 
+          fill="#e9ecef" stroke="#dee2e6" stroke-width="3" stroke-linejoin="round"/>
+    
+    <!-- Box top -->
+    <path d="M -80 -40 L 0 -80 L 80 -40 L 0 0 Z" 
+          fill="#dee2e6" stroke="#ced4da" stroke-width="3" stroke-linejoin="round"/>
+    
+    <!-- Box left side -->
+    <path d="M -80 -40 L 0 0 L 0 80 L -80 40 Z" 
+          fill="#e9ecef" stroke="#dee2e6" stroke-width="3" stroke-linejoin="round"/>
+    
+    <!-- Box right side -->
+    <path d="M 80 -40 L 0 0 L 0 80 L 80 40 Z" 
+          fill="#f8f9fa" stroke="#dee2e6" stroke-width="3" stroke-linejoin="round"/>
+    
+    <!-- Tape on top -->
+    <rect x="-5" y="-80" width="10" height="80" fill="#adb5bd" opacity="0.5"/>
+  </g>
+  
+  <!-- Text -->
+  <text x="200" y="320" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#6c757d" font-weight="bold">بێ وێنە</text>
+  <text x="200" y="345" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#adb5bd">No Image</text>
+</svg>

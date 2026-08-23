@@ -1,0 +1,51 @@
+html[data-bs-theme='dark'] body.bg-body-secondary {
+    background: #0f172a !important;
+}
+
+html[data-bs-theme='dark'] .stat-card,
+html[data-bs-theme='dark'] .recent-items,
+html[data-bs-theme='dark'] .telegram-modal-content,
+html[data-bs-theme='dark'] .account-expiration-card {
+    background: #1e293b;
+    color: #e2e8f0;
+    border: 1px solid #334155;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+html[data-bs-theme='dark'] .recent-item {
+    border-bottom-color: #334155;
+}
+
+html[data-bs-theme='dark'] .text-muted,
+html[data-bs-theme='dark'] .text-gray-800,
+html[data-bs-theme='dark'] .text-gray-300 {
+    color: #94a3b8 !important;
+}
+
+html[data-bs-theme='dark'] .account-expiration-icon {
+    color: #1f2937;
+}
+
+html[data-bs-theme='dark'] .telegram-message {
+    background: #0f172a;
+    border-right-color: #38bdf8;
+}
+
+html[data-bs-theme='dark'] .telegram-message p {
+    color: #e2e8f0;
+}
+
+html[data-bs-theme='dark'] .btn-close-modal {
+    background: #334155;
+    color: #e2e8f0;
+}
+
+html[data-bs-theme='dark'] .btn-close-modal:hover {
+    background: #475569;
+}
+
+html[data-bs-theme='dark'] .alert-info {
+    background: #0c4a6e;
+    border-color: #0369a1;
+    color: #e0f2fe;
+}

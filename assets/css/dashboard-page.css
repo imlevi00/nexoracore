@@ -1,0 +1,1074 @@
+﻿/*
+ * Dashboard page — extracted from index.php (slim overrides in theme-modern)
+ */
+        :root {
+            --sales-color: #10b981;
+            --products-color: #4f46e5;
+            --customers-color: #06b6d4;
+            --debt-color: #f59e0b;
+            --reports-color: #8b5cf6;
+            --settings-color: #64748b;
+        }
+
+        /* ===== گۆڕەری بزنس لە navbar (Multi-Business Switcher) ===== */
+        .biz-switch .dropdown-toggle{
+            background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.28);
+            border-radius:999px; padding:.35rem .9rem; color:#fff;
+            display:flex; align-items:center; gap:.5rem; white-space:nowrap;
+        }
+        .biz-switch .dropdown-toggle:hover,
+        .biz-switch .dropdown-toggle:focus{ background:rgba(255,255,255,.24); color:#fff; }
+        .biz-switch .dropdown-toggle::after{ display:none; }
+        .biz-switch .dropdown-menu{ min-width:260px; border:0; border-radius:14px;
+            box-shadow:0 12px 34px rgba(0,0,0,.18); padding:.4rem; }
+        .biz-switch .dropdown-header{ font-size:.72rem; letter-spacing:.4px; }
+        .biz-switch form{ margin:0; }
+        .biz-switch .dd-item{ display:flex; align-items:center; justify-content:space-between; gap:.5rem;
+            width:100%; border:0; background:transparent; border-radius:10px; padding:.55rem .6rem;
+            cursor:pointer; text-align:right; }
+        .biz-switch .dd-item:hover{ background:#f1f4f9; }
+        .biz-switch .dd-item.active{ background:rgba(13,110,253,.10); font-weight:600; }
+        .biz-switch .dd-item:disabled{ opacity:.55; cursor:not-allowed; }
+        .biz-switch .dd-ava{ width:30px; height:30px; border-radius:9px; display:flex;
+            align-items:center; justify-content:center; font-weight:700; font-size:.8rem; color:#fff; flex:0 0 auto; }
+        .biz-switch .report-link{ border-radius:10px; padding:.55rem .6rem; display:flex;
+            align-items:center; gap:.5rem; color:#0d6efd; font-weight:600; text-decoration:none; }
+        .biz-switch .report-link:hover{ background:#eef4ff; }
+
+        /* ===== پانێڵی بزنسەکان لەسەر داشبۆرد ===== */
+        .biz-panel{ border:0; border-radius:18px; overflow:hidden; box-shadow:0 6px 22px rgba(30,64,175,.14); }
+        .biz-panel-head{ background:linear-gradient(135deg,#1e40af,#4338ca); color:#fff;
+            padding:16px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+        .biz-panel-head h5{ margin:0; font-weight:700; display:flex; align-items:center; gap:.5rem; }
+        .biz-panel-head .btn-report{ background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35);
+            color:#fff; border-radius:999px; padding:.45rem 1rem; font-weight:600; white-space:nowrap; }
+        .biz-panel-head .btn-report:hover{ background:#fff; color:#1e40af; }
+        .biz-panel-body{ background:#fff; padding:16px; display:flex; gap:14px; overflow-x:auto; }
+        .biz-card-form{ flex:0 0 auto; }
+        .biz-card{ flex:0 0 200px; width:200px; border:1.5px solid #e7eaf1; border-radius:14px; padding:16px;
+            background:#fff; cursor:pointer; transition:.2s; position:relative; text-align:right; display:block; }
+        button.biz-card{ font:inherit; color:inherit; }
+        .biz-card:hover{ transform:translateY(-3px); box-shadow:0 8px 20px rgba(0,0,0,.10); border-color:#c7d2fe; }
+        .biz-card.is-active{ border-color:#4338ca; background:linear-gradient(135deg,#eef2ff,#faf5ff); cursor:default; }
+        .biz-card.is-disabled{ opacity:.6; cursor:not-allowed; }
+        .biz-card.is-disabled:hover{ transform:none; box-shadow:none; border-color:#e7eaf1; }
+        .biz-ava{ width:46px; height:46px; border-radius:12px; display:flex; align-items:center;
+            justify-content:center; font-weight:700; font-size:1.1rem; color:#fff; margin-bottom:10px; }
+        .biz-card h6{ margin:0 0 2px; font-weight:700; }
+        .biz-card .muted{ font-size:.78rem; color:#8b93a5; }
+        .biz-badge{ position:absolute; top:12px; left:12px; background:#4338ca; color:#fff;
+            font-size:.68rem; padding:.15rem .55rem; border-radius:999px; font-weight:600; }
+        .biz-card .go{ margin-top:10px; font-size:.8rem; color:#4338ca; font-weight:600;
+            display:flex; align-items:center; gap:.3rem; }
+        .biz-card.is-active .go{ color:#15803d; }
+        @media (max-width: 575px){
+            .biz-card, .biz-card-form .biz-card{ flex:0 0 160px; width:160px; }
+        }
+
+        .dashboard-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+            min-height: 140px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* نیشانەی ژمارەی ئاگاداری لەسەر کارتەکان */
+        .card-count-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            min-width: 24px;
+            height: 24px;
+            padding: 0 7px;
+            background: #dc3545;
+            color: #fff;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.85);
+            z-index: 3;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* لینکی کارتەکان */
+        a.text-decoration-none .dashboard-card {
+            cursor: pointer;
+        }
+        
+        a.text-decoration-none:focus .dashboard-card {
+            outline: 2px solid rgba(255, 255, 255, 0.5);
+            outline-offset: 2px;
+        }
+        
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .dashboard-card:hover .card-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        /* کارتەکانی بچووک */
+        h6.mb-0 {
+            font-weight: 600;
+            letter-spacing: 0.2px;
+        }
+
+      .section-sales { 
+    background: linear-gradient(135deg, 
+        color-mix(in srgb, var(--sales-color) 80%, black 20%), 
+        color-mix(in srgb, #20c997 80%, black 20%)
+    ); 
+}
+
+/* تۆنی ناوەندی - Medium tone (وەکو یەکەمیان) */
+.section-products { 
+    background: linear-gradient(135deg, 
+        color-mix(in srgb, var(--sales-color) 80%, black 20%), 
+        color-mix(in srgb,rgb(32, 91, 201) 80%, black 20%)
+    ); 
+}
+
+.section-categories { 
+    background: linear-gradient(135deg, 
+        color-mix(in srgb, var(--sales-color) 80%, black 20%), 
+        color-mix(in srgb, #20c997 80%, black 20%)
+    ); 
+}
+
+.section-returns { 
+    background: linear-gradient(135deg, 
+        color-mix(in srgb, var(--sales-color) 80%, black 20%), 
+        color-mix(in srgb, #20c997 80%, black 20%)
+    ); 
+}
+
+
+        .section-customers { background: linear-gradient(135deg, var(--debt-color),rgb(187, 141, 0)); }
+        
+        .section-debt { background: linear-gradient(135deg, var(--debt-color), #e0a800); }
+       
+       
+        .section-reports { background: linear-gradient(135deg, var(--reports-color), #5a32a3); }
+        .section-profits { background: linear-gradient(135deg, var(--reports-color), #5a32a3); }
+
+    
+        .section-settings { 
+            background: linear-gradient(135deg, #047857, #0e7490); 
+        }
+        .section-backup { 
+            background: linear-gradient(135deg, #047857, #0e7490); 
+        }
+
+
+.section-kashery-ai { 
+    background: linear-gradient(135deg, #2563eb, #7c3aed); 
+}
+
+.section-website { 
+    background: linear-gradient(135deg, #0ea5e9, #06b6d4); 
+}
+
+.section-about-us { 
+    background: linear-gradient(135deg,rgb(111, 131, 174),rgb(110, 91, 143)); 
+}
+
+.section-faq { 
+    background: linear-gradient(135deg,rgb(111, 131, 174),rgb(110, 91, 143)); 
+}
+
+.section-sub-users { 
+    background: linear-gradient(135deg, #1e40af, #5b21b6); 
+}
+
+.section-medical-staff {
+    background: linear-gradient(135deg, #059669, #0f766e);
+}
+
+.section-cosmetic-staff {
+    background: linear-gradient(135deg, #db2777, #9333ea);
+}
+
+.section-lab-staff {
+    background: linear-gradient(135deg, #0284c7, #4338ca);
+}
+
+        .section-dollar-price {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        
+
+
+.section-expenses {
+    background: linear-gradient(135deg, #8B4513 0%, #CD853F 100%);
+}
+
+.section-wallets {
+    background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+}
+
+.section-expenses-stats {
+    background: linear-gradient(135deg, #A0522D 0%, #CD853F 100%);
+}
+
+.section-credits {
+    background: linear-gradient(135deg, #A0522D 0%, #CD853F 100%);
+}
+
+.section-inventory {
+    background: linear-gradient(135deg, 
+        color-mix(in srgb, var(--sales-color) 80%, black 20%), 
+        color-mix(in srgb, #20c997 80%, black 20%)
+    ); 
+}
+
+        .section-companies { 
+            background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%); 
+        }
+        .section-debts { 
+            background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%); 
+        }
+        
+        
+         .section-purchase-stats { 
+            background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%); 
+        }
+        .section-purchases { 
+            background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%); 
+        }
+        
+        /* Notebook Section Styling */
+.section-notebook {
+    background: linear-gradient(135deg, #6f42c1, #5a32a3) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+
+/* دەفتەری تێبینی */
+.section-notebooks { 
+    background: linear-gradient(135deg, 
+        color-mix(in srgb, #6f42c1 80%, black 20%), 
+        color-mix(in srgb, #563d7c 80%, black 20%)
+    ); 
+}
+
+.section-notebooks .card-icon {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.section-notebooks .action-btn:hover {
+    background: rgba(255, 255, 255, 0.9);
+    color: #6f42c1;
+}
+
+/* ڕەنگەکانی ئایکۆنەکان بەپێی سێکشنەکان */
+.section-sales .card-icon {
+    background: linear-gradient(135deg, rgba(32, 201, 151, 0.25), rgba(16, 185, 129, 0.3)) !important;
+}
+
+.section-products .card-icon {
+    background: linear-gradient(135deg, rgba(32, 201, 151, 0.25), rgba(16, 185, 129, 0.3)) !important;
+}
+
+.section-categories .card-icon {
+    background: linear-gradient(135deg, rgba(32, 201, 151, 0.25), rgba(16, 185, 129, 0.3)) !important;
+}
+
+.section-returns .card-icon {
+    background: linear-gradient(135deg, rgba(32, 201, 151, 0.25), rgba(16, 185, 129, 0.3)) !important;
+}
+
+.section-inventory .card-icon {
+    background: linear-gradient(135deg, rgba(32, 201, 151, 0.25), rgba(16, 185, 129, 0.3)) !important;
+}
+
+.section-purchases .card-icon {
+    background: linear-gradient(135deg, rgba(74, 144, 226, 0.25), rgba(53, 122, 189, 0.3)) !important;
+}
+
+.section-companies .card-icon {
+    background: linear-gradient(135deg, rgba(74, 144, 226, 0.25), rgba(53, 122, 189, 0.3)) !important;
+}
+
+.section-debts .card-icon {
+    background: linear-gradient(135deg, rgba(74, 144, 226, 0.25), rgba(53, 122, 189, 0.3)) !important;
+}
+
+.section-purchase-stats .card-icon {
+    background: linear-gradient(135deg, rgba(74, 144, 226, 0.25), rgba(53, 122, 189, 0.3)) !important;
+}
+
+.section-customers .card-icon {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.25), rgba(224, 168, 0, 0.3)) !important;
+}
+
+.section-debt .card-icon {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.25), rgba(224, 168, 0, 0.3)) !important;
+}
+
+.section-reports .card-icon {
+    background: linear-gradient(135deg, rgba(111, 66, 193, 0.25), rgba(90, 50, 163, 0.3)) !important;
+}
+
+.section-profits .card-icon {
+    background: linear-gradient(135deg, rgba(111, 66, 193, 0.25), rgba(90, 50, 163, 0.3)) !important;
+}
+
+.section-notebooks .card-icon {
+    background: linear-gradient(135deg, rgba(111, 66, 193, 0.25), rgba(86, 61, 124, 0.3)) !important;
+}
+
+.section-settings .card-icon {
+    background: linear-gradient(135deg, rgba(4, 120, 87, 0.25), rgba(14, 116, 144, 0.3)) !important;
+}
+
+.section-backup .card-icon {
+    background: linear-gradient(135deg, rgba(4, 120, 87, 0.25), rgba(14, 116, 144, 0.3)) !important;
+}
+
+.section-kashery-ai .card-icon {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.25), rgba(124, 58, 237, 0.3)) !important;
+}
+
+.section-website .card-icon {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.25), rgba(6, 182, 212, 0.3)) !important;
+}
+
+.section-about-us .card-icon {
+    background: linear-gradient(135deg, rgba(111, 131, 174, 0.25), rgba(110, 91, 143, 0.3)) !important;
+}
+
+.section-faq .card-icon {
+    background: linear-gradient(135deg, rgba(111, 131, 174, 0.25), rgba(110, 91, 143, 0.3)) !important;
+}
+
+.section-sub-users .card-icon {
+    background: linear-gradient(135deg, rgba(30, 64, 175, 0.25), rgba(91, 33, 182, 0.3)) !important;
+}
+
+.section-medical-staff .card-icon {
+    background: linear-gradient(135deg, rgba(5, 150, 105, 0.25), rgba(15, 118, 110, 0.3)) !important;
+}
+
+.section-cosmetic-staff .card-icon {
+    background: linear-gradient(135deg, rgba(219, 39, 119, 0.25), rgba(147, 51, 234, 0.3)) !important;
+}
+
+.section-lab-staff .card-icon {
+    background: linear-gradient(135deg, rgba(2, 132, 199, 0.25), rgba(67, 56, 202, 0.3)) !important;
+}
+
+.section-dollar-price .card-icon {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.3)) !important;
+}
+
+.section-expenses .card-icon {
+    background: linear-gradient(135deg, rgba(139, 69, 19, 0.25), rgba(205, 133, 63, 0.3)) !important;
+}
+
+.section-wallets .card-icon {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.25), rgba(37, 99, 235, 0.3)) !important;
+}
+
+.section-expenses-stats .card-icon {
+    background: linear-gradient(135deg, rgba(160, 82, 45, 0.25), rgba(205, 133, 63, 0.3)) !important;
+}
+
+.section-credits .card-icon {
+    background: linear-gradient(135deg, rgba(160, 82, 45, 0.25), rgba(205, 133, 63, 0.3)) !important;
+}
+
+.section-notebook .card-icon {
+    background: linear-gradient(135deg, rgba(111, 66, 193, 0.25), rgba(90, 50, 163, 0.3)) !important;
+}
+
+.text-purple {
+    color: #6f42c1 !important;
+}
+
+        .activity-item {
+            padding: 12px;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            height: 100%;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .recent-items {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            height: 100%;
+        }
+        
+        .recent-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .recent-item:last-child {
+            border-bottom: none;
+        }
+        
+        /* دیزاینی 5 کارد لە هەر ڕیزێک */
+        .row.g-3 {
+            display: flex;
+            flex-wrap: wrap;
+            margin-right: -0.75rem;
+            margin-left: -0.75rem;
+        }
+        
+        .dashboard-card-wrapper {
+            padding: 0.5rem;
+        }
+        
+        @media (min-width: 992px) {
+            .dashboard-card-wrapper {
+                flex: 0 0 20%;
+                max-width: 20%;
+            }
+        }
+        
+        /* Responsive Design بۆ کارتەکان */
+        @media (max-width: 991px) and (min-width: 768px) {
+            .dashboard-card-wrapper {
+                flex: 0 0 25%;
+                max-width: 25%;
+            }
+        }
+        
+        @media (max-width: 767px) and (min-width: 576px) {
+            .dashboard-card-wrapper {
+                flex: 0 0 33.333%;
+                max-width: 33.333%;
+            }
+        }
+        
+        @media (max-width: 575px) {
+            .dashboard-card-wrapper {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+            
+            .dashboard-card h6 {
+                font-size: 12px !important;
+            }
+            
+            .card-icon {
+                width: 45px !important;
+                height: 45px !important;
+            }
+            
+            .card-icon i {
+                font-size: 20px !important;
+                line-height: 45px !important;
+            }
+        }
+        
+        .action-btn {
+            border-radius: 25px;
+            padding: 10px 20px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Telegram Contact Banner Styles */
+        .telegram-banner {
+            background: linear-gradient(135deg, #0088cc 0%, #229ED9 50%, #0088cc 100%);
+            border-radius: 15px;
+            padding: 20px 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 136, 204, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .telegram-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .telegram-banner:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 136, 204, 0.4);
+        }
+
+        .banner-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .banner-icon {
+            background: rgba(255, 255, 255, 0.2);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            animation: bellRing 2s ease-in-out infinite;
+        }
+
+        @keyframes bellRing {
+            0%, 100% { transform: rotate(0deg); }
+            10%, 30% { transform: rotate(-10deg); }
+            20%, 40% { transform: rotate(10deg); }
+            50% { transform: rotate(0deg); }
+        }
+
+        .banner-text {
+            flex: 1;
+            color: white;
+        }
+
+        .banner-text strong {
+            font-size: 18px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .banner-text p {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+
+        .banner-arrow {
+            color: white;
+            font-size: 20px;
+            opacity: 0.8;
+            transition: transform 0.3s ease;
+        }
+
+        .telegram-banner:hover .banner-arrow {
+            transform: translateX(-5px);
+        }
+
+        /* Telegram Modal Styles */
+        .telegram-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .telegram-modal.show {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .telegram-modal-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            overflow: hidden;
+            animation: slideUp 0.4s ease;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .telegram-modal-header {
+            background: linear-gradient(135deg, #0088cc, #229ED9);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+
+        .telegram-modal-header i.bi-telegram {
+            font-size: 48px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .telegram-modal-header h4 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .telegram-modal-body {
+            padding: 30px;
+        }
+
+        .telegram-message {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-right: 4px solid #0088cc;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+        .telegram-message i {
+            font-size: 32px;
+            color: #0088cc;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .telegram-message p {
+            margin: 0;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #1e293b;
+        }
+
+        .telegram-buttons {
+            display: flex;
+            gap: 15px;
+            flex-direction: column;
+        }
+
+        .btn-telegram {
+            background: linear-gradient(135deg, #0088cc, #229ED9);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 16px;
+        }
+
+        .btn-telegram:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 136, 204, 0.3);
+            color: white;
+        }
+
+        .btn-telegram i {
+            font-size: 20px;
+        }
+
+        .btn-close-modal {
+            background: #f1f5f9;
+            color: #64748b;
+            padding: 12px 25px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 15px;
+        }
+
+        .btn-close-modal:hover {
+            background: #e2e8f0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .telegram-banner {
+                padding: 15px 20px;
+            }
+
+            .banner-content {
+                gap: 15px;
+            }
+
+            .banner-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+
+            .banner-text strong {
+                font-size: 16px;
+            }
+
+            .banner-text p {
+                font-size: 13px;
+            }
+
+            .telegram-modal-content {
+                width: 95%;
+            }
+
+            .telegram-modal-body {
+                padding: 20px;
+            }
+
+            .telegram-message {
+                padding: 15px;
+            }
+        }
+
+        /* گەورەکردنی دووگمەی کاڵاکان و فرۆشتن */
+        .navbar-nav .nav-link.large-nav-btn {
+            font-size: 18px;
+            font-weight: 600;
+            padding: 12px 20px;
+            margin: 0 5px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-nav .nav-link.large-nav-btn:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .navbar-nav .nav-link.large-nav-btn i {
+            font-size: 20px;
+            margin-left: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .navbar-nav .nav-link.large-nav-btn {
+                font-size: 16px;
+                padding: 10px 15px;
+            }
+
+            .navbar-nav .nav-link.large-nav-btn i {
+                font-size: 18px;
+            }
+        }
+
+        /* کارتێکی ئاگادارکردنەوەی بەسەرچوونی ئەکاونت */
+        .account-expiration-card {
+            background: linear-gradient(135deg, #fef3c7, #fffbeb);
+            border-radius: 16px;
+            border: 1px solid rgba(250, 204, 21, 0.25);
+            box-shadow: 0 4px 14px rgba(202, 138, 4, 0.18);
+            padding: 18px 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .account-expiration-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #fbbf24, #facc15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #78350f;
+            box-shadow: 0 6px 14px rgba(202, 138, 4, 0.35);
+            flex-shrink: 0;
+        }
+
+        .account-expiration-content h5 {
+            font-size: 15px;
+            margin-bottom: 4px;
+            color: #78350f;
+            font-weight: 700;
+        }
+
+        .account-expiration-content p {
+            margin: 0;
+            font-size: 13px;
+            color: #713f12;
+            line-height: 1.8;
+        }
+
+        .account-expiration-content .expiration-date {
+            font-weight: 700;
+        }
+
+        /* PWA Install Banner */
+        .pwa-install-banner {
+            background: linear-gradient(135deg, #0d6efd 0%, #2563eb 50%, #0d6efd 100%);
+            border-radius: 15px;
+            padding: 18px 24px;
+            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+            position: relative;
+            overflow: hidden;
+            display: none;
+        }
+
+        .pwa-install-banner.show {
+            display: block;
+        }
+
+        .pwa-install-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+
+        .pwa-install-content {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: relative;
+            z-index: 1;
+            flex-wrap: wrap;
+        }
+
+        .pwa-install-logo {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            object-fit: contain;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 4px;
+            flex-shrink: 0;
+        }
+
+        .pwa-install-text {
+            flex: 1;
+            min-width: 180px;
+            color: #fff;
+        }
+
+        .pwa-install-text strong {
+            display: block;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .pwa-install-text p {
+            margin: 0;
+            font-size: 13px;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+
+        .pwa-install-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .pwa-install-actions .btn-light {
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .pwa-install-actions .btn-link {
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .pwa-install-actions .btn-link:hover {
+            color: #fff;
+        }
+
+        /* PWA iOS Modal */
+        .pwa-ios-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9998;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .pwa-ios-modal.show {
+            display: flex;
+        }
+
+        .pwa-ios-modal-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 480px;
+            width: 90%;
+            overflow: hidden;
+            animation: slideUp 0.4s ease;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .pwa-ios-modal-header {
+            background: linear-gradient(135deg, #0d6efd, #2563eb);
+            color: white;
+            padding: 22px;
+            text-align: center;
+            position: relative;
+        }
+
+        .pwa-ios-modal-header img {
+            width: 64px;
+            height: 64px;
+            border-radius: 14px;
+            background: #fff;
+            padding: 4px;
+            margin-bottom: 10px;
+        }
+
+        .pwa-ios-modal-header h4 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .pwa-ios-modal-body {
+            padding: 24px;
+        }
+
+        .pwa-ios-steps {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-right: 4px solid #0d6efd;
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .pwa-ios-steps ol {
+            margin: 0;
+            padding-right: 20px;
+            line-height: 2;
+            color: #1e293b;
+        }
+
+        @media (max-width: 575px) {
+            .pwa-install-content {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .pwa-install-actions {
+                justify-content: center;
+            }
+        }

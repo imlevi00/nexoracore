@@ -1,0 +1,9 @@
+[2026-08-19 12:19:05] [INFO] User logout: demo@kashery.local from IP: ::1
+[2026-08-19 12:34:40] [INFO] Main user login successful: demo@kashery.local from IP: ::1
+[2026-08-19 12:34:47] [INFO] Theme mode updated by user demo@kashery.local: light
+[2026-08-19 12:40:39] [INFO] Debt payment: 1000 for debt ID: 1 by user: demo@kashery.local
+[2026-08-19 12:42:42] [INFO] Business type updated by user demo@kashery.local: 2
+[2026-08-19 16:22:06] [INFO] User logout: demo@kashery.local from IP: ::1
+[2026-08-19 16:31:51] [INFO] Main user login successful: demo@kashery.local from IP: ::1
+[2026-08-19 16:34:39] [INFO] Theme mode updated by user demo@kashery.local: light
+[2026-08-19 16:42:24] [INFO] Sale created: Invoice INV-20260819-7997-944848, Amount: 10500 by user: demo@kashery.local

@@ -1,0 +1,569 @@
+/*
+ * Customers module visual refresh
+ * list, history, statement, cash, credit, money debts, debt payments
+ */
+
+.customers-list-page,
+.customers-history-page,
+.customers-statement-page,
+.customers-cash-page,
+.customers-debts-page,
+.debts-history-page {
+  background: var(--surface-2) !important;
+  background-image: var(--gradient-surface) !important;
+  background-attachment: fixed;
+  min-height: 100vh;
+  color: var(--text-primary);
+  --cu-accent: #0ea5e9;
+  --cu-accent-2: #4f46e5;
+}
+
+.customers-history-page { --cu-accent: #f59e0b; --cu-accent-2: #ea580c; }
+.customers-cash-page { --cu-accent: #10b981; --cu-accent-2: #059669; }
+.customers-debts-page { --cu-accent: #f59e0b; --cu-accent-2: #ef4444; }
+.customers-statement-page { --cu-accent: #6366f1; --cu-accent-2: #0ea5e9; }
+.debts-history-page { --cu-accent: #06b6d4; --cu-accent-2: #4f46e5; }
+
+.cu-wrap {
+  max-width: 1440px;
+  margin-inline: auto;
+}
+
+.cu-hero {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.15rem;
+  align-items: center;
+  padding: 1.35rem 1.5rem;
+  margin-bottom: 1.15rem;
+  background: var(--glass-bg, rgba(255, 255, 255, 0.72));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-default);
+  border-radius: 20px;
+  box-shadow: var(--box-shadow-lg, 0 8px 28px rgba(14, 165, 233, 0.12));
+  position: relative;
+  overflow: hidden;
+}
+
+.cu-hero::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, var(--cu-accent), var(--cu-accent-2));
+}
+
+.cu-hero::after {
+  content: '';
+  position: absolute;
+  inset-inline-end: -70px;
+  top: -80px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--cu-accent) 22%, transparent), transparent 68%);
+  pointer-events: none;
+}
+
+.cu-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--cu-accent);
+  background: color-mix(in srgb, var(--cu-accent) 10%, white);
+  border: 1px solid color-mix(in srgb, var(--cu-accent) 18%, var(--border-default));
+  border-radius: 999px;
+  padding: 0.22rem 0.7rem;
+  margin-bottom: 0.5rem;
+}
+
+.cu-hero h1 {
+  font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 0 0 0.25rem;
+}
+
+.cu-hero-sub {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+.cu-hero-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.7rem;
+}
+
+.cu-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  background: var(--surface-3, #f1f5f9);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+}
+
+.cu-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  position: relative;
+  z-index: 1;
+}
+
+.cu-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  font-family: inherit;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.cu-btn:hover { transform: translateY(-2px); color: inherit; }
+
+.cu-btn-ghost {
+  background: var(--surface-1);
+  color: var(--text-primary);
+  border-color: var(--border-default);
+}
+
+.cu-btn-primary {
+  background: linear-gradient(135deg, var(--cu-accent), var(--cu-accent-2));
+  color: #fff;
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--cu-accent) 32%, transparent);
+}
+
+.cu-btn-primary:hover { color: #fff; }
+
+.cu-btn-success {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+}
+
+.cu-btn-success:hover { color: #fff; }
+
+.cu-btn-warn {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #fff;
+}
+
+.cu-btn-warn:hover { color: #fff; }
+
+.cu-btn-sm { padding: 0.38rem 0.8rem; font-size: 0.78rem; }
+
+.cu-stats {
+  display: grid;
+  gap: 0.85rem;
+  margin-bottom: 1.15rem;
+}
+
+.cu-stats-3 { grid-template-columns: repeat(3, 1fr); }
+.cu-stats-4 { grid-template-columns: repeat(4, 1fr); }
+.cu-stats-5 { grid-template-columns: repeat(5, 1fr); }
+
+.cu-stat {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1rem 1.1rem;
+  background: var(--surface-1);
+  border: 1px solid var(--border-default);
+  border-radius: 16px;
+  box-shadow: var(--shadow-soft, 0 6px 18px rgba(15, 23, 42, 0.06));
+  position: relative;
+  overflow: hidden;
+  --stat-accent: var(--cu-accent);
+}
+
+.cu-stat::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  inset-inline: 0;
+  height: 3px;
+  background: var(--stat-accent);
+}
+
+.cu-stat-icon {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--stat-accent) 12%, white);
+  color: var(--stat-accent);
+  font-size: 1.15rem;
+}
+
+.cu-stat-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.cu-stat-value {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  word-break: break-word;
+}
+
+.cu-stat-meta {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.cu-panel {
+  background: var(--surface-1);
+  border: 1px solid var(--border-default);
+  border-radius: 18px;
+  box-shadow: var(--shadow-soft, 0 6px 18px rgba(15, 23, 42, 0.06));
+  overflow: hidden;
+  margin-bottom: 1.1rem;
+}
+
+.cu-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  padding: 0.9rem 1.2rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border-default);
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+
+.cu-panel-body { padding: 1.15rem 1.2rem; }
+
+.cu-empty {
+  text-align: center;
+  padding: 3rem 1.25rem;
+  color: var(--text-secondary);
+}
+
+.cu-empty-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 1rem;
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  font-size: 1.85rem;
+  background: color-mix(in srgb, var(--cu-accent) 12%, white);
+  color: var(--cu-accent);
+}
+
+.cu-empty h3 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 0.35rem;
+}
+
+.customers-list-page .form-control,
+.customers-list-page .form-select,
+.customers-history-page .form-control,
+.customers-history-page .form-select,
+.customers-statement-page .form-control,
+.customers-statement-page .form-select,
+.customers-cash-page .form-control,
+.customers-cash-page .form-select,
+.customers-debts-page .form-control,
+.customers-debts-page .form-select,
+.debts-history-page .form-control,
+.debts-history-page .form-select {
+  border-radius: 12px;
+  min-height: 42px;
+}
+
+.customers-module-page .pagination .page-link,
+.debts-history-page .pagination .page-link {
+  border-radius: 999px !important;
+  margin: 0 3px;
+  min-width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.customers-module-page .pagination .page-item.active .page-link,
+.debts-history-page .pagination .page-item.active .page-link {
+  background: linear-gradient(135deg, var(--cu-accent), var(--cu-accent-2));
+  border-color: transparent;
+}
+
+.customers-module-page .alert,
+.debts-history-page .alert {
+  border: none;
+  border-radius: 14px;
+}
+
+.customers-list-page .customers-list-table thead,
+.customers-cash-page .customers-cash-table thead,
+.customers-debts-page table thead,
+.debts-history-page table thead {
+  background: linear-gradient(135deg, #0ea5e9, #4f46e5);
+}
+
+.customers-list-page .customers-list-table thead th,
+.customers-cash-page .customers-cash-table thead th,
+.customers-debts-page table thead th,
+.debts-history-page table thead th {
+  color: #fff;
+  border: none;
+  font-size: 0.74rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.customers-list-page .customers-list-table tbody td,
+.customers-cash-page .customers-cash-table tbody td,
+.debts-history-page table tbody td {
+  vertical-align: middle;
+}
+
+.customer-region-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: color-mix(in srgb, #f59e0b 14%, white);
+  color: #b45309;
+}
+
+.cu-ava {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  display: inline-grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.85rem;
+  background: linear-gradient(135deg, #0ea5e9, #4f46e5);
+  margin-inline-end: 0.45rem;
+}
+
+.customers-history-page .log-row,
+.cu-log-row {
+  border: 1px solid var(--border-default);
+  border-radius: 16px;
+  background: var(--surface-1);
+  overflow: hidden;
+}
+
+.customers-history-page .log-row + .log-row { margin-top: 0.75rem; }
+
+.customers-history-page .log-summary {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 0.7fr 1.2fr 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.95rem 1.05rem;
+}
+
+.customers-history-page .log-details {
+  background: var(--surface-2);
+  border-top: 1px solid var(--border-default);
+  padding: 0.9rem 1.05rem 1.05rem;
+}
+
+.customers-history-page .meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.77rem;
+  border: 1px solid var(--border-default);
+  background: var(--surface-1);
+}
+
+.history-event { display: flex; align-items: center; gap: 0.65rem; }
+.history-dot {
+  width: 10px;
+  height: 10px;
+  min-width: 10px;
+  border-radius: 50%;
+  background: #f59e0b;
+  box-shadow: 0 0 0 4px color-mix(in srgb, #f59e0b 18%, transparent);
+}
+
+.log-row[data-event*="delete"] .history-dot { background: #ef4444; box-shadow: 0 0 0 4px color-mix(in srgb, #ef4444 18%, transparent); }
+.log-row[data-event*="create"] .history-dot { background: #10b981; box-shadow: 0 0 0 4px color-mix(in srgb, #10b981 18%, transparent); }
+.log-row[data-event*="payment"] .history-dot { background: #0ea5e9; box-shadow: 0 0 0 4px color-mix(in srgb, #0ea5e9 18%, transparent); }
+
+.statement-type-filters {
+  background: var(--surface-2) !important;
+  border-radius: 14px !important;
+  border-color: var(--border-default) !important;
+}
+
+.customers-statement-page .statement-stat-tile {
+  border: 1px solid var(--border-default) !important;
+  border-radius: 16px;
+  background: var(--surface-1) !important;
+}
+
+.customers-statement-page .customer-info,
+.customers-statement-page .statement-card-plain {
+  border: 1px solid var(--border-default);
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.customer-combobox { position: relative; }
+.customer-combobox .customer-search-input {
+  border-radius: 12px;
+  padding-inline-end: 2.25rem;
+}
+.customer-combobox .customer-search-icon {
+  position: absolute;
+  top: 12px;
+  inset-inline-end: 12px;
+  color: var(--text-secondary);
+  pointer-events: none;
+  z-index: 2;
+}
+.customer-combobox .customer-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  inset-inline: 0;
+  z-index: 1080;
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  background: var(--surface-1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  max-height: 280px;
+  overflow-y: auto;
+  display: none;
+}
+.customer-combobox .customer-dropdown.show { display: block; }
+.customer-combobox .customer-option {
+  cursor: pointer;
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border-default);
+}
+.customer-combobox .customer-option:last-child { border-bottom: 0; }
+.customer-combobox .customer-option.active,
+.customer-combobox .customer-option:hover {
+  background: color-mix(in srgb, var(--cu-accent) 10%, var(--surface-1));
+}
+
+.customer-filter-card {
+  position: relative;
+  z-index: 30;
+  overflow: visible;
+}
+.customer-filter-card .card-body,
+.customer-filter-card.cu-panel { overflow: visible; }
+
+html[data-bs-theme='dark'] .cu-hero,
+html[data-bs-theme='dark'] .cu-stat,
+html[data-bs-theme='dark'] .cu-panel,
+html[data-bs-theme='dark'] .customers-history-page .log-row {
+  background: var(--surface-1) !important;
+}
+
+html[data-bs-theme='dark'] .cu-kicker,
+html[data-bs-theme='dark'] .cu-stat-icon,
+html[data-bs-theme='dark'] .cu-empty-icon {
+  background: color-mix(in srgb, var(--stat-accent, var(--cu-accent)) 18%, var(--surface-2));
+}
+
+html[data-bs-theme='dark'] .cu-btn-ghost { background: var(--surface-2); color: var(--text-primary); }
+
+@media (max-width: 1199.98px) {
+  .cu-stats-5 { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 991.98px) {
+  .cu-hero { grid-template-columns: 1fr; }
+  .cu-stats-3, .cu-stats-4, .cu-stats-5 { grid-template-columns: 1fr 1fr; }
+  .customers-history-page .log-summary { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 767.98px) {
+  .cu-actions { flex-direction: column; }
+  .cu-actions .cu-btn { width: 100%; }
+  .cu-stats-3, .cu-stats-4, .cu-stats-5 { grid-template-columns: 1fr; }
+
+  .customers-list-page .customers-list-table thead,
+  .customers-cash-page .customers-cash-table thead,
+  .debts-history-page table thead { display: none; }
+
+  .customers-list-page .customers-list-table tbody tr,
+  .customers-cash-page .customers-cash-table tbody tr,
+  .debts-history-page table tbody tr {
+    display: block;
+    border: 1px solid var(--border-default);
+    border-radius: 14px;
+    margin: 0.75rem;
+    padding: 0.75rem 0.9rem;
+  }
+
+  .customers-list-page .customers-list-table tbody td,
+  .customers-cash-page .customers-cash-table tbody td,
+  .debts-history-page table tbody td {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    border: none;
+    padding: 0.35rem 0;
+  }
+
+  .customers-list-page .customers-list-table tbody td::before,
+  .customers-cash-page .customers-cash-table tbody td::before,
+  .debts-history-page table tbody td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: var(--text-secondary);
+    font-size: 0.76rem;
+  }
+
+  .customers-list-page .customers-list-table tbody td:last-child,
+  .customers-cash-page .customers-cash-table tbody td:last-child,
+  .debts-history-page table tbody td:last-child {
+    justify-content: center;
+    padding-top: 0.7rem;
+    border-top: 1px dashed var(--border-default);
+  }
+
+  .customers-list-page .customers-list-table tbody td:last-child::before,
+  .customers-cash-page .customers-cash-table tbody td:last-child::before,
+  .debts-history-page table tbody td:last-child::before { display: none; }
+}
+
+@media print {
+  .cu-hero::after, .cu-actions, .customers-module-navbar { display: none !important; }
+}

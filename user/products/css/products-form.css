@@ -1,0 +1,432 @@
+/*
+ * Product form — user/products/add.php
+ * Visual refresh aligned with products-list / theme-modern
+ */
+
+.products-form-page {
+  background: var(--surface-2) !important;
+  background-image: var(--gradient-surface) !important;
+  background-attachment: fixed;
+  min-height: 100vh;
+  color: var(--text-primary);
+  --pf-accent: #10b981;
+  --pf-brand: #4f46e5;
+}
+
+.products-form-page .pf-wrap {
+  max-width: 1080px;
+}
+
+/* ========== Hero ========== */
+.pf-hero {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.15rem;
+  align-items: center;
+  padding: 1.35rem 1.5rem;
+  margin-bottom: 1.15rem;
+  background: var(--glass-bg, rgba(255, 255, 255, 0.72));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-default);
+  border-radius: 20px;
+  box-shadow: var(--box-shadow-lg, 0 8px 28px rgba(16, 185, 129, 0.12));
+  position: relative;
+  overflow: hidden;
+}
+
+.pf-hero::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, #10b981, #4f46e5, #06b6d4);
+}
+
+.pf-hero::after {
+  content: '';
+  position: absolute;
+  inset-inline-end: -60px;
+  top: -70px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.18), transparent 68%);
+  pointer-events: none;
+}
+
+.pf-hero-main {
+  position: relative;
+  z-index: 1;
+}
+
+.pf-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--pf-accent);
+  background: color-mix(in srgb, var(--pf-accent) 12%, white);
+  border: 1px solid color-mix(in srgb, var(--pf-accent) 22%, var(--border-default));
+  border-radius: 999px;
+  padding: 0.22rem 0.7rem;
+  margin-bottom: 0.5rem;
+}
+
+.pf-hero h1 {
+  font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 0 0 0.25rem;
+}
+
+.pf-hero h1 i {
+  color: var(--pf-accent);
+  margin-inline-end: 0.3rem;
+}
+
+.pf-hero-sub {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+.pf-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.52rem 1.05rem;
+  border-radius: 999px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  font-family: inherit;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.pf-btn:hover {
+  transform: translateY(-2px);
+}
+
+.pf-btn-ghost {
+  background: var(--surface-1);
+  color: var(--text-primary);
+  border-color: var(--border-default);
+}
+
+.pf-btn-ghost:hover {
+  color: var(--text-primary);
+}
+
+.pf-btn-primary {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.32);
+}
+
+.pf-btn-primary:hover {
+  color: #fff;
+}
+
+.pf-btn-outline {
+  background: var(--surface-1);
+  color: #047857;
+  border-color: color-mix(in srgb, #10b981 35%, var(--border-default));
+}
+
+.pf-btn-outline:hover {
+  color: #065f46;
+}
+
+/* ========== Alerts ========== */
+.products-form-page .alert {
+  border: none;
+  border-radius: 14px;
+  box-shadow: var(--shadow-soft);
+}
+
+.products-form-page .alert-danger {
+  background: color-mix(in srgb, #ef4444 10%, white);
+  color: #991b1b;
+}
+
+.products-form-page .alert-info {
+  background: color-mix(in srgb, #4f46e5 8%, white);
+  color: #3730a3;
+}
+
+.products-form-page .alert-secondary {
+  background: var(--surface-3, #f1f5f9);
+  color: var(--text-secondary);
+}
+
+/* ========== Panels ========== */
+.pf-panel {
+  background: var(--surface-1);
+  border: 1px solid var(--border-default);
+  border-radius: 18px;
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+  margin-bottom: 1.1rem;
+}
+
+.pf-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.9rem 1.2rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border-default);
+  font-size: 0.95rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.pf-panel-head i {
+  color: var(--pf-brand);
+}
+
+.pf-panel-body {
+  padding: 1.2rem 1.25rem 1.05rem;
+}
+
+.products-form-page .form-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 0.35rem;
+}
+
+.products-form-page .form-control,
+.products-form-page .form-select {
+  border-radius: 12px;
+  min-height: 42px;
+  border-color: var(--border-default);
+}
+
+.products-form-page .form-control:focus,
+.products-form-page .form-select:focus {
+  border-color: var(--pf-brand);
+  box-shadow: 0 0 0 4px var(--focus-ring, rgba(79, 70, 229, 0.22));
+}
+
+.products-form-page .input-group .btn {
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.products-form-page .input-group > :first-child {
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.products-form-page .input-group > :last-child {
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+}
+
+.products-form-page .form-text,
+.products-form-page small.text-muted {
+  font-size: 0.75rem;
+}
+
+/* ========== Upload ========== */
+.products-form-page .file-upload-area {
+  border: 2px dashed color-mix(in srgb, var(--pf-brand) 28%, var(--border-default));
+  border-radius: 16px;
+  padding: 1.6rem 1rem;
+  background: color-mix(in srgb, var(--pf-brand) 5%, white);
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.products-form-page .file-upload-area:hover,
+.products-form-page .file-upload-area.border-primary {
+  border-color: var(--pf-brand);
+  background: color-mix(in srgb, var(--pf-brand) 9%, white);
+}
+
+.products-form-page .file-upload-area i.bi-camera {
+  color: var(--pf-brand);
+}
+
+.products-form-page .btn-outline-success,
+.products-form-page .btn-outline-primary {
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+#profitCalculation {
+  margin-bottom: 1.1rem;
+}
+
+/* ========== Units ========== */
+.products-form-page .unit-card {
+  border: 1px solid var(--border-default) !important;
+  border-radius: 16px !important;
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+}
+
+.products-form-page .unit-card .card-header,
+.products-form-page .pf-unit-head {
+  background: linear-gradient(135deg, #eef2ff, #f8fafc) !important;
+  border-bottom: 1px solid var(--border-default);
+  padding: 0.8rem 1rem;
+}
+
+.products-form-page .unit-card[data-is-primary="1"] .card-header {
+  background: linear-gradient(135deg, #ecfdf5, #f0fdf4) !important;
+}
+
+.products-form-page .unit-card .card-header h6 {
+  font-weight: 800;
+  margin: 0;
+}
+
+.products-form-page .unit-card .badge.bg-primary {
+  background: #4f46e5 !important;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+#units_container:empty::before {
+  content: 'هێشتا هیچ یەکەیەک زیاد نەکراوە';
+  display: block;
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 1.25rem;
+  border: 1px dashed var(--border-default);
+  border-radius: 14px;
+  background: var(--surface-2);
+}
+
+/* ========== Profit ========== */
+#profitCalculation .alert {
+  background: color-mix(in srgb, #10b981 10%, white);
+  color: inherit;
+}
+
+#profitCalculation .h5 {
+  font-weight: 800;
+  margin-top: 0.25rem;
+}
+
+/* ========== Custom fields ========== */
+.products-form-page .product-custom-fields-block > .col-12 > h6 {
+  border: none !important;
+  padding: 0.9rem 1.2rem;
+  margin: 0 0 0.85rem !important;
+  background: var(--surface-2);
+  border-radius: 14px;
+  font-weight: 800;
+}
+
+.products-form-page .product-custom-fields-block .card {
+  border-radius: 14px;
+  border-color: var(--border-default);
+}
+
+/* ========== Sticky actions ========== */
+.pf-actions {
+  position: sticky;
+  bottom: 0.75rem;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.65rem;
+  padding: 0.85rem 1rem;
+  background: var(--glass-bg, rgba(255, 255, 255, 0.88));
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--border-default);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.1);
+}
+
+.pf-actions-end {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* ========== Dark ========== */
+html[data-bs-theme='dark'] .pf-hero,
+html[data-bs-theme='dark'] .pf-panel,
+html[data-bs-theme='dark'] .pf-actions {
+  background: var(--surface-1) !important;
+}
+
+html[data-bs-theme='dark'] .pf-kicker {
+  background: color-mix(in srgb, var(--pf-accent) 18%, var(--surface-2));
+}
+
+html[data-bs-theme='dark'] .products-form-page .file-upload-area {
+  background: color-mix(in srgb, var(--pf-brand) 10%, var(--surface-2));
+}
+
+html[data-bs-theme='dark'] .products-form-page .alert-danger {
+  background: rgba(239, 68, 68, 0.16);
+  color: #fecaca;
+}
+
+html[data-bs-theme='dark'] .products-form-page .alert-info {
+  background: rgba(79, 70, 229, 0.16);
+  color: #c7d2fe;
+}
+
+html[data-bs-theme='dark'] .products-form-page .unit-card .card-header,
+html[data-bs-theme='dark'] .products-form-page .unit-card[data-is-primary="1"] .card-header {
+  background: var(--surface-2) !important;
+}
+
+html[data-bs-theme='dark'] .pf-btn-ghost,
+html[data-bs-theme='dark'] .pf-btn-outline {
+  background: var(--surface-2);
+  color: var(--text-primary);
+}
+
+html[data-bs-theme='dark'] #profitCalculation .alert {
+  background: rgba(16, 185, 129, 0.14);
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 767.98px) {
+  .pf-hero {
+    grid-template-columns: 1fr;
+    padding: 1.1rem 1.15rem;
+  }
+
+  .pf-hero .pf-btn {
+    width: 100%;
+  }
+
+  .pf-actions {
+    flex-direction: column;
+    position: static;
+  }
+
+  .pf-actions .pf-btn,
+  .pf-actions-end {
+    width: 100%;
+  }
+
+  .pf-actions-end .pf-btn {
+    flex: 1;
+  }
+
+  .products-form-page .file-upload-area {
+    min-height: 180px;
+  }
+}

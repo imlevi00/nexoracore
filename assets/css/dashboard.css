@@ -1,0 +1,503 @@
+/* Custom Dashboard Styles for NexoraCore */
+
+:root {
+    /* رەنگەکانی بەشە جیاوازەکان — NexoraCore palette */
+    --sales-color: #10b981;
+    --sales-light: #d1fae5;
+    --products-color: #4f46e5;
+    --products-light: #e0e7ff;
+    --customers-color: #06b6d4;
+    --customers-light: #cffafe;
+    --debt-color: #f59e0b;
+    --debt-light: #fef3c7;
+    --reports-color: #8b5cf6;
+    --reports-light: #ede9fe;
+    --settings-color: #64748b;
+    --settings-light: #f1f5f9;
+       
+    /* گرادیەنتەکان */
+    --gradient-sales: linear-gradient(135deg, var(--sales-color), #20c997);
+    --gradient-products: linear-gradient(135deg, var(--products-color), #0056b3);
+    --gradient-customers: linear-gradient(135deg, var(--customers-color), #138496);
+    --gradient-debt: linear-gradient(135deg, var(--debt-color), #e0a800);
+    --gradient-reports: linear-gradient(135deg, var(--reports-color), #5a32a3);
+    --gradient-settings: linear-gradient(135deg, var(--settings-color), #545b62);
+    
+    /* سایەکان */
+    --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-heavy: 0 8px 15px rgba(0, 0, 0, 0.2);
+    
+    /* بەرزکردنەوە */
+    --border-radius: 15px;
+    --border-radius-small: 10px;
+    --transition: all 0.3s ease;
+}
+
+/* کارتی سەرەکی داشبۆرد */
+.dashboard-card {
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-medium);
+    transition: var(--transition);
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.dashboard-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-heavy);
+}
+
+.dashboard-card:hover::before {
+    transform: translateX(100%);
+}
+
+/* ئایکۆنەکانی بەشەکان */
+.card-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+    margin-bottom: 15px;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-icon::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(255,255,255,0.2), rgba(255,255,255,0.4));
+    transform: rotate(-45deg) translate(-50%, -50%);
+    transition: var(--transition);
+}
+
+.dashboard-card:hover .card-icon::before {
+    transform: rotate(-45deg) translate(-30%, -30%);
+}
+
+/* رەنگەکانی بەشە جیاوازەکان */
+.section-sales { 
+    background: var(--gradient-sales);
+    color: white;
+}
+
+.section-products { 
+    background: var(--gradient-products);
+    color: white;
+}
+
+.section-customers { 
+    background: var(--gradient-customers);
+    color: white;
+}
+
+.section-debt { 
+    background: var(--gradient-debt);
+    color: white;
+}
+
+.section-reports { 
+    background: var(--gradient-reports);
+    color: white;
+}
+
+.section-settings { 
+    background: var(--gradient-settings);
+    color: white;
+}
+
+/* کارتی ئامار */
+.stat-card {
+    background: white;
+    border-radius: var(--border-radius-small);
+    padding: 20px;
+    text-align: center;
+    box-shadow: var(--shadow-light);
+    height: 100%;
+    transition: var(--transition);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-medium);
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+    background: linear-gradient(45deg, #007bff, #28a745);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* بەشی دوایین چالاکیەکان */
+.recent-items {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: var(--shadow-medium);
+    height: 100%;
+    border-left: 4px solid #007bff;
+    position: relative;
+    overflow: hidden;
+}
+
+.recent-items::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(to bottom, #007bff, #28a745);
+    transition: width 0.3s ease;
+}
+
+.recent-items:hover::before {
+    width: 8px;
+}
+
+.recent-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    transition: var(--transition);
+    border-radius: 5px;
+}
+
+.recent-item:hover {
+    background-color: #f8f9fa;
+    padding-left: 10px;
+    border-bottom-color: #007bff;
+}
+
+.recent-item:last-child {
+    border-bottom: none;
+}
+
+/* دووگمەی کردار */
+.action-btn {
+    border-radius: 25px;
+    padding: 10px 20px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-block;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    border: 2px solid transparent;
+}
+
+.action-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    text-decoration: none;
+    border-color: rgba(255,255,255,0.3);
+}
+
+.action-btn:hover::before {
+    width: 100px;
+    height: 100px;
+}
+
+/* نیشانەی ئاگاداری */
+.notification-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: linear-gradient(45deg, #dc3545, #fd7e14);
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* خشتەکان */
+.table {
+    background: white;
+    border-radius: var(--border-radius-small);
+    overflow: hidden;
+    box-shadow: var(--shadow-light);
+}
+
+.table thead th {
+    background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+    border: none;
+    font-weight: 600;
+    color: #495057;
+    position: relative;
+}
+
+.table thead th::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(to right, #007bff, #28a745);
+}
+
+.table tbody tr {
+    transition: var(--transition);
+}
+
+.table tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+    transform: scale(1.01);
+}
+
+.table td {
+    border-color: rgba(0,0,0,0.05);
+    vertical-align: middle;
+}
+
+/* نیشانەکان */
+.badge {
+    border-radius: 15px;
+    padding: 6px 12px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+}
+
+.badge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s;
+}
+
+.badge:hover::before {
+    left: 100%;
+}
+
+/* ڕەنگە تایبەتەکان بۆ نیشانەکان */
+.badge.bg-success {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+}
+
+.badge.bg-warning {
+    background: linear-gradient(45deg, #ffc107, #fd7e14) !important;
+    color: #212529 !important;
+}
+
+.badge.bg-danger {
+    background: linear-gradient(45deg, #dc3545, #e83e8c) !important;
+}
+
+.badge.bg-info {
+    background: linear-gradient(45deg, #17a2b8, #007bff) !important;
+}
+
+/* کردارە خێراکان */
+.quick-actions {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: var(--border-radius);
+    padding: 30px;
+    margin-top: 20px;
+    box-shadow: var(--shadow-medium);
+    text-align: center;
+}
+
+.quick-actions .action-btn {
+    margin: 5px;
+    min-width: 180px;
+}
+
+/* ڕێسپۆنسیڤ بۆ مۆبایل */
+@media (max-width: 768px) {
+    .dashboard-card {
+        margin-bottom: 20px;
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+    }
+    
+    .action-btn {
+        padding: 8px 15px;
+        font-size: 14px;
+        min-width: auto;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .quick-actions .action-btn {
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .card-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    .table-responsive {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 576px) {
+    .dashboard-card {
+        border-radius: 10px;
+    }
+    
+    .recent-items {
+        padding: 15px;
+        border-radius: 10px;
+    }
+    
+    .stat-number {
+        font-size: 1.3rem;
+    }
+    
+    .action-btn {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+}
+
+/* ئینیمەیشنە تایبەتەکان */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dashboard-card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.dashboard-card:nth-child(1) { animation-delay: 0.1s; }
+.dashboard-card:nth-child(2) { animation-delay: 0.2s; }
+.dashboard-card:nth-child(3) { animation-delay: 0.3s; }
+
+.recent-items {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+/* سکرۆڵباری تایبەتی */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, #007bff, #28a745);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(45deg, #0056b3, #1e7e34);
+}
+
+/* تایتڵی بەشەکان */
+.section-title {
+    position: relative;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 3px;
+    background: linear-gradient(to right, #007bff, #28a745);
+    border-radius: 2px;
+}
+
+/* لۆدینگ ئینیمەیشن بۆ کارتەکان */
+.dashboard-card.loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-card.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+
+
+
+
+
+
+

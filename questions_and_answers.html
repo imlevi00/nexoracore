@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پرسیار و وەڵامە باوەکان - FAQ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e27;
+            background-image: 
+                radial-gradient(at 20% 20%, rgba(120, 119, 198, 0.3) 0px, transparent 50%),
+                radial-gradient(at 80% 80%, rgba(99, 102, 241, 0.3) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(16, 185, 129, 0.2) 0px, transparent 50%);
+            min-height: 100vh;
+            padding: 30px 20px;
+            line-height: 1.6;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(99, 102, 241, 0.03) 2px,
+                    rgba(99, 102, 241, 0.03) 4px
+                );
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 24px;
+            padding: 60px 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(
+                from 0deg,
+                transparent,
+                rgba(99, 102, 241, 0.1),
+                transparent 60deg
+            );
+            animation: rotate 8s linear infinite;
+        }
+
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 15px;
+            font-weight: 800;
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(135deg, #6366f1, #10b981, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 30px rgba(99, 102, 241, 0.5));
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: #94a3b8;
+            position: relative;
+            z-index: 1;
+        }
+
+        .faq-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .faq-item {
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .faq-item:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 8px 40px rgba(99, 102, 241, 0.2);
+            transform: translateY(-4px) scale(1.01);
+        }
+
+        .faq-question {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(16, 185, 129, 0.15));
+            color: #e2e8f0;
+            padding: 26px 32px;
+            cursor: pointer;
+            font-size: 1.15em;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            transition: all 0.3s ease;
+            position: relative;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+        }
+
+        .faq-question::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #6366f1, #10b981);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .faq-question:hover {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(16, 185, 129, 0.25));
+        }
+
+        .faq-question:hover::before {
+            opacity: 1;
+        }
+
+        .faq-question::after {
+            content: '↓';
+            font-size: 1.4em;
+            font-weight: 300;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            color: #6366f1;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .faq-item.active .faq-question {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(16, 185, 129, 0.3));
+        }
+
+        .faq-item.active .faq-question::before {
+            opacity: 1;
+        }
+
+        .faq-item.active .faq-question::after {
+            transform: rotate(180deg);
+            background: rgba(16, 185, 129, 0.3);
+            color: #10b981;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .faq-answer {
+            padding: 0 32px;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(15, 23, 42, 0.3);
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 2000px;
+            padding: 32px;
+            border-top: 1px solid rgba(99, 102, 241, 0.1);
+        }
+
+        .faq-answer p {
+            color: #cbd5e1;
+            font-size: 1.05em;
+            line-height: 1.9;
+            margin-bottom: 16px;
+            animation: fadeInSlide 0.5s ease;
+        }
+
+        @keyframes fadeInSlide {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .faq-answer p strong {
+            color: #6366f1;
+            font-weight: 700;
+        }
+
+        .faq-answer p:last-child {
+            margin-bottom: 0;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(16, 185, 129, 0.3));
+            padding: 6px 14px;
+            border-radius: 10px;
+            font-weight: 700;
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+            display: inline-block;
+        }
+
+        .footer {
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(99, 102, 241, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+            text-align: center;
+            color: #64748b;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 15px;
+            }
+
+            .header {
+                padding: 40px 25px;
+                border-radius: 18px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .faq-question {
+                font-size: 1em;
+                padding: 20px 24px;
+            }
+
+            .faq-answer {
+                padding: 0 24px;
+            }
+
+            .faq-item.active .faq-answer {
+                padding: 24px;
+            }
+
+            .faq-question::after {
+                width: 35px;
+                height: 35px;
+                font-size: 1.2em;
+            }
+        }
+
+        .icon {
+            margin-left: 12px;
+            font-size: 1.35em;
+            filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.6));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(5deg); }
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #6366f1, #10b981);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #818cf8, #34d399);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>❓ پرسیار و وەڵامە باوەکان</h1>
+        </div>
+
+        <div class="faq-container">
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span><span class="icon">💭</span> ئایا ئەم سیستەمە تا کەی بەخۆڕاییە ؟</span>
+                </div>
+                <div class="faq-answer">
+                    <p><strong>وەڵام:</strong> کات دیاری نەکراوە بۆ سنوری خۆڕایی</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span><span class="icon">💰</span> ئێمە چۆن ئیسفادە دەکەین کاتێک بەخۆڕایی بێت ؟</span>
+                </div>
+                <div class="faq-answer">
+                    <p><strong>وەڵام:</strong> دەکرێت بەچەندین شێواز سود ببین یان تێچوو دابین بکەین بۆ نمونە:</p>
+                    <p>• لەڕێگەی پاڵپشتی مادی بەکارهێنەران</p>
+                    <p>• ڕیکلام (سپۆنسەرکردن)</p>
+                    <p>• ناوبانگ</p>
+                    <p>• لەڕێگەی پارەی بەشی بەکارهێنانی گفتووگۆکردن لەگەڵ AI ی سود ببین  </p>
+                    <p>• بۆ نمونە وەکو فەیسبووک و تۆڕەکانی تر فریە بەکارهێنانی</p>
+
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span><span class="icon">🔮</span> ئایا بۆ داهاتوو ئەگەر ببێتە پارە بەشی خۆڕایی دەمێنێتەوە یان چۆن دەبێت ؟</span>
+                </div>
+                <div class="faq-answer">
+                    <p><strong>وەڵام:</strong> ئەوە دیاری نەکراوە بۆ نمونە:</p>
+                    <p>• دەکرێت بەشێکی تایبەتمەندیەکان بکرێتە پارە و چەند پاکێجێک دابنرێت و بەشێکیشی خۆڕایی بمێنێتەوە</p>
+                    <p>• یان بەتەواوی بکرێتە پارە</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span><span class="icon">🔒</span> ئایا ئەم سیستەمە ئۆنڵاینە بەئینتەرنێتەوەیە مەترسی هاک کردنی نیە ؟</span>
+                </div>
+                <div class="faq-answer">
+                    <p><strong>وەڵام:</strong> بەگشتی هیچ شتێک لە ئینتەرنێتدا نیە مەترسی هاککردنی نەبێت بەڵام لەگەڵ ئەوەشدا:</p>
+                    <p>• ئێمە ئەزموونی باشمان هەیە و هەوڵدەدەین بەتەواوی پارێزراو بێت</p>
+                    <p>• بەڵام هیچ گرنتەیەکی %100 نیە</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span><span class="icon">🛡️</span> ئەگەر هاک کرا چی، ئێمە زەرەر ناکەین ؟</span>
+                </div>
+                <div class="faq-answer">
+                    <p><strong>وەڵام:</strong> ئێمە لە ئێستادا بەشی باک ئەپی داتای قەرزی کڕیارەکانمان داناوە:</p>
+                    <p>• دەتوانن ڕەبتی ئەکاوەنتی تیلیگرامتانی بکەن ڕۆژانە داخڵی سیستەم بوون ئۆتۆماتیکی داتاکانتان بۆ دێتەوە بۆ ئەوەی هیچ داتایەکی قەرزی کڕیارەکانتان نەفەوتێت ان شاء الله</p>
+                    <p>• ئێمە لای خۆمانەوە ڕۆژانە بەردەوام ئۆتۆماتیکی هەوڵدەدەین نوسخەی داتاکانمان باک ئەپ بکرێت بۆ ئەوەی خودا نەخواستە هیچ داتایەک نەفەوتێت و گەر خودا نەخواستە شتێکیش بوو بتوانین دواتر ئیش بە نوسخەی داتاکان بکەین</p>
+                    <p>• دەکرێت لەسەر خواستی خۆتان و بەتایبەتی بۆ نمونە بەپارە یان ڕێکەوتن نوسخەی تری داتاکانتان ڕۆژانە بۆ بنێردرێت یان تەواوی داتاکان</p>
+                    <p>• دەکرێت داوای سیستەمەکە بکەن بە ئۆفڵاین ئەویش بەپێی ڕێکەوتنی تایبەت</p>
+                    <p>• ئێمە بۆمان گرینگە هیچ کەسێک لەلای سیستەمی ئێمە هیچ جۆرە زەرەرێک نەکات ان شاء الله بۆیە هەوڵی باشیش دەدەین بۆ ئەوەو چەندین ڕێگا بەکاردەهێنین </p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span><span class="icon">💵</span> ئەگەر سیستەمەکە ببێت بەپارە چۆن دەبێت و چەند دەبێت ؟</span>
+                </div>
+                <div class="faq-answer">
+                    <p><strong>وەڵام:</strong> دیاری نەکراوە بەڵام:</p>
+                    <p>• ئێمە هەوڵدەدەین نرخێکی کەم بێت و بەکارهێنەری زۆر بێت نەک بەپێچەوانەوە نرخی زۆر بێت و بەکارهێنەری کەم بێت</p>
+                    <p>• ڕەنگە بەشی خۆڕاییشمان بەردەوام هەبێت بۆ نمونە:</p>
+                    <p style="padding-right: 20px;">&nbsp;&nbsp;&nbsp;• پاکێجی ئاسایی فری</p>
+                    <p style="padding-right: 20px;">&nbsp;&nbsp;&nbsp;• پاکێجی تایبەت بەپارە تایبەتمەندی زۆر</p>
+                </div>
+            </div>
+        </div>
+
+      
+    </div>
+
+    <script>
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const item = question.parentElement;
+                const isActive = item.classList.contains('active');
+                
+                // Close all items
+                document.querySelectorAll('.faq-item').forEach(faqItem => {
+                    faqItem.classList.remove('active');
+                });
+                
+                // Open clicked item if it wasn't active
+                if (!isActive) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

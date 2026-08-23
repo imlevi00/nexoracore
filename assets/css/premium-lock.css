@@ -1,0 +1,320 @@
+/* Premium feature lock — هاوشێوەی user/pos/receipt.php */
+body.premium-lock-screen {
+    overflow: hidden;
+}
+
+.locked-content {
+    filter: blur(8px) grayscale(20%);
+    pointer-events: none;
+    user-select: none;
+    opacity: 0.6;
+}
+
+.premium-lock-skeleton .wallet-table-shell {
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.premium-lock-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(8px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.premium-lock-card {
+    background: white;
+    padding: 2.5rem 2rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: max-content;
+    max-width: calc(100vw - 40px);
+    box-sizing: border-box;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.premium-lock-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(135deg, #0ea5e9, #6366f1);
+}
+
+@keyframes slideUp {
+    0% {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.lock-icon-container {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    border: 2px solid #e2e8f0;
+}
+
+.lock-icon-container i {
+    font-size: 30px;
+    color: #64748b;
+}
+
+.premium-lock-card__title,
+.premium-lock-card h3.premium-lock-card__title {
+    display: block;
+    width: max-content;
+    max-width: calc(100vw - 4.5rem);
+    margin: 0 auto 0.75rem;
+    padding: 0;
+    font-size: clamp(0.625rem, calc((100vw - 4.5rem) / 34), 1.05rem);
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1.35;
+    font-family: inherit;
+    white-space: nowrap;
+    text-wrap: nowrap;
+    overflow-wrap: normal;
+    word-break: keep-all;
+    hyphens: none;
+}
+
+@media (max-width: 480px) {
+    .premium-lock-card {
+        padding: 2rem 1rem;
+    }
+}
+
+.premium-lock-card p {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.premium-lock-card .upgrade-btn {
+    background: linear-gradient(135deg, #0ea5e9, #6366f1);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    color: white;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 10px 20px rgba(14, 165, 233, 0.2);
+    font-size: 0.95rem;
+    align-self: stretch;
+    box-sizing: border-box;
+}
+
+.premium-lock-card .upgrade-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 25px rgba(14, 165, 233, 0.3);
+    background: linear-gradient(135deg, #38bdf8, #818cf8);
+    color: white;
+}
+
+.premium-lock-card .back-btn {
+    display: inline-block;
+    margin-top: 1rem;
+    color: #94a3b8;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.premium-lock-card .back-btn:hover {
+    color: #64748b;
+    text-decoration: underline;
+}
+
+html[data-bs-theme='dark'] body.premium-lock-screen.bg-light {
+    background-color: #0b1220 !important;
+    color: #e5e7eb;
+}
+
+html[data-bs-theme='dark'] .premium-lock-skeleton .wallet-table-shell,
+html[data-bs-theme='dark'] .premium-lock-skeleton .card {
+    background: #111827;
+    border-color: rgba(71, 85, 105, 0.45);
+    color: #e5e7eb;
+}
+
+html[data-bs-theme='dark'] .premium-lock-card,
+body.dark-mode .premium-lock-card {
+    background: #111827;
+    border-color: #273244;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+html[data-bs-theme='dark'] .lock-icon-container,
+body.dark-mode .lock-icon-container {
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    border-color: #334155;
+}
+
+html[data-bs-theme='dark'] .lock-icon-container i,
+body.dark-mode .lock-icon-container i {
+    color: #cbd5e1;
+}
+
+html[data-bs-theme='dark'] .premium-lock-card__title,
+html[data-bs-theme='dark'] .premium-lock-card h3,
+body.dark-mode .premium-lock-card__title,
+body.dark-mode .premium-lock-card h3 {
+    color: #f8fafc;
+}
+
+html[data-bs-theme='dark'] .premium-lock-card p,
+html[data-bs-theme='dark'] .premium-lock-card .back-btn,
+body.dark-mode .premium-lock-card p,
+body.dark-mode .premium-lock-card .back-btn {
+    color: #cbd5e1;
+}
+
+html[data-bs-theme='dark'] .premium-lock-card .back-btn:hover,
+body.dark-mode .premium-lock-card .back-btn:hover {
+    color: #e2e8f0;
+}
+
+/* Section-scoped lock (e.g. inventory value cards on products list) */
+.premium-lock-section {
+    position: relative;
+}
+
+.premium-lock-section-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    background: rgba(15, 23, 42, 0.35);
+    backdrop-filter: blur(4px);
+    border-radius: 0.5rem;
+    pointer-events: auto;
+}
+
+.premium-lock-section .locked-content {
+    pointer-events: none;
+}
+
+.premium-lock-card--compact {
+    padding: 1.5rem 1.25rem;
+    max-width: min(100%, 22rem);
+}
+
+.premium-lock-card--compact .lock-icon-container {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 14px;
+}
+
+.premium-lock-card--compact .lock-icon-container i {
+    font-size: 24px;
+}
+
+.premium-lock-card--compact .premium-lock-card__title {
+    font-size: clamp(0.75rem, 2.5vw, 0.95rem);
+    white-space: normal;
+    text-wrap: balance;
+    max-width: 100%;
+}
+
+.premium-lock-card--compact p {
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.premium-lock-card--compact .upgrade-btn {
+    padding: 0.6rem 1.25rem;
+    font-size: 0.875rem;
+}
+
+/* بچووکتر بۆ overlay ـی کارتی مەخزەن لە products/index */
+.premium-lock-section-overlay .premium-lock-card--compact {
+    padding: 0.65rem 0.85rem;
+    max-width: min(100%, 15rem);
+    width: 100%;
+    border-radius: 0.65rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.premium-lock-section-overlay .premium-lock-card--compact::before {
+    height: 3px;
+}
+
+.premium-lock-section-overlay .premium-lock-card--compact .lock-icon-container {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 0.4rem;
+    border-width: 1px;
+}
+
+.premium-lock-section-overlay .premium-lock-card--compact .lock-icon-container i {
+    font-size: 14px;
+}
+
+.premium-lock-section-overlay .premium-lock-card--compact .premium-lock-card__title,
+.premium-lock-section-overlay .premium-lock-card--compact h3.premium-lock-card__title {
+    width: 100%;
+    max-width: 100%;
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: normal;
+    text-wrap: balance;
+    margin: 0 auto 0.25rem;
+    line-height: 1.35;
+}
+
+.premium-lock-section-overlay .premium-lock-card--compact p {
+    font-size: 0.68rem;
+    margin-bottom: 0.45rem;
+    line-height: 1.4;
+}
+
+.premium-lock-section-overlay .premium-lock-card--compact .upgrade-btn {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.68rem;
+    gap: 0.25rem;
+    box-shadow: 0 4px 10px rgba(14, 165, 233, 0.15);
+}
+
+html[data-bs-theme='dark'] .premium-lock-section-overlay,
+body.dark-mode .premium-lock-section-overlay {
+    background: rgba(2, 8, 23, 0.55);
+}

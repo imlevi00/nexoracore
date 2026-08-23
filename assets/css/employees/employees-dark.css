@@ -1,0 +1,82 @@
+html[data-bs-theme='dark'] body,
+html[data-bs-theme='dark'] body.bg-light {
+    background: #0f172a !important;
+}
+
+html[data-bs-theme='dark'] .page-header,
+html[data-bs-theme='dark'] .filter-card,
+html[data-bs-theme='dark'] .summary-card,
+html[data-bs-theme='dark'] .table-card,
+html[data-bs-theme='dark'] .chart-container,
+html[data-bs-theme='dark'] .employee-card,
+html[data-bs-theme='dark'] .card.sub-user-card,
+html[data-bs-theme='dark'] .premium-lock-card,
+html[data-bs-theme='dark'] .modal-content,
+html[data-bs-theme='dark'] .dropdown-menu {
+    background: #1e293b;
+    color: #e2e8f0;
+    border: 1px solid #334155;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+html[data-bs-theme='dark'] .stat-box,
+html[data-bs-theme='dark'] .summary-item {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+html[data-bs-theme='dark'] .form-control,
+html[data-bs-theme='dark'] .form-select {
+    background: #0f172a;
+    color: #e2e8f0;
+    border-color: #334155;
+}
+
+html[data-bs-theme='dark'] .form-control:focus,
+html[data-bs-theme='dark'] .form-select:focus {
+    background: #0f172a;
+    color: #e2e8f0;
+    border-color: #818cf8;
+}
+
+html[data-bs-theme='dark'] .table thead th {
+    border-color: #334155;
+}
+
+html[data-bs-theme='dark'] .table tbody td {
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+html[data-bs-theme='dark'] .table tbody tr:hover {
+    background: rgba(129, 140, 248, 0.12);
+}
+
+html[data-bs-theme='dark'] .text-muted,
+html[data-bs-theme='dark'] .muted,
+html[data-bs-theme='dark'] .small.text-muted {
+    color: #94a3b8 !important;
+}
+
+html[data-bs-theme='dark'] .dropdown-item {
+    color: #e2e8f0;
+}
+
+html[data-bs-theme='dark'] .dropdown-item:hover,
+html[data-bs-theme='dark'] .dropdown-item:focus {
+    background: #334155;
+    color: #f8fafc;
+}
+
+html[data-bs-theme='dark'] .btn-outline-secondary,
+html[data-bs-theme='dark'] .btn-reset {
+    border-color: #64748b;
+    color: #cbd5e1;
+    background: transparent;
+}
+
+html[data-bs-theme='dark'] .btn-outline-secondary:hover,
+html[data-bs-theme='dark'] .btn-reset:hover {
+    background: #334155;
+    color: #f8fafc;
+}

@@ -1,0 +1,10 @@
+{
+    "name": "kasher/app",
+    "description": "Optional Composer dependencies (پڕۆژەکە بێ vendor کاردەکات)",
+    "require": {
+        "php": ">=8.0"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

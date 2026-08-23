@@ -1,0 +1,304 @@
+/**
+ * Website & About modules — mobile & tablet responsive
+ */
+
+.website-module-page,
+.about-module-page,
+.aboutsystem-module-page {
+    -webkit-text-size-adjust: 100%;
+    min-height: 100dvh;
+}
+
+.hub-page-content,
+.website-module-page > .container-fluid,
+.website-module-page > .container,
+.about-module-page > .container,
+.about-module-page section .container,
+.aboutsystem-module-page > .container-fluid {
+    position: relative;
+    z-index: 1;
+}
+
+/* ========== Shared layout ========== */
+@media (max-width: 767.98px) {
+    .website-module-page .hub-page-content,
+    .about-module-page .hub-page-content,
+    .aboutsystem-module-page .hub-page-content,
+    .website-module-page > .container-fluid,
+    .website-module-page > .container,
+    .about-module-page > .container,
+    .aboutsystem-module-page > .container-fluid {
+        padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
+        padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
+        padding-top: 1rem !important;
+        padding-bottom: 1.25rem !important;
+    }
+
+    .website-module-page .hub-page-header,
+    .website-module-page .page-header .d-flex,
+    .website-module-page .d-flex.justify-content-between.align-items-center,
+    .aboutsystem-module-page .d-flex.justify-content-between.align-items-center {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 0.75rem;
+    }
+
+    .website-module-page .hub-page-header h1,
+    .website-module-page .hub-page-header h2,
+    .website-module-page .page-header h2,
+    .aboutsystem-module-page .hub-page-header h2 {
+        font-size: 1.35rem;
+    }
+
+    .website-module-page .hub-page-header .btn,
+    .website-module-page .page-header .btn,
+    .website-module-page .d-flex.gap-2 .btn,
+    .website-module-page .d-flex.flex-wrap.gap-2 .btn,
+    .aboutsystem-module-page .hub-page-header .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .website-module-page .nav-tabs,
+    .website-orders-page .nav-tabs,
+    .website-stats-page .nav-tabs,
+    .website-stats-page #statsTabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-bottom: 1px solid var(--border-soft, #dee2e6);
+    }
+
+    .website-module-page .nav-tabs .nav-link,
+    .website-orders-page .nav-tabs .nav-link,
+    .website-stats-page .nav-tabs .nav-link {
+        white-space: nowrap;
+        font-size: 0.85rem;
+    }
+
+    .website-module-page .table-responsive,
+    .website-orders-page .table-responsive {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .website-module-page .modal-dialog,
+    .website-orders-page .modal-dialog {
+        margin: 0.75rem;
+        max-width: calc(100vw - 1.5rem);
+    }
+
+    .website-settings-page .website-settings-card .card-header {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 0.75rem;
+    }
+
+    .website-settings-page .website-settings-card .card-header .d-flex {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.5rem;
+    }
+
+    .website-settings-page .website-settings-card .card-header .btn {
+        width: 100%;
+    }
+
+    .website-settings-page .d-flex.justify-content-end .btn-lg {
+        width: 100%;
+    }
+
+    .website-gmail-page .card-header form {
+        max-width: 100% !important;
+        flex-direction: column;
+    }
+
+    .website-gmail-page .shop-gmail-table {
+        min-width: 640px;
+        font-size: 0.85rem;
+    }
+
+    .website-manage-page .website-manage-table {
+        min-width: 680px;
+        font-size: 0.85rem;
+    }
+}
+
+/* ========== Website orders ========== */
+@media (max-width: 767.98px) {
+    .website-orders-page .page-header {
+        padding: 1rem !important;
+    }
+
+    .website-orders-page .order-card {
+        margin-bottom: 0.75rem;
+    }
+
+    .website-orders-page .order-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .website-orders-page .order-actions .btn {
+        width: 100%;
+    }
+
+    .website-orders-page .customer-search-wrapper {
+        width: 100%;
+    }
+}
+
+/* ========== Website statistics ========== */
+@media (max-width: 767.98px) {
+    .website-stats-page .page-header {
+        padding: 1rem !important;
+    }
+
+    .website-stats-page .stats-container .tab-content {
+        padding: 1rem 0.75rem !important;
+    }
+
+    .website-stats-page .stat-card {
+        margin-bottom: 0.5rem;
+    }
+
+    .website-stats-page .stat-value {
+        font-size: 1.25rem;
+    }
+
+    .website-stats-page .chart-wrapper {
+        padding: 0.75rem !important;
+        overflow-x: auto;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .website-stats-page .row.g-3 > [class*="col-md-"] {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+/* ========== About system hub ========== */
+@media (max-width: 767.98px) {
+    .aboutsystem-hub-page h2 {
+        font-size: 1.45rem;
+    }
+
+    .aboutsystem-hub-page .dashboard-card {
+        min-height: 130px;
+    }
+
+    .aboutsystem-hub-page .dashboard-card h6 {
+        font-size: 0.92rem !important;
+    }
+
+    .aboutsystem-hub-page .card-icon {
+        width: 52px !important;
+        height: 52px !important;
+        font-size: 24px !important;
+        margin-bottom: 0.5rem !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .aboutsystem-hub-page .dashboard-card-wrapper {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        padding: 0.35rem !important;
+    }
+
+    .aboutsystem-hub-page .dashboard-card:hover {
+        transform: none;
+    }
+}
+
+/* ========== About page ========== */
+@media (max-width: 767.98px) {
+    .about-module-page .hero-section {
+        padding: 2.5rem 0 !important;
+    }
+
+    .about-module-page .hero-section .display-3 {
+        font-size: 2rem;
+    }
+
+    .about-module-page .hero-section .lead {
+        font-size: 1.1rem !important;
+    }
+
+    .about-module-page .stats-box {
+        padding: 1rem 1.25rem !important;
+    }
+
+    .about-module-page .stats-number {
+        font-size: 2rem !important;
+    }
+
+    .about-module-page .service-card:hover {
+        transform: none;
+    }
+
+    .about-module-page .section-title {
+        margin-bottom: 1.5rem;
+        font-size: 1.35rem;
+    }
+
+    .about-module-page .contact-item {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 0.35rem;
+    }
+
+    .about-module-page .contact-item .mt-2 a {
+        display: block;
+        margin: 0.25rem 0;
+    }
+
+    .about-module-page .contact-item .mx-2 {
+        display: none;
+    }
+
+    .about-module-page .back-to-dashboard {
+        bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+        left: max(1rem, env(safe-area-inset-left, 0px));
+        width: 50px;
+        height: 50px;
+    }
+}
+
+/* ========== Order receipt (print preview) ========== */
+@media (max-width: 767.98px) {
+    .website-receipt-page .action-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.75rem;
+    }
+
+    .website-receipt-page .action-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .website-receipt-page .receipt-container {
+        padding: 0.75rem;
+    }
+
+    .website-receipt-page .receipt {
+        padding: 1rem !important;
+        font-size: 0.9rem;
+    }
+}
+
+/* ========== Touch ========== */
+@media (hover: none) and (pointer: coarse) {
+    .aboutsystem-hub-page .dashboard-card:hover,
+    .about-module-page .service-card:hover {
+        transform: none;
+    }
+
+    .website-module-page .btn,
+    .about-module-page .btn,
+    .aboutsystem-module-page .btn {
+        min-height: 44px;
+    }
+}

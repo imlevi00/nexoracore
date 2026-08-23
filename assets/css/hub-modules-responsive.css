@@ -1,0 +1,289 @@
+/**
+ * Expenses, Reports & Wallets — mobile & tablet responsive
+ * Layout and touch targets only; no logic changes.
+ */
+
+/* ========== Shared hub-module layout ========== */
+.expenses-module-page,
+.reports-module-page,
+.wallets-module-page {
+    -webkit-text-size-adjust: 100%;
+    min-height: 100dvh;
+}
+
+.hub-module-page .hub-page-content,
+.expenses-module-page > .container-fluid,
+.expenses-module-page > .container,
+.reports-module-page > .container-fluid,
+.reports-module-page > .container,
+.wallets-module-page > .container-fluid,
+.wallets-module-page > .container {
+    position: relative;
+    z-index: 1;
+}
+
+@media (max-width: 767.98px) {
+    .expenses-module-page .container-fluid,
+    .reports-module-page .container-fluid,
+    .wallets-module-page .container-fluid,
+    .hub-page-content {
+        padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
+        padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
+        padding-top: 1rem !important;
+        padding-bottom: 1.25rem !important;
+    }
+
+    .expenses-module-page > .container,
+    .reports-module-page > .container,
+    .wallets-module-page > .container {
+        padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
+        padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
+    }
+
+    .expenses-module-page .hub-page-header,
+    .reports-module-page .hub-page-header,
+    .wallets-module-page .hub-page-header,
+    .expenses-module-page .d-flex.justify-content-between.align-items-center.mb-4,
+    .expenses-module-page .d-flex.justify-content-between.align-items-center.mb-3,
+    .wallets-module-page .d-flex.justify-content-between.align-items-center.mb-3,
+    .wallets-module-page .d-flex.justify-content-between.align-items-center.mb-4,
+    .reports-module-page .d-flex.justify-content-between.align-items-center {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 0.75rem;
+    }
+
+    .expenses-module-page .hub-page-header h1,
+    .expenses-module-page .hub-page-header h2,
+    .expenses-module-page .hub-page-header .h3,
+    .expenses-module-page .d-flex.justify-content-between.align-items-center.mb-4 h1,
+    .wallets-module-page .wallet-title,
+    .reports-module-page h2 {
+        font-size: 1.35rem;
+        margin-bottom: 0;
+    }
+
+    .expenses-module-page .hub-page-header-actions,
+    .expenses-module-page .d-flex.justify-content-between.align-items-center.mb-4 > div:last-child,
+    .expenses-module-page .d-flex.justify-content-between.align-items-center.mb-4 > .d-flex,
+    .wallets-module-page .d-flex.justify-content-between.align-items-center.mb-3 > .d-flex,
+    .wallets-module-page .d-flex.gap-2 {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.5rem !important;
+    }
+
+    .expenses-module-page .hub-page-header .btn,
+    .expenses-module-page .d-flex.justify-content-between.align-items-center.mb-4 .btn,
+    .wallets-module-page .d-flex.justify-content-between.align-items-center .btn,
+    .reports-module-page .cashier-receipt-bar .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .expenses-module-page .row.g-3 > [class*="col-"],
+    .reports-module-page .row.g-3 > [class*="col-"],
+    .wallets-module-page .row.g-3 > [class*="col-"],
+    .expenses-module-page .row.mb-4 > [class*="col-"] {
+        margin-bottom: 0.65rem;
+    }
+
+    .expenses-module-page .card-body .row > [class*="col-md-"],
+    .expenses-module-page .card-body .row > [class*="col-lg-"],
+    .reports-module-page .filter-section .row > [class*="col-"],
+    .reports-module-page .cashier-receipt-bar .row > [class*="col-"] {
+        margin-bottom: 0.5rem;
+    }
+
+    .expenses-module-page .table-responsive,
+    .reports-module-page .table-responsive,
+    .wallets-module-page .table-responsive,
+    .wallets-module-page .wallet-table-shell .table-responsive {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .expenses-module-page .pagination,
+    .reports-module-page .pagination,
+    .wallets-module-page .pagination {
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        justify-content: center;
+    }
+
+    .expenses-module-page .modal-dialog,
+    .reports-module-page .modal-dialog,
+    .wallets-module-page .modal-dialog {
+        margin: 0.75rem;
+        max-width: calc(100vw - 1.5rem);
+    }
+}
+
+/* ========== Hub cards (main.php pages) ========== */
+@media (max-width: 767.98px) {
+    .expenses-hub-page h2,
+    .reports-hub-page h2,
+    .wallets-hub-page h2 {
+        font-size: 1.45rem;
+    }
+
+    .expenses-hub-page .dashboard-card,
+    .reports-hub-page .dashboard-card,
+    .wallets-hub-page .dashboard-card {
+        min-height: 130px;
+    }
+
+    .expenses-hub-page .dashboard-card h6,
+    .reports-hub-page .dashboard-card h6,
+    .wallets-hub-page .dashboard-card h6 {
+        font-size: 0.92rem !important;
+        line-height: 1.35;
+    }
+
+    .expenses-hub-page .card-icon,
+    .reports-hub-page .card-icon,
+    .wallets-hub-page .card-icon {
+        width: 52px !important;
+        height: 52px !important;
+        font-size: 24px !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    .reports-hub-page .period-stat-card {
+        padding: 0.85rem !important;
+    }
+
+    .reports-hub-page .period-stat-value {
+        font-size: 1rem;
+    }
+
+    .reports-hub-page .cashier-receipt-bar {
+        padding: 1rem !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .expenses-hub-page .dashboard-card-wrapper,
+    .reports-hub-page .dashboard-card-wrapper,
+    .wallets-hub-page .dashboard-card-wrapper {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        padding: 0.35rem !important;
+    }
+
+    .expenses-hub-page .dashboard-card,
+    .reports-hub-page .dashboard-card,
+    .wallets-hub-page .dashboard-card {
+        min-height: 118px;
+    }
+
+    .expenses-hub-page .dashboard-card:hover,
+    .reports-hub-page .dashboard-card:hover,
+    .wallets-hub-page .dashboard-card:hover {
+        transform: none;
+    }
+
+    .expenses-hub-page a.text-decoration-none,
+    .reports-hub-page a.text-decoration-none,
+    .wallets-hub-page a.text-decoration-none {
+        display: block;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0.08);
+    }
+}
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+    .reports-hub-page .dashboard-card-wrapper {
+        flex: 0 0 50% !important;
+        max-width: 50% !important;
+    }
+}
+
+/* ========== Expenses list / credits ========== */
+@media (max-width: 991.98px) {
+    .expenses-list-page .expenses-list-table,
+    .expenses-credits-page .expenses-credits-table {
+        min-width: 680px;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .expenses-stats-page .chart-container,
+    .expenses-stats-page canvas {
+        max-width: 100%;
+    }
+}
+
+/* ========== Reports profit page ========== */
+@media (max-width: 767.98px) {
+    .reports-profit-page .chart-container {
+        height: 280px !important;
+    }
+
+    .reports-profit-page .stat-card,
+    .reports-profit-page .weekly-card,
+    .reports-profit-page .profit-card {
+        padding: 1rem !important;
+        margin-bottom: 0.75rem;
+    }
+
+    .reports-profit-page .stat-number {
+        font-size: 1.5rem;
+    }
+
+    .reports-profit-page .filter-section {
+        padding: 1rem !important;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .reports-item-page .item-profit-table {
+        min-width: 720px;
+        font-size: 0.85rem;
+    }
+}
+
+/* ========== Wallets ========== */
+@media (max-width: 991.98px) {
+    .wallets-list-page .wallets-list-table {
+        min-width: 640px;
+        font-size: 0.85rem;
+    }
+
+    .wallets-list-page .wallet-table-shell {
+        padding: 0.85rem !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .wallets-history-page .history-filter-card .row > [class*="col-"] {
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* ========== Full width on mobile ========== */
+@media (max-width: 767.98px) {
+    .expenses-module-page,
+    .reports-module-page,
+    .wallets-module-page {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* ========== Touch ========== */
+@media (hover: none) and (pointer: coarse) {
+    .expenses-hub-page .dashboard-card:hover,
+    .reports-hub-page .dashboard-card:hover,
+    .wallets-hub-page .dashboard-card:hover {
+        transform: none;
+    }
+
+    .expenses-module-page .btn,
+    .reports-module-page .btn,
+    .wallets-module-page .btn,
+    .expenses-module-page .dashboard-card,
+    .reports-module-page .dashboard-card,
+    .wallets-module-page .dashboard-card {
+        min-height: 44px;
+    }
+}

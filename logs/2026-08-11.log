@@ -1,0 +1,10 @@
+[2026-08-11 12:19:18] [INFO] Business type updated by user demo@local.test: 2
+[2026-08-11 12:19:36] [INFO] Business type updated by user demo@local.test: 1
+[2026-08-11 12:19:58] [INFO] Business type updated by user demo@local.test: 4
+[2026-08-11 12:20:58] [INFO] Business type updated by user demo@local.test: 4
+[2026-08-11 12:27:18] [INFO] Business type updated by user demo@local.test: 5
+[2026-08-11 16:31:02] [INFO] Sale created: Invoice INV-20260811-5972-626478, Amount: 25000 by user: demo@local.test
+[2026-08-11 16:31:33] [INFO] Business type updated by user demo@local.test: 2
+[2026-08-11 16:37:49] [INFO] User logout: demo@local.test from IP: ::1
+[2026-08-11 16:38:05] [INFO] Main user login successful: clothing@kashery.local from IP: ::1
+[2026-08-11 17:48:55] [INFO] Sale created: Invoice INV-20260811-6107-358564, Amount: 25000 by user: clothing@kashery.local

@@ -1,0 +1,39 @@
+html[data-bs-theme='dark'] body,
+html[data-bs-theme='dark'] body.bg-body-secondary {
+    background: #0f172a !important;
+}
+
+html[data-bs-theme='dark'] .card,
+html[data-bs-theme='dark'] .modal-content,
+html[data-bs-theme='dark'] .table-responsive {
+    background: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+html[data-bs-theme='dark'] .form-control,
+html[data-bs-theme='dark'] .form-select {
+    background: #0f172a;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+html[data-bs-theme='dark'] .form-control:focus,
+html[data-bs-theme='dark'] .form-select:focus {
+    background: #0f172a;
+    color: #e2e8f0;
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 0.2rem rgba(56, 189, 248, 0.15);
+}
+
+html[data-bs-theme='dark'] .table {
+    --bs-table-bg: #1e293b;
+    --bs-table-striped-bg: #172235;
+    --bs-table-striped-color: #e2e8f0;
+    --bs-table-color: #e2e8f0;
+    --bs-table-border-color: #334155;
+}
+
+html[data-bs-theme='dark'] .text-muted {
+    color: #94a3b8 !important;
+}

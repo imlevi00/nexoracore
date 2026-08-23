@@ -1,0 +1,2261 @@
+/* Smart Clinics Doctor UI — scoped to .doctor-smart-clinic-page */
+
+/* English UI: override global RTL from assets/css/style.css */
+html[dir="ltr"] body.doctor-ui-ltr {
+    direction: ltr;
+    text-align: left;
+}
+
+html[dir="ltr"] body.doctor-ui-ltr .form-control,
+html[dir="ltr"] body.doctor-ui-ltr .form-select,
+html[dir="ltr"] body.doctor-ui-ltr textarea,
+html[dir="ltr"] body.doctor-ui-ltr .input-group-text,
+html[dir="ltr"] body.doctor-ui-ltr .list-group-item,
+html[dir="ltr"] body.doctor-ui-ltr .dropdown-item,
+html[dir="ltr"] body.doctor-ui-ltr .prescription-search-result-item {
+    direction: ltr;
+    text-align: left;
+}
+
+html[dir="ltr"] body.doctor-ui-ltr .sc-table thead th,
+html[dir="ltr"] body.doctor-ui-ltr .sc-table tbody td {
+    text-align: left;
+}
+
+html[dir="ltr"] body.doctor-ui-ltr .alert ul {
+    padding-inline-start: 1.5rem;
+    padding-inline-end: 0;
+}
+
+.doctor-smart-clinic-page {
+    --sc-green: #1B5E20;
+    --sc-green-dark: #0D3B12;
+    --sc-green-light: #2E7D32;
+    --sc-panel-header: #00897B;
+    --sc-panel-header-dark: #00695C;
+    --sc-page-bg: #F5F5F5;
+    --sc-surface: #FFFFFF;
+    --sc-border: #E0E0E0;
+    --sc-row-hover: #FFF9C4;
+    --sc-row-zebra: #FAFAFA;
+    --sc-stat-total: #424242;
+    --sc-stat-waiting: #F9A825;
+    --sc-stat-active: #2E7D32;
+    --sc-stat-completed: #0288D1;
+    --sc-stat-rx: #7B1FA2;
+    --sc-stat-lab: #00ACC1;
+    --sc-stat-pending: #EF6C00;
+    --sc-stat-new: #1565C0;
+    background: var(--sc-page-bg) !important;
+}
+
+[data-bs-theme="dark"] .doctor-smart-clinic-page {
+    --sc-green: #2E7D32;
+    --sc-green-dark: #1B5E20;
+    --sc-green-light: #43A047;
+    --sc-panel-header: #00695C;
+    --sc-panel-header-dark: #004D40;
+    --sc-page-bg: #121212;
+    --sc-surface: #1E1E1E;
+    --sc-border: #333333;
+    --sc-row-hover: rgba(255, 235, 59, 0.12);
+    --sc-row-zebra: #1A1A1A;
+    --sc-stat-total: #BDBDBD;
+    --sc-stat-waiting: #FFB74D;
+    --sc-stat-active: #66BB6A;
+    --sc-stat-completed: #4FC3F7;
+    --sc-stat-rx: #CE93D8;
+    --sc-stat-lab: #4DD0E1;
+    --sc-stat-pending: #FFB74D;
+    --sc-stat-new: #64B5F6;
+}
+
+/* Navbar */
+.doctor-smart-clinic-page .navbar.bg-primary {
+    background-color: var(--sc-green) !important;
+    border-bottom: 2px solid var(--sc-green-dark);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.doctor-smart-clinic-page .navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.doctor-smart-clinic-page .navbar .nav-link {
+    font-size: 0.9rem;
+    padding: 0.45rem 0.75rem;
+    border-radius: 0.4rem;
+    transition: background 0.15s ease;
+}
+
+.doctor-smart-clinic-page .navbar .nav-link:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.doctor-smart-clinic-page .navbar .nav-link.active {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.doctor-smart-clinic-page .container.py-4 {
+    max-width: 1400px;
+}
+
+/* History page uses three columns, so give it more of the viewport width
+   to avoid large empty margins on the left and right. */
+.doctor-history-page .container.py-4 {
+    max-width: 1800px;
+}
+
+/* Page shell */
+.sc-page {
+    margin-bottom: 1rem;
+}
+
+.sc-page-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.sc-page-header .btn {
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.sc-page-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--bs-body-color);
+    margin: 0;
+}
+
+.sc-page-subtitle {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--bs-secondary-color);
+    margin: 0.15rem 0 0;
+}
+
+/* Stat bar */
+.sc-stat-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin-bottom: 1rem;
+}
+
+.sc-stat-card {
+    flex: 1 1 100px;
+    min-width: 90px;
+    background: var(--sc-surface);
+    border: 1px solid var(--sc-border);
+    border-radius: 0.5rem;
+    padding: 0.65rem 0.85rem 0.55rem;
+    text-align: center;
+    border-bottom: 3px solid var(--sc-stat-accent, var(--sc-stat-total));
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.sc-stat-card .sc-stat-value {
+    display: block;
+    font-size: 1.85rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--sc-stat-accent, var(--sc-stat-total));
+}
+
+.sc-stat-card .sc-stat-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--bs-secondary-color);
+    margin-top: 0.15rem;
+}
+
+.sc-stat-total { --sc-stat-accent: var(--sc-stat-total); }
+.sc-stat-waiting { --sc-stat-accent: var(--sc-stat-waiting); }
+.sc-stat-active { --sc-stat-accent: var(--sc-stat-active); }
+.sc-stat-completed { --sc-stat-accent: var(--sc-stat-completed); }
+.sc-stat-rx { --sc-stat-accent: var(--sc-stat-rx); }
+.sc-stat-lab { --sc-stat-accent: var(--sc-stat-lab); }
+.sc-stat-pending { --sc-stat-accent: var(--sc-stat-pending); }
+.sc-stat-new { --sc-stat-accent: var(--sc-stat-new); }
+
+/* Filter bar */
+.sc-filter-bar {
+    background: var(--sc-surface);
+    border: 1px solid var(--sc-border);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.sc-filter-bar .sc-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    align-items: flex-end;
+}
+
+.sc-filter-bar .sc-filter-field {
+    flex: 1 1 140px;
+    min-width: 120px;
+}
+
+.sc-filter-bar .sc-filter-field label {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--bs-secondary-color);
+    margin-bottom: 0.25rem;
+}
+
+.sc-filter-bar .form-control,
+.sc-filter-bar .form-select {
+    font-size: 1rem;
+    font-weight: 600;
+    border-color: var(--sc-border);
+}
+
+.sc-filter-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+/* Content card wrapper */
+.sc-content-card {
+    background: var(--sc-surface);
+    border: 1px solid var(--sc-border);
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+.sc-content-card .sc-content-body {
+    padding: 0;
+}
+
+/* Tables */
+.sc-table-wrap {
+    overflow-x: auto;
+}
+
+.sc-table {
+    width: 100%;
+    margin-bottom: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    border-collapse: collapse;
+}
+
+.sc-table thead th {
+    background: var(--sc-green);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 0.75rem 0.85rem;
+    border: none;
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+[data-bs-theme="dark"] .sc-table thead th {
+    background: var(--sc-green-dark);
+}
+
+.sc-table tbody tr {
+    border-bottom: 1px solid var(--sc-border);
+    transition: background 0.12s ease;
+}
+
+.sc-table tbody tr:nth-child(even) {
+    background: var(--sc-row-zebra);
+}
+
+.sc-table tbody tr:hover {
+    background: var(--sc-row-hover) !important;
+}
+
+.sc-table tbody td {
+    padding: 0.65rem 0.85rem;
+    vertical-align: middle;
+    border: none;
+    font-weight: 600;
+}
+
+.sc-table tbody td.small {
+    font-size: inherit;
+    font-weight: 600;
+}
+
+.sc-table .sc-status-waiting { color: var(--sc-stat-waiting); font-weight: 700; }
+.sc-table .sc-status-active { color: var(--sc-stat-active); font-weight: 700; }
+.sc-table .sc-status-completed { color: var(--sc-stat-completed); font-weight: 700; }
+
+/* Icon action buttons */
+.sc-action-group {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* Keep the action cell and its buttons on a single line so "Done"
+   never drops below; the table wrapper scrolls horizontally if needed. */
+.sc-table td.sc-actions-cell {
+    white-space: nowrap;
+}
+
+/* Keep the patient name on one line */
+.sc-table td.sc-name-cell {
+    white-space: nowrap;
+}
+
+.sc-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.35rem 0.65rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    border-radius: 0.35rem;
+    border: 1px solid var(--sc-border);
+    background: var(--sc-surface);
+    color: var(--bs-body-color);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.12s ease, border-color 0.12s ease;
+    white-space: nowrap;
+}
+
+.sc-action-btn:hover {
+    background: var(--sc-row-zebra);
+    border-color: var(--sc-green);
+    color: var(--sc-green);
+}
+
+.sc-action-btn.sc-action-primary {
+    border-color: var(--sc-green);
+    color: var(--sc-green);
+}
+
+.sc-action-btn.sc-action-primary:hover {
+    background: var(--sc-green);
+    color: #fff;
+}
+
+.sc-action-btn.sc-action-success {
+    border-color: var(--sc-stat-active);
+    color: var(--sc-stat-active);
+}
+
+.sc-action-btn.sc-action-success:hover {
+    background: var(--sc-stat-active);
+    color: #fff;
+}
+
+.sc-action-btn.sc-action-danger {
+    border-color: var(--bs-danger);
+    color: var(--bs-danger);
+}
+
+.sc-action-btn i {
+    font-size: 0.85rem;
+}
+
+.sc-action-btn-form {
+    display: inline;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: none;
+}
+
+/* Empty state */
+.sc-empty {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: var(--bs-secondary-color);
+}
+
+.sc-empty i {
+    display: block;
+    font-size: 2.25rem;
+    margin-bottom: 0.65rem;
+    opacity: 0.5;
+}
+
+/* Pagination */
+.sc-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--sc-border);
+    background: var(--sc-surface);
+    font-size: 0.85rem;
+}
+
+.sc-pagination .pagination {
+    margin: 0;
+}
+
+/* Buttons */
+.sc-btn-primary {
+    background: var(--sc-green);
+    border-color: var(--sc-green-dark);
+    color: #fff;
+}
+
+.sc-btn-primary:hover,
+.sc-btn-primary:focus {
+    background: var(--sc-green-dark);
+    border-color: var(--sc-green-dark);
+    color: #fff;
+}
+
+/* Workspace layout (create pages) */
+.sc-workspace {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 1rem;
+    align-items: start;
+}
+
+.sc-workspace > .sc-main-panels:only-child {
+    grid-column: 1 / -1;
+}
+
+/* History page: three columns — patient/actions (left), the active consultation
+   form plus the revealed visit-detail pane (middle), and the Clinic tree pinned
+   to the right. Clicking a tree node shows that visit's record in the middle. */
+.sc-workspace-hist {
+    grid-template-columns: 220px minmax(0, 1fr) 360px;
+}
+
+.sc-workspace-hist > .sc-sidebar {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.sc-workspace-hist > .sc-main-panels {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.sc-workspace-hist > .sc-clinic-column {
+    grid-column: 3;
+    grid-row: 1;
+}
+
+.sc-clinic-column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+@media (max-width: 991.98px) {
+    .sc-workspace,
+    .sc-workspace-hist {
+        grid-template-columns: 1fr;
+    }
+
+    .sc-workspace-hist > .sc-sidebar,
+    .sc-workspace-hist > .sc-main-panels,
+    .sc-workspace-hist > .sc-clinic-column {
+        grid-column: 1;
+        grid-row: auto;
+    }
+}
+
+.sc-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.sc-patient-card {
+    background: var(--sc-surface);
+    border: 1px solid var(--sc-border);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.sc-patient-card .sc-patient-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 0.65rem;
+    color: var(--bs-body-color);
+}
+
+.sc-patient-card .sc-patient-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    color: var(--bs-secondary-color);
+}
+
+.sc-patient-card .sc-patient-detail span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.sc-send-to {
+    background: var(--sc-surface);
+    border: 1px solid var(--sc-border);
+    border-radius: 0.5rem;
+    padding: 0.85rem;
+}
+
+.sc-send-to-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--bs-secondary-color);
+    margin-bottom: 0.65rem;
+}
+
+.sc-send-to-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.sc-send-to-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.6rem 0.4rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--sc-border);
+    background: var(--sc-surface);
+    color: var(--bs-body-color);
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+    transition: background 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
+}
+
+.sc-send-to-btn:hover {
+    border-color: var(--sc-panel-header);
+    background: rgba(0, 137, 123, 0.08);
+    color: var(--sc-panel-header);
+    transform: translateY(-1px);
+}
+
+.sc-send-to-btn i {
+    font-size: 1.15rem;
+}
+
+.sc-send-to-btn.sc-send-lab i { color: var(--sc-stat-lab); }
+.sc-send-to-btn.sc-send-rx i { color: var(--sc-stat-rx); }
+.sc-send-to-btn.sc-send-history i { color: var(--sc-stat-completed); }
+.sc-send-to-btn.sc-send-change i { color: var(--sc-stat-pending); }
+
+/* Panels */
+.sc-main-panels {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.sc-panel {
+    background: var(--sc-surface);
+    border: 1px solid var(--sc-border);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.sc-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    background: var(--sc-panel-header);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+[data-bs-theme="dark"] .sc-panel-header {
+    background: var(--sc-panel-header-dark);
+}
+
+.sc-panel-header i {
+    font-size: 1rem;
+}
+
+.sc-panel-body {
+    padding: 1rem;
+}
+
+.sc-panel:has(.sc-product-search-wrap) {
+    overflow: visible;
+}
+
+.sc-product-search-wrap {
+    overflow: visible;
+    z-index: 2;
+}
+
+/* Patient picker (create pages, no patient selected) */
+.sc-picker-section {
+    background: var(--sc-surface);
+    border: 1px solid var(--sc-border);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.sc-picker-section .patient-picker-list {
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+/* Prescription items */
+.rx-item-mini-label {
+    display: block;
+    font-size: 0.7rem;
+    margin-bottom: 2px;
+    color: var(--bs-secondary-color);
+}
+
+.rx-item-row .card-body {
+    align-items: flex-end;
+}
+
+.rx-item-row .rx-item-name {
+    align-self: center;
+}
+
+.rx-item-row {
+    background: var(--sc-row-zebra) !important;
+    border: 1px solid var(--sc-border) !important;
+    border-radius: 0.4rem !important;
+}
+
+.prescription-search-results {
+    position: absolute;
+    z-index: 1060;
+    inset-inline: 0;
+    top: 100%;
+    max-height: 240px;
+    overflow-y: auto;
+    border-radius: 0.5rem;
+    margin-top: 0.35rem;
+    display: none;
+    background: var(--sc-surface);
+    border: 1px solid var(--sc-border);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+[data-bs-theme="dark"] .prescription-search-results {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+}
+
+.prescription-search-results.is-open {
+    display: block;
+}
+
+/* Override Bootstrap .list-group-item-action.active (white text on primary) */
+.doctor-smart-clinic-page .prescription-search-result-item.list-group-item-action,
+.doctor-smart-clinic-page .prescription-search-result-item.list-group-item-action:hover,
+.doctor-smart-clinic-page .prescription-search-result-item.list-group-item-action:focus,
+.doctor-smart-clinic-page .prescription-search-result-item.list-group-item-action.active {
+    color: var(--bs-body-color);
+}
+
+.prescription-search-result-item {
+    cursor: pointer;
+    border: none;
+    width: 100%;
+    text-align: inherit;
+    background: var(--sc-surface);
+    color: var(--bs-body-color);
+    transition: background 0.12s ease, color 0.12s ease;
+}
+
+.prescription-search-result-item:hover,
+.prescription-search-result-item:focus,
+.prescription-search-result-item.active {
+    background: var(--sc-row-hover);
+    color: var(--bs-body-color);
+    outline: none;
+}
+
+[data-bs-theme="dark"] .prescription-search-result-item:hover,
+[data-bs-theme="dark"] .prescription-search-result-item:focus,
+[data-bs-theme="dark"] .prescription-search-result-item.active {
+    background: rgba(255, 235, 59, 0.12);
+    color: var(--bs-body-color);
+}
+
+.prescription-search-result-meta {
+    font-size: 0.75rem;
+    color: var(--bs-secondary-color);
+}
+
+.prescription-search-loading {
+    padding: 0.65rem 1rem;
+    font-size: 0.875rem;
+    color: var(--bs-secondary-color);
+}
+
+.prescription-list-diagnosis {
+    max-width: 220px;
+}
+
+/* Lab test selection */
+.lab-test-item {
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+    border-color: var(--sc-border) !important;
+}
+
+.lab-test-item.is-selected {
+    border-color: var(--sc-stat-active) !important;
+    background: rgba(46, 125, 50, 0.06);
+}
+
+[data-bs-theme="dark"] .lab-test-item.is-selected {
+    background: rgba(102, 187, 106, 0.1);
+}
+
+.lab-group-title {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--sc-panel-header);
+    padding: 0.35rem 0;
+    border-bottom: 1px solid var(--sc-border);
+    margin-bottom: 0.5rem;
+}
+
+.lab-rows-toggle .lab-rows-badge {
+    margin-inline-start: 0.25rem;
+}
+
+.lab-rows-panel {
+    background: var(--sc-row-zebra);
+    border-radius: 0 0 0.375rem 0.375rem;
+}
+
+.lab-row-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+.lab-row-chips .lab-chip {
+    --bs-btn-padding-y: 0.4rem;
+    --bs-btn-padding-x: 0.9rem;
+    font-weight: 500;
+}
+
+.lab-row-chips .lab-chip-all {
+    border-style: dashed;
+}
+
+/* Search: parameter matches */
+.lab-search-clear {
+    border-color: var(--sc-border);
+}
+
+.lab-test-item--param-match {
+    border-color: var(--sc-stat-active) !important;
+    box-shadow: 0 0 0 1px rgba(46, 125, 50, 0.15);
+}
+
+.lab-param-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-inline-start: 0.5rem;
+    padding: 0.1rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--sc-stat-active);
+    background: rgba(46, 125, 50, 0.1);
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+[data-bs-theme="dark"] .lab-param-hint {
+    color: #a5d6a7;
+    background: rgba(102, 187, 106, 0.16);
+}
+
+.lab-row-chips .lab-chip.lab-chip--match {
+    box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.35);
+    font-weight: 700;
+    animation: labChipPulse 0.4s ease;
+}
+
+@keyframes labChipPulse {
+    0% { transform: scale(0.92); }
+    60% { transform: scale(1.04); }
+    100% { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .lab-row-chips .lab-chip.lab-chip--match {
+        animation: none;
+    }
+}
+
+/* Mobile cards */
+.sc-mobile-cards {
+    display: none;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem;
+}
+
+.sc-mobile-card {
+    background: var(--sc-surface);
+    border: 1px solid var(--sc-border);
+    border-radius: 0.5rem;
+    padding: 0.85rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.sc-mobile-card strong {
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.sc-mobile-card .sc-mobile-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--bs-secondary-color);
+    margin-top: 0.35rem;
+}
+
+@media (max-width: 767.98px) {
+    .sc-table-desktop {
+        display: none;
+    }
+
+    .sc-mobile-cards {
+        display: flex;
+    }
+
+    .sc-stat-bar {
+        gap: 0.5rem;
+    }
+
+    .sc-stat-card {
+        flex: 1 1 calc(50% - 0.5rem);
+        min-width: 0;
+    }
+
+    .sc-stat-card .sc-stat-value {
+        font-size: 1.5rem;
+    }
+
+    .sc-stat-card .sc-stat-label {
+        font-size: 0.85rem;
+    }
+}
+
+/* Patient picker cards override */
+.doctor-smart-clinic-page .patient-picker-card {
+    background: var(--sc-surface);
+    border-color: var(--sc-border);
+}
+
+.doctor-smart-clinic-page .patient-picker-card:hover,
+.doctor-smart-clinic-page .patient-picker-card.selected {
+    border-color: var(--sc-panel-header);
+    background: rgba(0, 137, 123, 0.06);
+}
+
+[data-bs-theme="dark"] .sc-panel-header .badge.bg-light {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #fff !important;
+}
+
+.doctor-smart-clinic-page .patient-summary-chip {
+    border-color: rgba(0, 137, 123, 0.35);
+    background: rgba(0, 137, 123, 0.06);
+}
+
+/* ---------------------------------------------------------------------------
+   Visit History "mind map" — nested, collapsible tree of a patient's past
+   prescriptions (pharmacy) and lab orders. Pure CSS via <details>/<summary>.
+--------------------------------------------------------------------------- */
+.sc-vh {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.sc-vh-empty {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--bs-secondary-color);
+}
+
+.sc-vh-empty i {
+    display: block;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.5;
+}
+
+/* Remove native disclosure triangle */
+.sc-vh summary {
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
+}
+
+.sc-vh summary::-webkit-details-marker {
+    display: none;
+}
+
+/* Rotating caret shared by every collapsible node */
+.sc-vh-caret {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.1rem;
+    flex-shrink: 0;
+    transition: transform 0.15s ease;
+    color: var(--bs-secondary-color);
+}
+
+html[dir="rtl"] .sc-vh-caret {
+    transform: scaleX(-1);
+}
+
+.sc-vh details[open] > summary > .sc-vh-caret {
+    transform: rotate(90deg);
+}
+
+html[dir="rtl"] .sc-vh details[open] > summary > .sc-vh-caret {
+    transform: rotate(90deg) scaleX(-1);
+}
+
+/* Visit (day) node */
+.sc-vh-visit {
+    border: 1px solid var(--sc-border);
+    border-radius: 0.5rem;
+    background: var(--sc-surface);
+    overflow: hidden;
+}
+
+.sc-vh-visit-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.85rem;
+    font-weight: 700;
+    background: var(--sc-row-zebra);
+    transition: background 0.12s ease;
+}
+
+.sc-vh-visit-head:hover {
+    background: var(--sc-row-hover);
+}
+
+.sc-vh-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--bs-body-color);
+}
+
+.sc-vh-date i {
+    color: var(--sc-green);
+}
+
+.sc-vh-pills {
+    display: inline-flex;
+    gap: 0.35rem;
+    margin-inline-start: auto;
+    flex-wrap: wrap;
+}
+
+.sc-vh-pill {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    color: #fff;
+    white-space: nowrap;
+}
+
+.sc-vh-pill-rx { background: var(--sc-stat-rx); }
+.sc-vh-pill-lab { background: var(--sc-stat-lab); }
+
+.sc-vh-visit-body {
+    padding: 0.6rem 0.85rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    /* connector spine */
+    margin-inline-start: 0.85rem;
+    border-inline-start: 2px solid var(--sc-border);
+    padding-inline-start: 0.85rem;
+}
+
+/* Branch (Pharmacy / Lab) node */
+.sc-vh-branch {
+    border: 1px solid var(--sc-border);
+    border-radius: 0.45rem;
+    overflow: hidden;
+    background: var(--sc-surface);
+    position: relative;
+}
+
+.sc-vh-branch::before {
+    /* elbow connector from the visit spine */
+    content: "";
+    position: absolute;
+    inset-inline-start: -0.85rem;
+    top: 1.1rem;
+    width: 0.85rem;
+    height: 2px;
+    background: var(--sc-border);
+}
+
+.sc-vh-branch-head {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.75rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.sc-vh-branch-icon { font-size: 0.95rem; }
+
+.sc-vh-branch-rx .sc-vh-branch-head { color: var(--sc-stat-rx); }
+.sc-vh-branch-rx .sc-vh-branch-icon { color: var(--sc-stat-rx); }
+.sc-vh-branch-rx { border-inline-start: 3px solid var(--sc-stat-rx); }
+
+.sc-vh-branch-lab .sc-vh-branch-head { color: var(--sc-stat-lab); }
+.sc-vh-branch-lab .sc-vh-branch-icon { color: var(--sc-stat-lab); }
+.sc-vh-branch-lab { border-inline-start: 3px solid var(--sc-stat-lab); }
+
+.sc-vh-count {
+    margin-inline-start: auto;
+    min-width: 1.35rem;
+    text-align: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.05rem 0.4rem;
+    border-radius: 999px;
+    background: var(--sc-row-zebra);
+    border: 1px solid var(--sc-border);
+    color: var(--bs-body-color);
+}
+
+.sc-vh-branch-body {
+    padding: 0.15rem 0.75rem 0.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Individual entry (one prescription / one lab order) */
+.sc-vh-entry {
+    background: var(--sc-row-zebra);
+    border: 1px solid var(--sc-border);
+    border-radius: 0.4rem;
+    padding: 0.5rem 0.65rem;
+}
+
+.sc-vh-entry-head {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 0.35rem;
+}
+
+.sc-vh-entry-title {
+    font-weight: 700;
+    color: var(--bs-body-color);
+    margin-inline-end: auto;
+}
+
+.sc-vh-time {
+    font-size: 0.75rem;
+    color: var(--bs-secondary-color);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.sc-vh-view {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 0.15rem 0.5rem;
+    border: 1px solid var(--sc-border);
+    border-radius: 0.35rem;
+    color: var(--sc-green);
+    background: var(--sc-surface);
+}
+
+.sc-vh-view:hover {
+    background: var(--sc-green);
+    border-color: var(--sc-green);
+    color: #fff;
+}
+
+.sc-vh-muted {
+    font-size: 0.8rem;
+    color: var(--bs-secondary-color);
+}
+
+.sc-vh-note {
+    font-size: 0.82rem;
+    color: var(--bs-body-color);
+    margin-bottom: 0.3rem;
+    line-height: 1.5;
+}
+
+.sc-vh-note-label {
+    font-weight: 700;
+    color: var(--sc-green);
+}
+
+.sc-vh-meds {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.sc-vh-meds li {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.sc-vh-meds li i { color: var(--sc-stat-rx); }
+
+.sc-vh-med-name { color: var(--bs-body-color); }
+
+.sc-vh-med-qty {
+    margin-inline-start: auto;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--bs-secondary-color);
+    background: var(--sc-surface);
+    border: 1px solid var(--sc-border);
+    border-radius: 0.35rem;
+    padding: 0.05rem 0.45rem;
+}
+
+.sc-vh-tests {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.sc-vh-test-chip {
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.15rem 0.55rem;
+    border-radius: 0.35rem;
+    background: rgba(0, 172, 193, 0.12);
+    color: var(--bs-body-color);
+    border: 1px solid rgba(0, 172, 193, 0.3);
+}
+
+/* Compact tree when embedded in the narrow treatment sidebar */
+.sc-vh-embedded .sc-vh-visit-body {
+    margin-inline-start: 0.5rem;
+    padding-inline-start: 0.6rem;
+}
+
+/* Collapsible Visit History panel on the treatment page */
+.sc-vh-panel > summary.sc-vh-panel-header {
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
+}
+
+.sc-vh-panel > summary.sc-vh-panel-header::-webkit-details-marker {
+    display: none;
+}
+
+.sc-vh-panel-caret {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.sc-vh-panel[open] > summary > .sc-vh-panel-caret {
+    transform: rotate(90deg);
+}
+
+html[dir="rtl"] .sc-vh-panel-caret {
+    transform: scaleX(-1);
+}
+
+html[dir="rtl"] .sc-vh-panel[open] > summary > .sc-vh-panel-caret {
+    transform: rotate(90deg) scaleX(-1);
+}
+
+
+/* ---------------------------------------------------------------------------
+   Visit tree — master/detail view of the patient's clinic history. The tree
+   (Clinic visit → Pharmacy / Lab leaf nodes) lives in the right rail and is the
+   navigator; clicking a leaf reveals its full record in the detail pane, which
+   sits in the middle column above the consultation form and looks like the note.
+--------------------------------------------------------------------------- */
+.sc-vt-tree {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 72vh;
+    overflow-y: auto;
+    padding-inline-end: 0.15rem;
+}
+
+/* Detail pane — revealed in the middle column when a tree node is clicked. */
+.sc-vt-detail {
+    margin-bottom: 1rem;
+    border: 1px solid var(--sc-border);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background: var(--sc-surface);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.sc-vt-detail-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.75rem;
+    background: var(--sc-panel-header);
+    color: #fff;
+}
+
+[data-bs-theme="dark"] .sc-vt-detail-bar {
+    background: var(--sc-panel-header-dark);
+}
+
+.sc-vt-detail-bar-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.sc-vt-detail-close {
+    margin-inline-start: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border: none;
+    border-radius: 0.35rem;
+    background: rgba(255, 255, 255, 0.16);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.12s ease;
+}
+
+.sc-vt-detail-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Visit (day) node */
+.sc-vt-visit {
+    border: 1px solid var(--sc-border);
+    border-radius: 0.5rem;
+    background: var(--sc-surface);
+    overflow: hidden;
+}
+
+.sc-vt-visit > summary.sc-vt-visit-head {
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
+}
+
+.sc-vt-visit > summary.sc-vt-visit-head::-webkit-details-marker {
+    display: none;
+}
+
+.sc-vt-visit-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 0.7rem;
+    background: var(--sc-row-zebra);
+    font-weight: 700;
+    transition: background 0.12s ease;
+}
+
+.sc-vt-visit-head:hover {
+    background: var(--sc-row-hover);
+}
+
+.sc-vt-visit-head.is-active {
+    background: rgba(27, 94, 32, 0.1);
+    box-shadow: inset 3px 0 0 var(--sc-green);
+}
+
+[data-bs-theme="dark"] .sc-vt-visit-head.is-active {
+    background: rgba(67, 160, 71, 0.18);
+}
+
+.sc-vt-visit[open] > summary > .sc-vh-caret {
+    transform: rotate(90deg);
+}
+
+html[dir="rtl"] .sc-vt-visit[open] > summary > .sc-vh-caret {
+    transform: rotate(90deg) scaleX(-1);
+}
+
+.sc-vt-visit-icon {
+    color: var(--sc-green);
+    font-size: 1.05rem;
+    flex-shrink: 0;
+}
+
+.sc-vt-visit-main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+}
+
+.sc-vt-visit-title {
+    color: var(--bs-body-color);
+    font-size: 0.9rem;
+}
+
+.sc-vt-visit-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.15rem 0.6rem;
+    font-weight: 500;
+    font-size: 0.74rem;
+    color: var(--bs-secondary-color);
+}
+
+.sc-vt-visit-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.sc-vt-visit-date i {
+    color: var(--sc-green);
+}
+
+.sc-vt-visit-body {
+    padding: 0.45rem 0.5rem 0.55rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-inline-start: 0.85rem;
+    border-inline-start: 2px solid var(--sc-border);
+}
+
+/* Leaf node (one prescription / one lab order) */
+.sc-vt-node {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    width: 100%;
+    text-align: start;
+    border: 1px solid var(--sc-border);
+    border-radius: 0.4rem;
+    background: var(--sc-surface);
+    padding: 0.45rem 0.6rem;
+    cursor: pointer;
+    color: var(--bs-body-color);
+    transition: background 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.sc-vt-node:hover {
+    background: var(--sc-row-hover);
+    border-color: var(--sc-green);
+}
+
+.sc-vt-node.is-active {
+    border-color: var(--sc-green);
+    background: rgba(27, 94, 32, 0.08);
+    box-shadow: inset 0 0 0 1px var(--sc-green);
+}
+
+[data-bs-theme="dark"] .sc-vt-node.is-active {
+    background: rgba(67, 160, 71, 0.16);
+}
+
+.sc-vt-node-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.sc-vt-node-rx .sc-vt-node-icon {
+    color: var(--sc-stat-rx);
+}
+
+.sc-vt-node-lab .sc-vt-node-icon {
+    color: var(--sc-stat-lab);
+}
+
+.sc-vt-node-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.05rem;
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.sc-vt-node-label {
+    font-weight: 700;
+    font-size: 0.8rem;
+}
+
+.sc-vt-node-sub {
+    font-size: 0.75rem;
+    color: var(--bs-secondary-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sc-vt-node-caret {
+    margin-inline-start: auto;
+    color: var(--bs-secondary-color);
+    font-size: 0.8rem;
+    flex-shrink: 0;
+}
+
+html[dir="rtl"] .sc-vt-node-caret {
+    transform: scaleX(-1);
+}
+
+/* Detail pane */
+.sc-vt-placeholder {
+    border: 1px dashed var(--sc-border);
+    border-radius: 0.5rem;
+    padding: 2.75rem 1rem;
+    text-align: center;
+    color: var(--bs-secondary-color);
+    background: var(--sc-row-zebra);
+}
+
+.sc-vt-placeholder i {
+    display: block;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.5;
+}
+
+.sc-vt-panel {
+    background: var(--sc-surface);
+    overflow: hidden;
+}
+
+.sc-vt-panel-head {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.75rem 0.9rem;
+    background: var(--sc-row-zebra);
+    border-bottom: 1px solid var(--sc-border);
+}
+
+.sc-vt-panel-titles {
+    min-width: 0;
+}
+
+.sc-vt-panel-title {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--bs-body-color);
+}
+
+.sc-vt-panel-title i {
+    color: var(--sc-green);
+}
+
+.sc-vt-panel-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.6rem;
+    margin-top: 0.4rem;
+}
+
+.sc-vt-panel-head .sc-vh-view {
+    margin-inline-start: auto;
+}
+
+.sc-vt-section {
+    padding: 0.75rem 0.9rem;
+    border-bottom: 1px solid var(--sc-border);
+}
+
+.sc-vt-section:last-child {
+    border-bottom: none;
+}
+
+.sc-vt-section-label {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--sc-green);
+    margin-bottom: 0.45rem;
+}
+
+
+/* ============================================================
+   Markdown clinical-note editor (History / Examination / Diagnoses)
+   ============================================================ */
+.sc-md-panel .sc-panel-body.sc-md-body {
+    padding: 0.75rem;
+}
+
+.sc-md-req {
+    color: #FFCDD2;
+    font-weight: 700;
+}
+
+.sc-md-editor {
+    border: 1px solid var(--sc-border);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background: var(--sc-surface);
+}
+
+.sc-md-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.35rem 0.45rem;
+    background: var(--sc-row-zebra);
+    border-bottom: 1px solid var(--sc-border);
+}
+
+.sc-md-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.15rem;
+}
+
+.sc-md-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid transparent;
+    border-radius: 0.35rem;
+    background: transparent;
+    color: var(--bs-body-color);
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+
+.sc-md-btn:hover {
+    background: var(--sc-surface);
+    border-color: var(--sc-border);
+    color: var(--sc-green-light);
+}
+
+.sc-md-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.sc-md-tabs {
+    display: inline-flex;
+    margin-inline-start: auto;
+    background: var(--sc-surface);
+    border: 1px solid var(--sc-border);
+    border-radius: 0.4rem;
+    overflow: hidden;
+}
+
+.sc-md-tab {
+    border: 0;
+    background: transparent;
+    color: var(--bs-secondary-color);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.3rem 0.7rem;
+    cursor: pointer;
+}
+
+.sc-md-tab.is-active {
+    background: var(--sc-green);
+    color: #fff;
+}
+
+.sc-md-input {
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    resize: vertical;
+    min-height: 7rem;
+    font-size: 0.98rem;
+    line-height: 1.5;
+    background: var(--sc-surface);
+}
+
+.sc-md-input:focus {
+    box-shadow: none !important;
+    outline: none;
+}
+
+.sc-md-preview {
+    padding: 0.75rem 0.9rem;
+    min-height: 7rem;
+    font-size: 0.98rem;
+    line-height: 1.6;
+    background: var(--sc-surface);
+}
+
+.sc-md-empty {
+    color: var(--bs-secondary-color);
+    font-style: italic;
+    margin: 0;
+}
+
+.sc-md-hint {
+    margin-top: 0.4rem;
+    font-size: 0.78rem;
+    color: var(--bs-secondary-color);
+}
+
+.sc-md-hint code {
+    background: var(--sc-row-zebra);
+    border: 1px solid var(--sc-border);
+    border-radius: 0.25rem;
+    padding: 0 0.25rem;
+    font-size: 0.72rem;
+    color: inherit;
+}
+
+/* Rendered markdown (preview + saved view) */
+.sc-md-preview > :first-child,
+.sc-md-render > :first-child { margin-top: 0; }
+.sc-md-preview > :last-child,
+.sc-md-render > :last-child { margin-bottom: 0; }
+
+.sc-md-preview p,
+.sc-md-render p { margin: 0 0 0.6rem; }
+
+.sc-md-preview h1, .sc-md-render h1 { font-size: 1.35rem; }
+.sc-md-preview h2, .sc-md-render h2 { font-size: 1.2rem; }
+.sc-md-preview h3, .sc-md-render h3 { font-size: 1.05rem; }
+.sc-md-preview h4, .sc-md-preview h5, .sc-md-preview h6,
+.sc-md-render h4, .sc-md-render h5, .sc-md-render h6 { font-size: 0.95rem; }
+
+.sc-md-preview h1, .sc-md-preview h2, .sc-md-preview h3,
+.sc-md-preview h4, .sc-md-preview h5, .sc-md-preview h6,
+.sc-md-render h1, .sc-md-render h2, .sc-md-render h3,
+.sc-md-render h4, .sc-md-render h5, .sc-md-render h6 {
+    font-weight: 700;
+    margin: 0.4rem 0 0.5rem;
+    color: var(--sc-green-light);
+}
+
+.sc-md-preview ul, .sc-md-preview ol,
+.sc-md-render ul, .sc-md-render ol {
+    margin: 0 0 0.6rem;
+    padding-inline-start: 1.4rem;
+}
+
+.sc-md-preview li, .sc-md-render li { margin-bottom: 0.2rem; }
+
+.sc-md-preview blockquote,
+.sc-md-render blockquote {
+    margin: 0 0 0.6rem;
+    padding: 0.35rem 0.85rem;
+    border-inline-start: 3px solid var(--sc-green-light);
+    background: var(--sc-row-zebra);
+    color: var(--bs-secondary-color);
+    border-radius: 0.25rem;
+}
+
+.sc-md-preview code, .sc-md-render code {
+    background: var(--sc-row-zebra);
+    border: 1px solid var(--sc-border);
+    border-radius: 0.25rem;
+    padding: 0.05rem 0.3rem;
+    font-size: 0.85em;
+}
+
+.sc-md-preview hr, .sc-md-render hr {
+    border: 0;
+    border-top: 1px solid var(--sc-border);
+    margin: 0.7rem 0;
+}
+
+.sc-md-preview a, .sc-md-render a {
+    color: var(--sc-green-light);
+    text-decoration: underline;
+}
+
+/* Draft auto-save status pill (patient History consultation) */
+.sc-autosave {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: 0.85rem;
+    padding: 0.28rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid var(--sc-border);
+    background: var(--sc-row-zebra);
+    color: var(--sc-text-muted, #6c757d);
+    font-size: 0.8rem;
+    line-height: 1.2;
+}
+
+.sc-autosave.is-saved {
+    border-color: rgba(25, 135, 84, 0.35);
+    color: #198754;
+}
+
+.sc-autosave.is-error {
+    border-color: rgba(220, 53, 69, 0.4);
+    color: #dc3545;
+}
+
+.sc-autosave .sc-spin {
+    animation: sc-spin 0.9s linear infinite;
+    display: inline-block;
+}
+
+@keyframes sc-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ---- Referrals (doctor-to-doctor) ---------------------------------------- */
+
+/* A <button> reused as a Send-To tile: keep it visually identical to the <a>. */
+button.sc-send-to-btn {
+    width: 100%;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.sc-send-to-btn.sc-send-referral i { color: var(--sc-stat-rx); }
+
+/* "Referred by Dr. X" chip on the patient card. */
+.sc-referred-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.15rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    background: rgba(123, 31, 162, 0.1);
+    color: var(--sc-stat-rx);
+    font-size: 0.78rem;
+    font-weight: 700;
+    width: fit-content;
+}
+
+/* Clinic panel lives in the narrow sidebar — cap its height and let it scroll. */
+.sc-clinic-panel .sc-panel-body {
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+/* Treating-doctor chip inside each visit-history entry. */
+.sc-vh-doctor {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--sc-panel-header);
+    background: rgba(0, 137, 123, 0.1);
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+/* Referrals list: referring doctor + optional note. */
+.sc-referral-from {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-weight: 700;
+    color: var(--sc-stat-rx);
+}
+
+.sc-referral-note {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.78rem;
+    color: var(--bs-secondary-color);
+    max-width: 260px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ── Today's appointment schedule ─────────────────────────────────────────
+   Doctor-side view of who is booked today and at what time. Colour tokens
+   reuse the stat palette so the module reads as one system. */
+:root { --sc-stat-scheduled: #00897B; }
+[data-bs-theme="dark"] { --sc-stat-scheduled: #4DB6AC; }
+.sc-stat-scheduled { --sc-stat-accent: var(--sc-stat-scheduled); }
+
+.sc-schedule-card {
+    margin-bottom: 1rem;
+    padding: 0;
+}
+
+.sc-schedule-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--sc-border);
+}
+
+.sc-schedule-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--sc-stat-scheduled);
+}
+
+.sc-schedule-sub {
+    margin: 0.15rem 0 0;
+    font-size: 0.85rem;
+    color: var(--bs-secondary-color);
+}
+
+.sc-schedule-count {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--sc-stat-scheduled);
+    background: color-mix(in srgb, var(--sc-stat-scheduled) 14%, transparent);
+    border-radius: 999px;
+    padding: 0.2rem 0.75rem;
+    white-space: nowrap;
+}
+
+.sc-schedule-empty {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 1.4rem 1rem;
+    color: var(--bs-secondary-color);
+    justify-content: center;
+}
+
+.sc-schedule-empty i { font-size: 1.3rem; opacity: 0.6; }
+
+.sc-schedule-list {
+    list-style: none;
+    margin: 0;
+    padding: 0.35rem 0;
+}
+
+.sc-schedule-item {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.6rem 1rem;
+    border-inline-start: 4px solid transparent;
+}
+
+.sc-schedule-item + .sc-schedule-item {
+    border-top: 1px solid var(--sc-border);
+}
+
+.sc-schedule-item-with_doctor {
+    border-inline-start-color: var(--sc-stat-active);
+    background: color-mix(in srgb, var(--sc-stat-active) 7%, transparent);
+}
+
+.sc-schedule-item-waiting {
+    border-inline-start-color: var(--sc-stat-waiting);
+}
+
+.sc-schedule-slot {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-width: 140px;
+}
+
+.sc-schedule-order {
+    display: inline-grid;
+    place-items: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background: var(--sc-stat-scheduled);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    flex: 0 0 auto;
+}
+
+.sc-schedule-time {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.sc-schedule-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.sc-schedule-name {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sc-schedule-meta {
+    font-size: 0.82rem;
+    color: var(--bs-secondary-color);
+}
+
+.sc-schedule-status { flex: 0 0 auto; }
+
+/* Compact appointment chip used inside the active-patients table/cards */
+.sc-appt-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.85rem;
+    color: var(--sc-stat-scheduled);
+    background: color-mix(in srgb, var(--sc-stat-scheduled) 12%, transparent);
+    border-radius: 0.4rem;
+    padding: 0.1rem 0.5rem;
+    white-space: nowrap;
+}
+
+@media (max-width: 575.98px) {
+    .sc-schedule-item {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    .sc-schedule-slot { min-width: auto; }
+    .sc-schedule-status { margin-inline-start: auto; }
+}
+
+/* ============================================================
+   Clinical-note image attachments (History / Examination / Diagnoses)
+   ============================================================ */
+
+/* Editable attachment strip inside a markdown note panel */
+.sc-attach {
+    margin-top: 0.65rem;
+    padding-top: 0.65rem;
+    border-top: 1px dashed var(--sc-border);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sc-attach-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+/* One thumbnail (shared by editable strip and read-only gallery) */
+.sc-attach-thumb {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    border: 1px solid var(--sc-border);
+    background: var(--sc-row-zebra);
+    flex: 0 0 auto;
+}
+
+.sc-attach-thumb-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: zoom-in;
+}
+
+.sc-attach-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.sc-attach-del {
+    position: absolute;
+    top: 2px;
+    inset-inline-end: 2px;
+    width: 22px;
+    height: 22px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(20, 20, 20, 0.72);
+    color: #fff;
+    font-size: 0.7rem;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.sc-attach-thumb:hover .sc-attach-del,
+.sc-attach-del:focus-visible {
+    opacity: 1;
+}
+
+.sc-attach-del:hover {
+    background: var(--sc-stat-pending, #EF6C00);
+}
+
+.sc-attach-del:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+/* "Add image" control (also a drop target) */
+.sc-attach-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    height: 72px;
+    padding: 0 0.85rem;
+    border: 1px dashed var(--sc-border);
+    border-radius: 0.5rem;
+    color: var(--sc-green-light);
+    background: var(--sc-surface);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.sc-attach-add:hover,
+.sc-attach-add.is-dragover {
+    border-color: var(--sc-green-light);
+    background: color-mix(in srgb, var(--sc-green-light) 10%, transparent);
+    color: var(--sc-green);
+}
+
+.sc-attach-add.is-dragover {
+    border-style: solid;
+}
+
+.sc-attach-add i { font-size: 1.05rem; }
+
+.sc-attach-status {
+    flex-basis: 100%;
+    font-size: 0.78rem;
+    color: var(--bs-secondary-color);
+}
+
+.sc-attach-status.is-error { color: #dc3545; }
+
+/* Read-only gallery (view page note sections) */
+.sc-attach-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.sc-md-render + .sc-attach-gallery {
+    margin-top: 0.75rem;
+}
+
+/* Attachments inside a visit-history entry */
+.sc-vh-images {
+    margin: 0.35rem 0;
+}
+
+.sc-vh-images-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--sc-green);
+    margin-bottom: 0.25rem;
+}
+
+.sc-vh-images .sc-attach-gallery { gap: 0.35rem; }
+
+.sc-vh-images .sc-attach-thumb {
+    width: 54px;
+    height: 54px;
+    border-radius: 0.4rem;
+}
+
+/* ---- Image lightbox ---- */
+body.sc-lightbox-open { overflow: hidden; }
+
+.sc-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: rgba(0, 0, 0, 0.82);
+    animation: sc-lightbox-in 0.15s ease;
+}
+
+@keyframes sc-lightbox-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.sc-lightbox-figure {
+    margin: 0;
+    max-width: 100%;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.sc-lightbox-img {
+    max-width: min(92vw, 1100px);
+    max-height: 82vh;
+    object-fit: contain;
+    border-radius: 0.4rem;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    background: #fff;
+}
+
+.sc-lightbox-caption {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.85rem;
+    text-align: center;
+    max-width: 90vw;
+    word-break: break-word;
+}
+
+.sc-lightbox-close {
+    position: absolute;
+    top: 1rem;
+    inset-inline-end: 1.25rem;
+    width: 2.4rem;
+    height: 2.4rem;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    font-size: 1.6rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.sc-lightbox-close:hover { background: rgba(255, 255, 255, 0.25); }
+
+@media (max-width: 575.98px) {
+    .sc-attach-thumb { width: 60px; height: 60px; }
+    .sc-attach-add { height: 60px; }
+    .sc-lightbox { padding: 1rem; }
+}
+
+/* ---- Slim fancy doctor UI ---- */
+.doctor-smart-clinic-page .sc-nav,
+.doctor-smart-clinic-page .navbar {
+    min-height: 52px;
+    backdrop-filter: blur(12px);
+}
+
+.doctor-smart-clinic-page .sc-nav-link,
+.doctor-smart-clinic-page .nav-link {
+    font-size: 0.85rem;
+    border-radius: 999px;
+    padding: 0.32rem 0.75rem !important;
+}
+
+.doctor-smart-clinic-page .sc-panel,
+.doctor-smart-clinic-page .card {
+    border-radius: 12px !important;
+    box-shadow: 0 2px 12px rgba(15, 23, 42, 0.05) !important;
+}
+
+.doctor-smart-clinic-page .sc-stat-chip {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.82rem;
+    border-radius: 999px;
+}
+

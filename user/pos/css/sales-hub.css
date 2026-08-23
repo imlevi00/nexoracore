@@ -1,0 +1,212 @@
+/*
+ * Sales hub — user/pos/main.php
+ */
+
+.sales-hub-page {
+  min-height: 100vh;
+  background: var(--surface-2);
+  background-image: var(--gradient-surface);
+  background-attachment: fixed;
+}
+
+.sales-hub-page .kasher-navbar,
+.sales-hub-page .navbar.bg-primary {
+  box-shadow: 0 4px 24px rgba(79, 70, 229, 0.15);
+}
+
+.sales-hub-hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  background: var(--glass-bg, rgba(255, 255, 255, 0.72));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg, 14px);
+  box-shadow: var(--box-shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.sales-hub-hero::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, #10b981, #4f46e5);
+}
+
+.sales-hub-hero h2 {
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.2rem;
+}
+
+.sales-hub-hero h2 i {
+  color: var(--brand);
+  margin-inline-end: 0.35rem;
+}
+
+.sales-hub-hero p {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+.sales-hub-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.sales-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 108px;
+  padding: 1.15rem 1.25rem;
+  background: var(--surface-1);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg, 14px);
+  box-shadow: var(--shadow-soft, 0 1px 3px rgba(15, 23, 42, 0.04));
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  --sales-accent: var(--brand);
+}
+
+.sales-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  inset-inline: 0;
+  height: 3px;
+  background: var(--sales-accent);
+}
+
+.sales-card::after {
+  content: '';
+  position: absolute;
+  inset-inline-end: -24px;
+  bottom: -24px;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--sales-accent) 10%, transparent);
+  pointer-events: none;
+}
+
+a:hover .sales-card,
+.sales-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--sales-accent) 18%, transparent);
+  border-color: color-mix(in srgb, var(--sales-accent) 28%, var(--border-default));
+}
+
+.sales-card .card-icon {
+  width: 52px;
+  height: 52px;
+  min-width: 52px;
+  margin: 0 !important;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--sales-accent) 12%, white);
+  color: var(--sales-accent);
+  font-size: 1.45rem;
+  box-shadow: none;
+  transition: transform 0.2s ease;
+}
+
+.sales-card:hover .card-icon {
+  transform: scale(1.06);
+}
+
+.sales-card h5 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.sales-card-desc {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin-top: 0.15rem;
+}
+
+.sales-card-pos { --sales-accent: #10b981; }
+.sales-card-list { --sales-accent: #4f46e5; }
+.sales-card-returns { --sales-accent: #8b5cf6; }
+
+/* Quick tips strip */
+.sales-hub-tips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding: 0.85rem 1rem;
+  background: color-mix(in srgb, var(--brand) 6%, white);
+  border: 1px dashed color-mix(in srgb, var(--brand) 25%, var(--border-default));
+  border-radius: var(--radius-lg, 14px);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.sales-hub-tips i {
+  color: var(--brand);
+}
+
+.sales-hub-tips span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.sales-card {
+  cursor: pointer;
+}
+
+.sales-card .card-icon i {
+  line-height: 1;
+}
+
+html[data-bs-theme='dark'] .sales-hub-tips {
+  background: rgba(79, 70, 229, 0.08);
+  border-color: #334155;
+}
+
+html[data-bs-theme='dark'] .sales-hub-hero {
+  background: var(--glass-bg);
+  border-color: var(--border-default);
+}
+
+html[data-bs-theme='dark'] .sales-card {
+  background: var(--surface-1);
+}
+
+html[data-bs-theme='dark'] .sales-card .card-icon {
+  background: color-mix(in srgb, var(--sales-accent) 18%, var(--surface-2));
+}
+
+@media (max-width: 575.98px) {
+  .sales-hub-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sales-hub-hero {
+    padding: 1rem;
+  }
+
+  .sales-hub-hero .back-button {
+    width: 100%;
+    justify-content: center;
+  }
+}

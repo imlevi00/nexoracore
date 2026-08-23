@@ -1,0 +1,25 @@
+[2026-08-17 12:37:19] [INFO] User logout: demo@kashery.local from IP: ::1
+[2026-08-17 12:59:14] [INFO] Theme mode updated by user demo@local.test: light
+[2026-08-17 13:12:23] [INFO] Login failed: user not found demo@local.test from IP: ::1
+[2026-08-17 13:12:25] [INFO] Login failed: user not found demo@local.test from IP: ::1
+[2026-08-17 13:12:27] [INFO] Login failed: user not found demo@local.test from IP: ::1
+[2026-08-17 13:12:30] [INFO] Login failed: user not found demo@local.test from IP: ::1
+[2026-08-17 13:12:35] [INFO] Login failed: user not found demo@local.test from IP: ::1
+[2026-08-17 13:27:35] [INFO] Login failed: user not found demo@local.test from IP: ::1
+[2026-08-17 13:28:07] [INFO] Main user login successful: demo@kashery.local from IP: ::1
+[2026-08-17 13:28:39] [INFO] Business type updated by user demo@kashery.local: 2
+[2026-08-17 13:28:50] [INFO] User logout: demo@kashery.local from IP: ::1
+[2026-08-17 14:50:46] [INFO] Main user login successful: demo@kashery.local from IP: ::1
+[2026-08-17 15:12:38] [INFO] User logout: demo@kashery.local from IP: ::1
+[2026-08-17 15:12:56] [INFO] Main user login successful: demo@kashery.local from IP: ::1
+[2026-08-17 15:13:48] [INFO] User logout: demo@kashery.local from IP: ::1
+[2026-08-17 15:17:55] [INFO] Main user login successful: demo@kashery.local from IP: ::1
+[2026-08-17 16:52:27] [INFO] Main user login successful: demo@kashery.local from IP: ::1
+[2026-08-17 16:58:45] [INFO] Main user login successful: demo@kashery.local from IP: ::1
+[2026-08-17 17:05:47] [INFO] Sale created: Invoice INV-20260817-1383-475986, Amount: 13500 by user: demo@kashery.local
+[2026-08-17 17:06:01] [INFO] Sale created: Invoice INV-20260817-5027-610455, Amount: 13500 by user: demo@kashery.local
+[2026-08-17 17:15:36] [INFO] Business type updated by user demo@kashery.local: 5
+[2026-08-17 17:25:50] [INFO] Product added: ssa (ID: 14) with units by user: demo@kashery.local
+[2026-08-17 17:26:51] [INFO] Sale created: Invoice INV-20260817-6437-115133, Amount: 1000 by user: demo@kashery.local
+[2026-08-17 17:32:34] [INFO] Main user login successful: demo@kashery.local from IP: ::1
+[2026-08-17 17:35:00] [INFO] Business type updated by user demo@kashery.local: 5
