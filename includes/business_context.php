@@ -52,23 +52,28 @@ function getOrganizationForOwner($userId)
     if ($userId <= 0 || !$conn) {
         return null;
     }
-    $stmt = $conn->prepare("SELECT id, name, owner_user_id FROM organizations WHERE owner_user_id = ? LIMIT 1");
-    if (!$stmt) {
-        return null; // خشتەکە نییە (migration نەکراوە) → بێ ڕێکخراو
-    }
-    $stmt->bind_param('i', $userId);
-    $stmt->execute();
-    $row = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
+    try {
+        $stmt = $conn->prepare("SELECT id, name, owner_user_id FROM organizations WHERE owner_user_id = ? LIMIT 1");
+        if (!$stmt) {
+            return null; // خشتەکە نییە (migration نەکراوە) → بێ ڕێکخراو
+        }
+        $stmt->bind_param('i', $userId);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $row = $res ? $res->fetch_assoc() : null;
+        $stmt->close();
 
-    if (!$row) {
+        if (!$row) {
+            return null;
+        }
+        return [
+            'id' => (int)$row['id'],
+            'name' => (string)$row['name'],
+            'owner_user_id' => (int)$row['owner_user_id'],
+        ];
+    } catch (Throwable $e) {
         return null;
     }
-    return [
-        'id' => (int)$row['id'],
-        'name' => (string)$row['name'],
-        'owner_user_id' => (int)$row['owner_user_id'],
-    ];
 }
 
 /**
@@ -81,24 +86,30 @@ function getBusinessesInOrganization($organizationId)
     if ($organizationId <= 0 || !$conn) {
         return [];
     }
-    $stmt = $conn->prepare("SELECT id, business_name, status, expiration_date FROM users WHERE organization_id = ? ORDER BY id ASC");
-    if (!$stmt) {
+    try {
+        $stmt = $conn->prepare("SELECT id, business_name, status, expiration_date FROM users WHERE organization_id = ? ORDER BY id ASC");
+        if (!$stmt) {
+            return [];
+        }
+        $stmt->bind_param('i', $organizationId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $out = [];
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $out[] = [
+                    'id' => (int)$row['id'],
+                    'business_name' => (string)$row['business_name'],
+                    'status' => (string)$row['status'],
+                    'expiration_date' => $row['expiration_date'] !== null ? (string)$row['expiration_date'] : null,
+                ];
+            }
+        }
+        $stmt->close();
+        return $out;
+    } catch (Throwable $e) {
         return [];
     }
-    $stmt->bind_param('i', $organizationId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $out = [];
-    while ($row = $result->fetch_assoc()) {
-        $out[] = [
-            'id' => (int)$row['id'],
-            'business_name' => (string)$row['business_name'],
-            'status' => (string)$row['status'],
-            'expiration_date' => $row['expiration_date'] !== null ? (string)$row['expiration_date'] : null,
-        ];
-    }
-    $stmt->close();
-    return $out;
 }
 
 /**
@@ -230,21 +241,26 @@ function getMaxBusinessesForPackage($packageId = null)
         return 1;
     }
 
-    $stmt = $conn->prepare("SELECT is_enabled FROM package_feature_permissions WHERE package_id = ? AND feature_key = 'multi_business_max_count' LIMIT 1");
-    if (!$stmt) {
+    try {
+        $stmt = $conn->prepare("SELECT is_enabled FROM package_feature_permissions WHERE package_id = ? AND feature_key = 'multi_business_max_count' LIMIT 1");
+        if (!$stmt) {
+            return 1;
+        }
+        $packageId = (int)$packageId;
+        $stmt->bind_param('i', $packageId);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $row = $res ? $res->fetch_assoc() : null;
+        $stmt->close();
+
+        if ($row === null) {
+            return 1; // ڕیز نییە → بنەڕەت (تاک-بزنس، backward compatible)
+        }
+        $val = (int)$row['is_enabled'];
+        return $val < 1 ? 1 : $val;
+    } catch (Throwable $e) {
         return 1;
     }
-    $packageId = (int)$packageId;
-    $stmt->bind_param('i', $packageId);
-    $stmt->execute();
-    $row = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
-
-    if ($row === null) {
-        return 1; // ڕیز نییە → بنەڕەت (تاک-بزنس، backward compatible)
-    }
-    $val = (int)$row['is_enabled'];
-    return $val < 1 ? 1 : $val;
 }
 
 /**
@@ -257,19 +273,24 @@ function getMaxBusinessesForUser($userId)
     if ($userId <= 0 || !$conn) {
         return 1;
     }
-    $stmt = $conn->prepare("SELECT package_id FROM users WHERE id = ? LIMIT 1");
-    if (!$stmt) {
-        return 1;
-    }
-    $stmt->bind_param('i', $userId);
-    $stmt->execute();
-    $row = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
+    try {
+        $stmt = $conn->prepare("SELECT package_id FROM users WHERE id = ? LIMIT 1");
+        if (!$stmt) {
+            return 1;
+        }
+        $stmt->bind_param('i', $userId);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $row = $res ? $res->fetch_assoc() : null;
+        $stmt->close();
 
-    if (!$row || empty($row['package_id'])) {
+        if (!$row || empty($row['package_id'])) {
+            return 1;
+        }
+        return getMaxBusinessesForPackage((int)$row['package_id']);
+    } catch (Throwable $e) {
         return 1;
     }
-    return getMaxBusinessesForPackage((int)$row['package_id']);
 }
 
 /* --------------------------------------------------------------------------
@@ -288,34 +309,35 @@ function ensureOrganizationForOwner($ownerUserId, $name = null)
         return ['ok' => false, 'error' => 'invalid_owner'];
     }
 
-    // ئایا پێشتر خاوەنی ڕێکخراوێکە؟
-    $existing = getOrganizationForOwner($ownerUserId);
-    if ($existing) {
-        return ['ok' => true, 'org_id' => (int)$existing['id']];
-    }
-
-    // ئایا سەر بە ڕێکخراوێکی ترە (وەک ئەندام، نەک خاوەن)؟ ئەوا ناکرێت.
-    $stmt = $conn->prepare("SELECT organization_id, business_name FROM users WHERE id = ? LIMIT 1");
-    if (!$stmt) {
-        return ['ok' => false, 'error' => 'db_error'];
-    }
-    $stmt->bind_param('i', $ownerUserId);
-    $stmt->execute();
-    $row = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
-
-    if (!$row) {
-        return ['ok' => false, 'error' => 'owner_not_found'];
-    }
-    if (!empty($row['organization_id'])) {
-        // سەر بە ڕێکخراوێکی ترە بەڵام خاوەن نییە
-        return ['ok' => false, 'error' => 'already_member_not_owner'];
-    }
-
-    $orgName = ($name !== null && trim((string)$name) !== '') ? trim((string)$name) : (string)$row['business_name'];
-
-    $conn->begin_transaction();
     try {
+        // ئایا پێشتر خاوەنی ڕێکخراوێکە؟
+        $existing = getOrganizationForOwner($ownerUserId);
+        if ($existing) {
+            return ['ok' => true, 'org_id' => (int)$existing['id']];
+        }
+
+        // ئایا سەر بە ڕێکخراوێکی ترە (وەک ئەندام، نەک خاوەن)؟ ئەوا ناکرێت.
+        $stmt = $conn->prepare("SELECT organization_id, business_name FROM users WHERE id = ? LIMIT 1");
+        if (!$stmt) {
+            return ['ok' => false, 'error' => 'db_error'];
+        }
+        $stmt->bind_param('i', $ownerUserId);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $row = $res ? $res->fetch_assoc() : null;
+        $stmt->close();
+
+        if (!$row) {
+            return ['ok' => false, 'error' => 'owner_not_found'];
+        }
+        if (!empty($row['organization_id'])) {
+            // سەر بە ڕێکخراوێکی ترە بەڵام خاوەن نییە
+            return ['ok' => false, 'error' => 'already_member_not_owner'];
+        }
+
+        $orgName = ($name !== null && trim((string)$name) !== '') ? trim((string)$name) : (string)$row['business_name'];
+
+        $conn->begin_transaction();
         $insOrg = $conn->prepare("INSERT INTO organizations (name, owner_user_id) VALUES (?, ?)");
         $insOrg->bind_param('si', $orgName, $ownerUserId);
         $insOrg->execute();
@@ -330,7 +352,9 @@ function ensureOrganizationForOwner($ownerUserId, $name = null)
         $conn->commit();
         return ['ok' => true, 'org_id' => $orgId];
     } catch (Throwable $e) {
-        $conn->rollback();
+        if ($conn) {
+            @$conn->rollback();
+        }
         return ['ok' => false, 'error' => 'create_failed'];
     }
 }

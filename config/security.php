@@ -51,7 +51,7 @@ class Security {
             return array_map([self::class, 'sanitizeInput'], $input);
         }
         
-        $input = trim($input);
+        $input = trim((string)$input);
         $input = stripslashes($input);
         $input = htmlspecialchars($input, ENT_QUOTES, 'UTF-8');
         
@@ -183,7 +183,7 @@ class Security {
     public static function validateRememberToken($selector, $token) {
         global $conn;
 
-        if (!$selector || !$token) {
+        if (!$selector || !$token || !is_string($token) || !ctype_xdigit($token) || strlen($token) % 2 !== 0) {
             return false;
         }
 
@@ -533,7 +533,7 @@ class SessionManager {
         // Remember Me verification (Day check removed so it works across multiple days)
         // جیاکردنەوەی selector و token
         $cookieParts = explode(':', $_COOKIE['remember_me'], 2);
-        if (count($cookieParts) !== 2) {
+        if (count($cookieParts) !== 2 || empty($cookieParts[0]) || empty($cookieParts[1])) {
             setcookie('remember_me', '', time() - 3600, '/', '', true, true);
             return false;
         }
@@ -863,6 +863,18 @@ class SecureFileUpload {
      * حیسابکردنی قەبارەی نوێ
      */
     private static function calculateNewDimensions($originalWidth, $originalHeight, $maxWidth, $maxHeight) {
+        $originalWidth = (float)$originalWidth;
+        $originalHeight = (float)$originalHeight;
+        $maxWidth = (float)$maxWidth;
+        $maxHeight = (float)$maxHeight;
+
+        if ($originalWidth <= 0 || $originalHeight <= 0) {
+            return [
+                'width' => max(1, (int)$maxWidth),
+                'height' => max(1, (int)$maxHeight)
+            ];
+        }
+
         $width = $originalWidth;
         $height = $originalHeight;
         
@@ -870,19 +882,19 @@ class SecureFileUpload {
         $aspectRatio = $originalWidth / $originalHeight;
         
         // resize ئەگەر زۆر گەورە بێت
-        if ($width > $maxWidth) {
+        if ($maxWidth > 0 && $width > $maxWidth) {
             $width = $maxWidth;
-            $height = $width / $aspectRatio;
+            $height = $aspectRatio > 0 ? ($width / $aspectRatio) : $height;
         }
         
-        if ($height > $maxHeight) {
+        if ($maxHeight > 0 && $height > $maxHeight) {
             $height = $maxHeight;
             $width = $height * $aspectRatio;
         }
         
         return [
-            'width' => round($width),
-            'height' => round($height)
+            'width' => max(1, (int)round($width)),
+            'height' => max(1, (int)round($height))
         ];
     }
 
@@ -896,18 +908,18 @@ class SecureFileUpload {
         $errors = [];
         
         // تاقیکردنی بوونی فایل
-        if (!isset($file) || $file['error'] !== UPLOAD_ERR_OK) {
+        if (!isset($file) || !is_array($file) || !isset($file['error']) || $file['error'] !== UPLOAD_ERR_OK) {
             $errors[] = "هەڵەیەک ڕوویدا لە ئەپلۆدی فایل";
             return ['success' => false, 'errors' => $errors];
         }
         
         // تاقیکردنی جۆری فایل
-        if (!self::validateFileType($file['name'], $allowedTypes)) {
+        if (!isset($file['name']) || !self::validateFileType($file['name'], $allowedTypes)) {
             $errors[] = "جۆری فایل ڕێپێدراو نییە";
         }
         
         // تاقیکردنی قەبارەی فایل
-        if (!self::validateFileSize($file['size'])) {
+        if (!isset($file['size']) || !self::validateFileSize($file['size'])) {
             $errors[] = "قەبارەی فایل زۆر گەورەیە";
         }
         

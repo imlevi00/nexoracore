@@ -31,7 +31,6 @@ if (!function_exists('kasher_env')) {
      * خوێندنەوەی environment variable هەم لە getenv() و هەم لە $_SERVER
      * (بۆ گونجاندن لەگەڵ mod_php و PHP-FPM/FastCGI کە SetEnv تێیدا دەچێتە $_SERVER).
      */
-    function kasher_env(string $name) {
     function kasher_env($name) {
         $v = getenv($name);
         if ($v !== false && $v !== '') {
@@ -50,7 +49,6 @@ if (!function_exists('kasher_secret')) {
      * @param string $envName ناوی environment variable (ئیختیاری)
      * @param string $default نرخی fallback ئەگەر هیچیان نەبوون
      */
-    function kasher_secret(string $key, string $envName = '', string $default = ''): string {
     function kasher_secret($key, $envName = '', $default = '') {
         static $secrets = null;
 

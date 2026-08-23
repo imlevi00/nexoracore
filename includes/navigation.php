@@ -80,7 +80,7 @@ $currentAdmin = getCurrentAdmin();
                             <a class="nav-link dropdown-toggle" href="#" id="businessSwitcherDropdown" role="button"
                                data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-shop-window"></i>
-                                <span class="d-none d-md-inline"><?php echo htmlspecialchars($activeName); ?></span>
+                                <span class="d-none d-md-inline"><?php echo htmlspecialchars($activeName ?? ''); ?></span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="businessSwitcherDropdown">
                                 <li><h6 class="dropdown-header"><i class="bi bi-diagram-3"></i> بزنسەکان</h6></li>
@@ -96,7 +96,7 @@ $currentAdmin = getCurrentAdmin();
                                             <button type="submit" class="dropdown-item d-flex align-items-center justify-content-between<?php echo $isActiveBiz ? ' active' : ''; ?>"<?php echo (!$isUsable && !$isActiveBiz) ? ' disabled' : ''; ?>>
                                                 <span>
                                                     <i class="bi <?php echo $isActiveBiz ? 'bi-check-circle-fill' : 'bi-shop'; ?>"></i>
-                                                    <?php echo htmlspecialchars($b['business_name']); ?>
+                                                    <?php echo htmlspecialchars($b['business_name'] ?? ''); ?>
                                                 </span>
                                                 <?php if (!$isUsable): ?><small class="text-danger">ناچالاک</small><?php endif; ?>
                                             </button>
@@ -118,9 +118,9 @@ $currentAdmin = getCurrentAdmin();
                                 <span class="d-none d-md-inline">
                                     <?php
                                     if ($isUser) {
-                                        echo htmlspecialchars($currentUser['business_name']);
+                                        echo htmlspecialchars($currentUser['business_name'] ?? $currentUser['username'] ?? $currentUser['full_name'] ?? '');
                                     } else {
-                                        echo htmlspecialchars($currentAdmin['username']);
+                                        echo htmlspecialchars($currentAdmin['username'] ?? '');
                                     }
                                     ?>
                                 </span>

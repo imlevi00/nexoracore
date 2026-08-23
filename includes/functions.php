@@ -22,8 +22,16 @@ function resolveBusinessImageUrl($imagePath)
         $normalizedPath = 'img/' . $normalizedPath;
     }
 
-    $url = spaces_public_url_for_object_key($normalizedPath);
-    return $url ?? '';
+    if (function_exists('spaces_public_url_for_object_key')) {
+        $url = spaces_public_url_for_object_key($normalizedPath);
+        return $url ?? '';
+    }
+
+    if (defined('SITE_URL')) {
+        return rtrim(SITE_URL, '/') . '/assets/uploads/' . $normalizedPath;
+    }
+
+    return '';
 }
 
 /**
@@ -36,7 +44,7 @@ function resolveBusinessImageUrl($imagePath)
 
 function sanitizeHtml($content) {
     $allowedTags = '<p><br><strong><em><ul><ol><li><h1><h2><h3><h4><h5><h6>';
-    return strip_tags($content, $allowedTags);
+    return strip_tags((string)($content ?? ''), $allowedTags);
 }
 
 
@@ -62,9 +70,12 @@ function requireLogin() {
  * پاککردنەوەی داتا بۆ ئاسایشی
  */
 function sanitizeInput($data) {
-    $data = trim($data);
+    if (is_array($data)) {
+        return array_map('sanitizeInput', $data);
+    }
+    $data = trim((string)($data ?? ''));
     $data = stripslashes($data);
-    $data = htmlspecialchars($data);
+    $data = htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
     return $data;
 }
 
@@ -77,36 +88,52 @@ function sanitizeInput($data) {
  */
 function isUserExpired($userId, $isSubUser = false) {
     global $conn;
+    $userId = (int)$userId;
+    if ($userId <= 0 || !$conn) {
+        return false;
+    }
     
-    if ($isSubUser) {
-        $stmt = $conn->prepare("
-            SELECT su.expiration_date, u.expiration_date as main_expiration_date 
-            FROM sub_users su 
-            JOIN users u ON su.main_user_id = u.id 
-            WHERE su.id = ?
-        ");
-        $stmt->bind_param("i", $userId);
-        $stmt->execute();
-        $result = $stmt->get_result()->fetch_assoc();
-        
-        if ($result) {
-            // Check sub-user expiration first, then main user expiration
-            if ($result['expiration_date'] && strtotime($result['expiration_date']) < time()) {
-                return true;
+    try {
+        if ($isSubUser) {
+            $stmt = $conn->prepare("
+                SELECT su.expiration_date, u.expiration_date as main_expiration_date 
+                FROM sub_users su 
+                JOIN users u ON su.main_user_id = u.id 
+                WHERE su.id = ?
+            ");
+            if (!$stmt) {
+                return false;
             }
-            if ($result['main_expiration_date'] && strtotime($result['main_expiration_date']) < time()) {
+            $stmt->bind_param("i", $userId);
+            $stmt->execute();
+            $result = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+            
+            if ($result) {
+                // Check sub-user expiration first, then main user expiration
+                if ($result['expiration_date'] && strtotime($result['expiration_date']) < time()) {
+                    return true;
+                }
+                if ($result['main_expiration_date'] && strtotime($result['main_expiration_date']) < time()) {
+                    return true;
+                }
+            }
+        } else {
+            $stmt = $conn->prepare("SELECT expiration_date FROM users WHERE id = ?");
+            if (!$stmt) {
+                return false;
+            }
+            $stmt->bind_param("i", $userId);
+            $stmt->execute();
+            $result = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+            
+            if ($result && $result['expiration_date'] && strtotime($result['expiration_date']) < time()) {
                 return true;
             }
         }
-    } else {
-        $stmt = $conn->prepare("SELECT expiration_date FROM users WHERE id = ?");
-        $stmt->bind_param("i", $userId);
-        $stmt->execute();
-        $result = $stmt->get_result()->fetch_assoc();
-        
-        if ($result && $result['expiration_date'] && strtotime($result['expiration_date']) < time()) {
-            return true;
-        }
+    } catch (Throwable $e) {
+        return false;
     }
     
     return false;
@@ -117,36 +144,57 @@ function isUserExpired($userId, $isSubUser = false) {
  */
 function extendUserExpiration($userId, $months = 1, $isSubUser = false) {
     global $conn;
-    
-    if ($isSubUser) {
-        $stmt = $conn->prepare("
-            UPDATE sub_users 
-            SET expiration_date = DATE_ADD(COALESCE(expiration_date, NOW()), INTERVAL ? MONTH) 
-            WHERE id = ?
-        ");
-        $stmt->bind_param("ii", $months, $userId);
-    } else {
-        $stmt = $conn->prepare("
-            UPDATE users 
-            SET expiration_date = DATE_ADD(COALESCE(expiration_date, NOW()), INTERVAL ? MONTH) 
-            WHERE id = ?
-        ");
-        $stmt->bind_param("ii", $months, $userId);
-        
-        // Also update all sub-users of this main user
-        if ($stmt->execute()) {
-            $subStmt = $conn->prepare("
-                UPDATE sub_users 
-                SET expiration_date = DATE_ADD(COALESCE(expiration_date, NOW()), INTERVAL ? MONTH) 
-                WHERE main_user_id = ?
-            ");
-            $subStmt->bind_param("ii", $months, $userId);
-            $subStmt->execute();
-            $subStmt->close();
-        }
+    $userId = (int)$userId;
+    $months = (int)$months;
+    if ($userId <= 0 || !$conn) {
+        return false;
     }
     
-    return $stmt->execute();
+    try {
+        if ($isSubUser) {
+            $stmt = $conn->prepare("
+                UPDATE sub_users 
+                SET expiration_date = DATE_ADD(COALESCE(expiration_date, NOW()), INTERVAL ? MONTH) 
+                WHERE id = ?
+            ");
+            if (!$stmt) {
+                return false;
+            }
+            $stmt->bind_param("ii", $months, $userId);
+            $res = $stmt->execute();
+            $stmt->close();
+            return $res;
+        } else {
+            $stmt = $conn->prepare("
+                UPDATE users 
+                SET expiration_date = DATE_ADD(COALESCE(expiration_date, NOW()), INTERVAL ? MONTH) 
+                WHERE id = ?
+            ");
+            if (!$stmt) {
+                return false;
+            }
+            $stmt->bind_param("ii", $months, $userId);
+            $res = $stmt->execute();
+            $stmt->close();
+            
+            // Also update all sub-users of this main user
+            if ($res) {
+                $subStmt = $conn->prepare("
+                    UPDATE sub_users 
+                    SET expiration_date = DATE_ADD(COALESCE(expiration_date, NOW()), INTERVAL ? MONTH) 
+                    WHERE main_user_id = ?
+                ");
+                if ($subStmt) {
+                    $subStmt->bind_param("ii", $months, $userId);
+                    $subStmt->execute();
+                    $subStmt->close();
+                }
+            }
+            return $res;
+        }
+    } catch (Throwable $e) {
+        return false;
+    }
 }
 
 /**
@@ -154,34 +202,50 @@ function extendUserExpiration($userId, $months = 1, $isSubUser = false) {
  */
 function getUserExpirationDate($userId, $isSubUser = false) {
     global $conn;
+    $userId = (int)$userId;
+    if ($userId <= 0 || !$conn) {
+        return null;
+    }
     
-    if ($isSubUser) {
-        $stmt = $conn->prepare("
-            SELECT su.expiration_date, u.expiration_date as main_expiration_date 
-            FROM sub_users su 
-            JOIN users u ON su.main_user_id = u.id 
-            WHERE su.id = ?
-        ");
-        $stmt->bind_param("i", $userId);
-        $stmt->execute();
-        $result = $stmt->get_result()->fetch_assoc();
-        
-        if ($result) {
-            // Return the earliest expiration date
-            if ($result['expiration_date'] && $result['main_expiration_date']) {
-                return strtotime($result['expiration_date']) < strtotime($result['main_expiration_date']) 
-                    ? $result['expiration_date'] 
-                    : $result['main_expiration_date'];
+    try {
+        if ($isSubUser) {
+            $stmt = $conn->prepare("
+                SELECT su.expiration_date, u.expiration_date as main_expiration_date 
+                FROM sub_users su 
+                JOIN users u ON su.main_user_id = u.id 
+                WHERE su.id = ?
+            ");
+            if (!$stmt) {
+                return null;
             }
-            return $result['expiration_date'] ?: $result['main_expiration_date'];
+            $stmt->bind_param("i", $userId);
+            $stmt->execute();
+            $result = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+            
+            if ($result) {
+                // Return the earliest expiration date
+                if ($result['expiration_date'] && $result['main_expiration_date']) {
+                    return strtotime($result['expiration_date']) < strtotime($result['main_expiration_date']) 
+                        ? $result['expiration_date'] 
+                        : $result['main_expiration_date'];
+                }
+                return $result['expiration_date'] ?: $result['main_expiration_date'];
+            }
+        } else {
+            $stmt = $conn->prepare("SELECT expiration_date FROM users WHERE id = ?");
+            if (!$stmt) {
+                return null;
+            }
+            $stmt->bind_param("i", $userId);
+            $stmt->execute();
+            $result = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+            
+            return $result ? $result['expiration_date'] : null;
         }
-    } else {
-        $stmt = $conn->prepare("SELECT expiration_date FROM users WHERE id = ?");
-        $stmt->bind_param("i", $userId);
-        $stmt->execute();
-        $result = $stmt->get_result()->fetch_assoc();
-        
-        return $result ? $result['expiration_date'] : null;
+    } catch (Throwable $e) {
+        return null;
     }
     
     return null;
@@ -211,7 +275,7 @@ function verifyCSRFToken($token) {
  * فۆرماتکردنی پارە
  */
 function formatCurrency($amount, $currency = 'IQD') {
-    return number_format($amount, 0) . ' ' . $currency;
+    return number_format((float)$amount, 0) . ' ' . $currency;
 }
 
 /**
@@ -227,19 +291,32 @@ function logActivity($action, $description = null) {
         return false;
     }
     
-    $db = new Database();
-    $conn = $db->getConnection();
-    $userId = getCurrentUserId();
+    global $conn;
+    if (!$conn) {
+        $db = new Database();
+        $conn = $db->getConnection();
+    }
+    if (!$conn) {
+        return false;
+    }
     
-    $stmt = $conn->prepare("INSERT INTO activity_logs (user_id, action, description, ip_address, user_agent) VALUES (?, ?, ?, ?, ?)");
-    $ip_address = $_SERVER['REMOTE_ADDR'] ?? null;
-    $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? null;
-    
-    $stmt->bind_param("issss", $userId, $action, $description, $ip_address, $user_agent);
-    $result = $stmt->execute();
-    $stmt->close();
-    
-    return $result;
+    try {
+        $userId = getCurrentUserId();
+        $stmt = $conn->prepare("INSERT INTO activity_logs (user_id, action, description, ip_address, user_agent) VALUES (?, ?, ?, ?, ?)");
+        if (!$stmt) {
+            return false;
+        }
+        $ip_address = $_SERVER['REMOTE_ADDR'] ?? null;
+        $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? null;
+        
+        $stmt->bind_param("issss", $userId, $action, $description, $ip_address, $user_agent);
+        $result = $stmt->execute();
+        $stmt->close();
+        
+        return $result;
+    } catch (Throwable $e) {
+        return false;
+    }
 }
 
 
@@ -376,8 +453,18 @@ function getReadableFileSize($bytes, $precision = 2) {
  * فۆرماتکردنی بەروار بۆ کوردی
  */
 function formatKurdishDate($date, $includeTime = false) {
-    if (is_string($date)) {
-        $date = new DateTime($date, new DateTimeZone(DEFAULT_TIMEZONE));
+    if (empty($date)) {
+        return '';
+    }
+    try {
+        if (is_string($date)) {
+            $date = new DateTime($date, new DateTimeZone(DEFAULT_TIMEZONE));
+        }
+        if (!($date instanceof DateTimeInterface)) {
+            return '';
+        }
+    } catch (Throwable $e) {
+        return (string)$date;
     }
     
     $months = [
@@ -396,7 +483,7 @@ function formatKurdishDate($date, $includeTime = false) {
     ];
     
     $day = $date->format('d');
-    $month = $months[(int)$date->format('n')];
+    $month = $months[(int)$date->format('n')] ?? '';
     $year = $date->format('Y');
     
     $formattedDate = "$day $month $year";
@@ -413,10 +500,16 @@ function formatKurdishDate($date, $includeTime = false) {
  * حیسابکردنی تەمەن
  */
 function calculateAge($birthdate) {
-    $birth = new DateTime($birthdate, new DateTimeZone(DEFAULT_TIMEZONE));
-    $today = new DateTime('now', new DateTimeZone(DEFAULT_TIMEZONE));
-    
-    return $birth->diff($today)->y;
+    if (empty($birthdate)) {
+        return 0;
+    }
+    try {
+        $birth = new DateTime($birthdate, new DateTimeZone(DEFAULT_TIMEZONE));
+        $today = new DateTime('now', new DateTimeZone(DEFAULT_TIMEZONE));
+        return (int)$birth->diff($today)->y;
+    } catch (Throwable $e) {
+        return 0;
+    }
 }
 
 /**
@@ -427,6 +520,8 @@ function calculateAge($birthdate) {
  * حیسابکردنی قازانج
  */
 function calculateProfit($sellPrice, $buyPrice) {
+    $sellPrice = (float)$sellPrice;
+    $buyPrice = (float)$buyPrice;
     if ($buyPrice <= 0) {
         return 0;
     }
@@ -438,6 +533,8 @@ function calculateProfit($sellPrice, $buyPrice) {
  * حیسابکردنی ڕێژەی قازانج
  */
 function calculateProfitPercentage($sellPrice, $buyPrice) {
+    $sellPrice = (float)$sellPrice;
+    $buyPrice = (float)$buyPrice;
     if ($buyPrice <= 0) {
         return 0;
     }
@@ -449,6 +546,8 @@ function calculateProfitPercentage($sellPrice, $buyPrice) {
  * حیسابکردنی داشکاندن
  */
 function calculateDiscount($originalPrice, $discountedPrice) {
+    $originalPrice = (float)$originalPrice;
+    $discountedPrice = (float)$discountedPrice;
     if ($originalPrice <= 0) {
         return 0;
     }
@@ -460,7 +559,7 @@ function calculateDiscount($originalPrice, $discountedPrice) {
  * حیسابکردنی باج
  */
 function calculateTax($amount, $taxRate) {
-    return ($amount * $taxRate) / 100;
+    return ((float)$amount * (float)$taxRate) / 100;
 }
 
 /**
@@ -471,29 +570,37 @@ function calculateTax($amount, $taxRate) {
  * حیسابکردنی ناوەند
  */
 function calculateAverage($numbers) {
-    if (empty($numbers)) {
+    if (!is_array($numbers) || empty($numbers)) {
+        return 0;
+    }
+    $filtered = array_filter($numbers, 'is_numeric');
+    if (empty($filtered)) {
         return 0;
     }
     
-    return array_sum($numbers) / count($numbers);
+    return array_sum($filtered) / count($filtered);
 }
 
 /**
  * دۆزینەوەی بەهای ناوەندی
  */
 function findMedian($numbers) {
-    if (empty($numbers)) {
+    if (!is_array($numbers) || empty($numbers)) {
+        return 0;
+    }
+    $filtered = array_values(array_filter($numbers, 'is_numeric'));
+    if (empty($filtered)) {
         return 0;
     }
     
-    sort($numbers);
-    $count = count($numbers);
+    sort($filtered);
+    $count = count($filtered);
     $middle = floor($count / 2);
     
     if ($count % 2) {
-        return $numbers[$middle];
+        return $filtered[$middle];
     } else {
-        return ($numbers[$middle - 1] + $numbers[$middle]) / 2;
+        return ($filtered[$middle - 1] + $filtered[$middle]) / 2;
     }
 }
 
@@ -837,22 +944,38 @@ function getExchangeRate($userId, $fromCurrency = 'USD', $toCurrency = 'IQD') {
         return 1.0;
     }
     
-    $stmt = $conn->prepare("
-        SELECT exchange_rate 
-        FROM currency_exchange_rates 
-        WHERE user_id = ? AND from_currency = ? AND to_currency = ?
-        LIMIT 1
-    ");
-    $stmt->bind_param("iss", $userId, $fromCurrency, $toCurrency);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    if ($row = $result->fetch_assoc()) {
-        $stmt->close();
-        return (float)$row['exchange_rate'];
+    $userId = (int)$userId;
+    if ($userId <= 0 || !$conn) {
+        if ($fromCurrency === 'USD' && $toCurrency === 'IQD') {
+            return 1400.0;
+        }
+        if ($fromCurrency === 'IQD' && $toCurrency === 'USD') {
+            return 1.0 / 1400.0;
+        }
+        return false;
     }
     
-    $stmt->close();
+    try {
+        $stmt = $conn->prepare("
+            SELECT exchange_rate 
+            FROM currency_exchange_rates 
+            WHERE user_id = ? AND from_currency = ? AND to_currency = ?
+            LIMIT 1
+        ");
+        if ($stmt) {
+            $stmt->bind_param("iss", $userId, $fromCurrency, $toCurrency);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            if ($row = $result->fetch_assoc()) {
+                $stmt->close();
+                return (float)$row['exchange_rate'];
+            }
+            $stmt->close();
+        }
+    } catch (Throwable $e) {
+        // Fallback below
+    }
     
     // ئەگەر ڕێژە نەدۆزرایەوە، بە default 1400 دەگەڕێتەوە (بۆ USD -> IQD)
     if ($fromCurrency === 'USD' && $toCurrency === 'IQD') {
@@ -862,7 +985,7 @@ function getExchangeRate($userId, $fromCurrency = 'USD', $toCurrency = 'IQD') {
     // بۆ گەڕاندنەوە (IQD -> USD)، بەکارهێنانی بەپێچەوانە
     if ($fromCurrency === 'IQD' && $toCurrency === 'USD') {
         $reverseRate = getExchangeRate($userId, 'USD', 'IQD');
-        return $reverseRate > 0 ? (1.0 / $reverseRate) : (1.0 / 1400.0);
+        return ($reverseRate && $reverseRate > 0) ? (1.0 / $reverseRate) : (1.0 / 1400.0);
     }
     
     return false;
@@ -951,28 +1074,41 @@ function formatDualCurrency($iqd, $usd, $sep = ' + ') {
  */
 function setExchangeRate($userId, $fromCurrency, $toCurrency, $exchangeRate, $manualAdjustment = null) {
     global $conn;
+    $userId = (int)$userId;
+    if ($userId <= 0 || !$conn) {
+        return false;
+    }
     
     // ئەگەر manualAdjustment نەدرابێت، حساب بکرێت لە جیاوازی لە نێوان exchange_rate و base_rate
     if ($manualAdjustment === null && $fromCurrency === 'USD' && $toCurrency === 'IQD') {
         $baseRate = getBaseExchangeRateFromDollarPrices();
-        $manualAdjustment = $exchangeRate - $baseRate;
+        $manualAdjustment = (float)$exchangeRate - (float)$baseRate;
     } else if ($manualAdjustment === null) {
-        $manualAdjustment = 0;
+        $manualAdjustment = 0.0;
     }
     
-    $stmt = $conn->prepare("
-        INSERT INTO currency_exchange_rates (user_id, from_currency, to_currency, exchange_rate, manual_adjustment)
-        VALUES (?, ?, ?, ?, ?)
-        ON DUPLICATE KEY UPDATE 
-            exchange_rate = VALUES(exchange_rate),
-            manual_adjustment = VALUES(manual_adjustment),
-            updated_at = CURRENT_TIMESTAMP
-    ");
-    $stmt->bind_param("issdd", $userId, $fromCurrency, $toCurrency, $exchangeRate, $manualAdjustment);
-    $result = $stmt->execute();
-    $stmt->close();
-    
-    return $result;
+    try {
+        $stmt = $conn->prepare("
+            INSERT INTO currency_exchange_rates (user_id, from_currency, to_currency, exchange_rate, manual_adjustment)
+            VALUES (?, ?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE 
+                exchange_rate = VALUES(exchange_rate),
+                manual_adjustment = VALUES(manual_adjustment),
+                updated_at = CURRENT_TIMESTAMP
+        ");
+        if (!$stmt) {
+            return false;
+        }
+        $exchangeRate = (float)$exchangeRate;
+        $manualAdjustment = (float)$manualAdjustment;
+        $stmt->bind_param("issdd", $userId, $fromCurrency, $toCurrency, $exchangeRate, $manualAdjustment);
+        $result = $stmt->execute();
+        $stmt->close();
+        
+        return $result;
+    } catch (Throwable $e) {
+        return false;
+    }
 }
 
 /**
@@ -984,27 +1120,39 @@ function setExchangeRate($userId, $fromCurrency, $toCurrency, $exchangeRate, $ma
  */
 function setManualAdjustment($userId, $manualAdjustment) {
     global $conn;
+    $userId = (int)$userId;
+    if ($userId <= 0 || !$conn) {
+        return false;
+    }
     
     // وەرگرتنی base_rate لە dollar_prices
     $baseRate = getBaseExchangeRateFromDollarPrices();
+    $manualAdjustment = (float)$manualAdjustment;
     
     // حسابکردنی exchange_rate = base_rate + manual_adjustment
     $exchangeRate = $baseRate + $manualAdjustment;
     
-    // نوێکردنەوەی currency_exchange_rates
-    $stmt = $conn->prepare("
-        INSERT INTO currency_exchange_rates (user_id, from_currency, to_currency, exchange_rate, manual_adjustment)
-        VALUES (?, 'USD', 'IQD', ?, ?)
-        ON DUPLICATE KEY UPDATE 
-            exchange_rate = VALUES(exchange_rate),
-            manual_adjustment = VALUES(manual_adjustment),
-            updated_at = CURRENT_TIMESTAMP
-    ");
-    $stmt->bind_param("idd", $userId, $exchangeRate, $manualAdjustment);
-    $result = $stmt->execute();
-    $stmt->close();
-    
-    return $result;
+    try {
+        // نوێکردنەوەی currency_exchange_rates
+        $stmt = $conn->prepare("
+            INSERT INTO currency_exchange_rates (user_id, from_currency, to_currency, exchange_rate, manual_adjustment)
+            VALUES (?, 'USD', 'IQD', ?, ?)
+            ON DUPLICATE KEY UPDATE 
+                exchange_rate = VALUES(exchange_rate),
+                manual_adjustment = VALUES(manual_adjustment),
+                updated_at = CURRENT_TIMESTAMP
+        ");
+        if (!$stmt) {
+            return false;
+        }
+        $stmt->bind_param("idd", $userId, $exchangeRate, $manualAdjustment);
+        $result = $stmt->execute();
+        $stmt->close();
+        
+        return $result;
+    } catch (Throwable $e) {
+        return false;
+    }
 }
 
 /**
@@ -1014,18 +1162,26 @@ function setManualAdjustment($userId, $manualAdjustment) {
  */
 function getBaseExchangeRateFromDollarPrices() {
     global $conn;
+    if (!$conn) {
+        return 1400.0;
+    }
     
     try {
         $result = $conn->query("SELECT offer_price FROM dollar_prices ORDER BY last_updated DESC LIMIT 1");
         
         if ($result && $result->num_rows > 0) {
             $row = $result->fetch_assoc();
-            $offerPrice = floatval($row['offer_price']);
+            $offerPrice = floatval($row['offer_price'] ?? 0);
             
-            // وەرگرتنی تەنها 4 ژمارەی سەرەتای
-            return extractFirstFourDigits($offerPrice);
+            if ($offerPrice > 0) {
+                // وەرگرتنی تەنها 4 ژمارەی سەرەتای
+                $extracted = extractFirstFourDigits($offerPrice);
+                if ($extracted > 0) {
+                    return $extracted;
+                }
+            }
         }
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         // هەڵە بێدەنگ بکە
     }
     
@@ -1038,6 +1194,9 @@ function getBaseExchangeRateFromDollarPrices() {
  */
 function extractFirstFourDigits($number) {
     $numberStr = (string)intval($number);
+    if (strlen($numberStr) <= 4) {
+        return floatval($numberStr);
+    }
     $firstFour = substr($numberStr, 0, 4);
     return floatval($firstFour);
 }
@@ -1050,23 +1209,32 @@ function extractFirstFourDigits($number) {
  */
 function getManualAdjustment($userId) {
     global $conn;
-    
-    $stmt = $conn->prepare("
-        SELECT manual_adjustment 
-        FROM currency_exchange_rates 
-        WHERE user_id = ? AND from_currency = 'USD' AND to_currency = 'IQD'
-        LIMIT 1
-    ");
-    $stmt->bind_param("i", $userId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    if ($row = $result->fetch_assoc()) {
-        $stmt->close();
-        return floatval($row['manual_adjustment'] ?? 0);
+    $userId = (int)$userId;
+    if ($userId <= 0 || !$conn) {
+        return 0.0;
     }
     
-    $stmt->close();
+    try {
+        $stmt = $conn->prepare("
+            SELECT manual_adjustment 
+            FROM currency_exchange_rates 
+            WHERE user_id = ? AND from_currency = 'USD' AND to_currency = 'IQD'
+            LIMIT 1
+        ");
+        if ($stmt) {
+            $stmt->bind_param("i", $userId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            if ($row = $result->fetch_assoc()) {
+                $stmt->close();
+                return floatval($row['manual_adjustment'] ?? 0);
+            }
+            $stmt->close();
+        }
+    } catch (Throwable $e) {
+        return 0.0;
+    }
     return 0.0;
 }
 
@@ -1078,24 +1246,35 @@ function getManualAdjustment($userId) {
  */
 function getUserExchangeRates($userId) {
     global $conn;
-    
-    $stmt = $conn->prepare("
-        SELECT from_currency, to_currency, exchange_rate, manual_adjustment, updated_at
-        FROM currency_exchange_rates
-        WHERE user_id = ?
-        ORDER BY updated_at DESC
-    ");
-    $stmt->bind_param("i", $userId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    $rates = [];
-    while ($row = $result->fetch_assoc()) {
-        $rates[] = $row;
+    $userId = (int)$userId;
+    if ($userId <= 0 || !$conn) {
+        return [];
     }
     
-    $stmt->close();
-    return $rates;
+    try {
+        $stmt = $conn->prepare("
+            SELECT from_currency, to_currency, exchange_rate, manual_adjustment, updated_at
+            FROM currency_exchange_rates
+            WHERE user_id = ?
+            ORDER BY updated_at DESC
+        ");
+        if (!$stmt) {
+            return [];
+        }
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        $rates = [];
+        while ($row = $result->fetch_assoc()) {
+            $rates[] = $row;
+        }
+        
+        $stmt->close();
+        return $rates;
+    } catch (Throwable $e) {
+        return [];
+    }
 }
 
 ?>

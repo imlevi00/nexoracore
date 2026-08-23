@@ -91,20 +91,25 @@ if (!function_exists('kasher_resolve_theme_mode')) {
             return 'system';
         }
 
-        $stmt = $connZanyari->prepare('SELECT theme_mode FROM user_account_settings WHERE user_id = ? LIMIT 1');
-        if (!$stmt) {
-            return 'system';
-        }
-
-        $stmt->bind_param('i', $userId);
         $themeMode = 'system';
-        if ($stmt->execute()) {
-            $row = $stmt->get_result()->fetch_assoc();
-            if ($row && isset($row['theme_mode'])) {
-                $themeMode = kasher_normalize_theme_mode($row['theme_mode']);
+        try {
+            $stmt = $connZanyari->prepare('SELECT theme_mode FROM user_account_settings WHERE user_id = ? LIMIT 1');
+            if (!$stmt) {
+                return 'system';
             }
+
+            $stmt->bind_param('i', $userId);
+            if ($stmt->execute()) {
+                $res = $stmt->get_result();
+                $row = $res ? $res->fetch_assoc() : null;
+                if ($row && isset($row['theme_mode'])) {
+                    $themeMode = kasher_normalize_theme_mode($row['theme_mode']);
+                }
+            }
+            $stmt->close();
+        } catch (Throwable $e) {
+            $themeMode = 'system';
         }
-        $stmt->close();
 
         $_SESSION['user_theme_mode'] = $themeMode;
         $_SESSION['user_data']['theme_mode'] = $themeMode;

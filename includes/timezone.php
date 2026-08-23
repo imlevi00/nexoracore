@@ -53,20 +53,32 @@ class TimezoneManager {
      * گۆڕینی کات بۆ timezone ی جیاواز
      */
     public static function convertToTimezone($datetime, $targetTimezone) {
-        if (is_string($datetime)) {
-            $datetime = new DateTime($datetime, new DateTimeZone(self::$timezone));
+        try {
+            if (is_string($datetime)) {
+                $datetime = new DateTime($datetime, new DateTimeZone(self::$timezone));
+            }
+            if ($datetime instanceof DateTime) {
+                $datetime->setTimezone(new DateTimeZone($targetTimezone));
+            }
+            return $datetime;
+        } catch (Throwable $e) {
+            return self::createDateTime();
         }
-        
-        $datetime->setTimezone(new DateTimeZone($targetTimezone));
-        return $datetime;
     }
     
     /**
      * فۆرماتکردنی کات بۆ کوردی
      */
     public static function formatKurdish($datetime, $includeTime = false) {
-        if (is_string($datetime)) {
-            $datetime = new DateTime($datetime, new DateTimeZone(self::$timezone));
+        try {
+            if (is_string($datetime)) {
+                $datetime = new DateTime($datetime, new DateTimeZone(self::$timezone));
+            }
+            if (!($datetime instanceof DateTimeInterface)) {
+                return '';
+            }
+        } catch (Throwable $e) {
+            return (string)$datetime;
         }
         
         $months = [
@@ -77,7 +89,7 @@ class TimezoneManager {
         ];
         
         $day = $datetime->format('d');
-        $month = $months[(int)$datetime->format('n')];
+        $month = $months[(int)$datetime->format('n')] ?? '';
         $year = $datetime->format('Y');
         
         $formatted = "$day $month $year";
@@ -94,20 +106,35 @@ class TimezoneManager {
      * حیسابکردنی جیاوازی کات
      */
     public static function timeDiff($from, $to = null) {
-        if ($to === null) {
-            $to = self::createDateTime();
-        } else {
-            $to = new DateTime($to, new DateTimeZone(self::$timezone));
+        try {
+            if ($to === null) {
+                $to = self::createDateTime();
+            } elseif (is_string($to)) {
+                $to = new DateTime($to, new DateTimeZone(self::$timezone));
+            }
+            
+            if (is_string($from)) {
+                $from = new DateTime($from, new DateTimeZone(self::$timezone));
+            }
+            
+            if (($from instanceof DateTimeInterface) && ($to instanceof DateTimeInterface)) {
+                return $from->diff($to);
+            }
+        } catch (Throwable $e) {
+            // fallback
         }
         
-        $from = new DateTime($from, new DateTimeZone(self::$timezone));
-        return $from->diff($to);
+        $now = new DateTime();
+        return $now->diff($now);
     }
     
     /**
      * تاقیکردنەوەی کاتی بەروار
      */
     public static function isValidDate($date, $format = 'Y-m-d H:i:s') {
+        if (!is_string($date) || $date === '') {
+            return false;
+        }
         $d = DateTime::createFromFormat($format, $date);
         return $d && $d->format($format) === $date;
     }

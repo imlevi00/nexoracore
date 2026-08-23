@@ -289,10 +289,17 @@ function formatMoney($amount, $currency = DEFAULT_CURRENCY) {
  * فۆرماتکردنی بەروار
  */
 function formatDate($date, $format = 'Y-m-d H:i:s') {
-    if (is_string($date)) {
-        $date = new DateTime($date, new DateTimeZone(DEFAULT_TIMEZONE));
+    if (empty($date)) {
+        return '';
     }
-    return $date->format($format);
+    try {
+        if (is_string($date)) {
+            $date = new DateTime($date, new DateTimeZone(DEFAULT_TIMEZONE));
+        }
+        return ($date instanceof DateTimeInterface) ? $date->format($format) : '';
+    } catch (Throwable $e) {
+        return (string)$date;
+    }
 }
 
 /**
@@ -324,7 +331,7 @@ function generateInvoiceNumber() {
  * پاککردنەوەی HTML
  */
 function clean($data) {
-    return htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
+    return htmlspecialchars(trim((string)($data ?? '')), ENT_QUOTES, 'UTF-8');
 }
 
 /**

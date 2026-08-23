@@ -30,7 +30,7 @@ $currentYear = date('Y');
                                 <i class="bi bi-person-circle"></i>
                                 <?php
                                 $user = getCurrentUser() ?? getCurrentAdmin();
-                                echo $user ? htmlspecialchars($user['business_name'] ?? $user['username']) : 'نامۆ';
+                                echo $user ? htmlspecialchars($user['business_name'] ?? $user['username'] ?? '') : 'نامۆ';
                                 ?>
                             <?php endif; ?>
                         </p>
