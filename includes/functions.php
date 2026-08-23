@@ -870,6 +870,11 @@ function runSystemHealthCheck() {
 
 /**
  * کاشکردنی داتا
+ * 
+ * @param string $key
+ * @param mixed $data
+ * @param int $expiration
+ * @return bool
  */
 function cacheData($key, $data, $expiration = 3600) {
     $cacheDir = ROOT_PATH . '/cache';
@@ -877,7 +882,7 @@ function cacheData($key, $data, $expiration = 3600) {
         createSecureDirectory($cacheDir);
     }
     
-    $cacheFile = $cacheDir . '/' . md5($key) . '.cache';
+    $cacheFile = $cacheDir . '/' . md5((string)$key) . '.cache';
     
     $cacheData = [
         'data' => $data,
@@ -890,35 +895,44 @@ function cacheData($key, $data, $expiration = 3600) {
 
 /**
  * وەرگرتنی داتا لە کاش
+ * 
+ * @param string $key
+ * @return mixed
  */
 function getCachedData($key) {
     $cacheDir = ROOT_PATH . '/cache';
-    $cacheFile = $cacheDir . '/' . md5($key) . '.cache';
+    $cacheFile = $cacheDir . '/' . md5((string)$key) . '.cache';
     
     if (!file_exists($cacheFile)) {
         return false;
     }
     
     $cacheData = unserialize(file_get_contents($cacheFile));
-    
-    // تاقیکردنی expiration
-    if (time() > $cacheData['expires']) {
-        unlink($cacheFile);
+    if (!is_array($cacheData) || !isset($cacheData['expires'])) {
         return false;
     }
     
-    return $cacheData['data'];
+    // تاقیکردنی expiration
+    if (time() > $cacheData['expires']) {
+        @unlink($cacheFile);
+        return false;
+    }
+    
+    return $cacheData['data'] ?? false;
 }
 
 /**
  * سڕینەوەی کاشی تایبەت
+ * 
+ * @param string $key
+ * @return bool
  */
 function deleteCachedData($key) {
     $cacheDir = ROOT_PATH . '/cache';
-    $cacheFile = $cacheDir . '/' . md5($key) . '.cache';
+    $cacheFile = $cacheDir . '/' . md5((string)$key) . '.cache';
     
     if (file_exists($cacheFile)) {
-        return unlink($cacheFile);
+        return @unlink($cacheFile);
     }
     
     return true;
@@ -1191,6 +1205,9 @@ function getBaseExchangeRateFromDollarPrices() {
 /**
  * وەرگرتنی تەنها 4 ژمارەی سەرەتای ژمارەکە
  * بۆ نمونە: 142000 → 1420
+ * 
+ * @param int|float|string $number
+ * @return float
  */
 function extractFirstFourDigits($number) {
     $numberStr = (string)intval($number);
