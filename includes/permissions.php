@@ -1281,11 +1281,9 @@ function requireCustomersAccountStatementAccess($lockMessage = null): void
 /**
  * چالاکی بەڕێوەبردنی خەرجیەکان بەپێی پاکێج
  */
-if (!function_exists('hasExpensesModuleAccess')) {
-    function hasExpensesModuleAccess(): bool
-    {
-        return hasFeaturePermission('expenses_manage');
-    }
+function hasExpensesModuleAccess(): bool
+{
+    return hasFeaturePermission('expenses_manage');
 }
 
 /**
@@ -1601,7 +1599,7 @@ function isWalletsModuleEnabledForCurrentPackage() {
 /**
  * چالاکی module ی قاسەکان بەپێی پاکێج
  */
-function hasWalletsModuleAccess()
+function hasWalletsModuleAccess(): bool
 {
     return isWalletsModuleEnabledForCurrentPackage();
 }
@@ -1644,183 +1642,6 @@ function requireWalletsModuleAccess($lockMessage = null) {
         'skeleton' => 'wallets',
         'back_url' => function_exists('url') ? url('user/dashboard/index.php') : '/user/dashboard/index.php',
         'back_label' => 'گەڕانەوە بۆ داشبۆرد',
-    ]);
-}
-
-/**
- * چیکردنی چالاکی module ی خەرجیەکان بەپێی پاکێجی بەکارهێنەری ئێستا
- */
-if (!function_exists('isExpensesModuleEnabledForCurrentPackage')) {
-    function isExpensesModuleEnabledForCurrentPackage() {
-        return hasFeaturePermission('expenses_manage');
-    }
-}
-
-/**
- * چیکردنی دەستڕاگەیشتن بۆ module ی خەرجیەکان (ABAC + package feature)
- */
-function canCurrentUserAccessExpensesModule($context = []) {
-    $currentUser = getCurrentUser();
-    if (!$currentUser) {
-        return false;
-    }
-
-    $authResult = authorize($currentUser, 'expenses.view', [
-        'route' => $context['route'] ?? ($_SERVER['REQUEST_URI'] ?? ''),
-        'request_method' => $context['request_method'] ?? ($_SERVER['REQUEST_METHOD'] ?? 'GET')
-    ]);
-    if (empty($authResult['allowed'])) {
-        return false;
-    }
-
-    return isExpensesModuleEnabledForCurrentPackage();
-}
-
-/**
- * دڵنیابوونەوە لە بوونی خشتە و ستوونەکانی خەرجیەکان
- */
-function ensureExpensesSchemaTables($conn = null)
-{
-    if ($conn === null) {
-        global $conn;
-    }
-    if (!$conn || !($conn instanceof mysqli)) {
-        return;
-    }
-
-    try {
-        // expense_types
-        $conn->query("
-            CREATE TABLE IF NOT EXISTS `expense_types` (
-              `id` INT NOT NULL AUTO_INCREMENT,
-              `user_id` INT NOT NULL,
-              `name` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-              `description` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-              `is_recurring` TINYINT(1) NOT NULL DEFAULT 0,
-              `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              PRIMARY KEY (`id`),
-              KEY `idx_user_id` (`user_id`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-        ");
-
-        // expenses
-        $conn->query("
-            CREATE TABLE IF NOT EXISTS `expenses` (
-              `id` INT NOT NULL AUTO_INCREMENT,
-              `user_id` INT NOT NULL,
-              `expense_type_id` INT NULL DEFAULT NULL,
-              `expense_name` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-              `amount` DECIMAL(15,3) NOT NULL DEFAULT 0.000,
-              `currency` VARCHAR(10) NOT NULL DEFAULT 'IQD',
-              `payment_method` VARCHAR(50) NOT NULL DEFAULT 'cash',
-              `wallet_id` INT NULL DEFAULT NULL,
-              `is_recurring` TINYINT(1) NOT NULL DEFAULT 0,
-              `has_credit` TINYINT(1) NOT NULL DEFAULT 0,
-              `description` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-              `receipt_number` VARCHAR(100) NULL DEFAULT NULL,
-              `expense_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-              PRIMARY KEY (`id`),
-              KEY `idx_user_id` (`user_id`),
-              KEY `idx_expense_date` (`expense_date`),
-              KEY `idx_wallet_id` (`wallet_id`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-        ");
-
-        // Check columns for expenses table
-        $expCols = [];
-        $expColRes = $conn->query("SHOW COLUMNS FROM `expenses`");
-        if ($expColRes) {
-            while ($col = $expColRes->fetch_assoc()) {
-                $expCols[] = strtolower($col['Field']);
-            }
-            $expColRes->close();
-        }
-        if (!empty($expCols)) {
-            if (!in_array('currency', $expCols, true)) {
-                $conn->query("ALTER TABLE `expenses` ADD COLUMN `currency` VARCHAR(10) NOT NULL DEFAULT 'IQD' AFTER `amount`");
-            }
-            if (!in_array('wallet_id', $expCols, true)) {
-                $conn->query("ALTER TABLE `expenses` ADD COLUMN `wallet_id` INT NULL DEFAULT NULL AFTER `payment_method`, ADD KEY `idx_wallet_id` (`wallet_id`)");
-            }
-            if (!in_array('is_recurring', $expCols, true)) {
-                $conn->query("ALTER TABLE `expenses` ADD COLUMN `is_recurring` TINYINT(1) NOT NULL DEFAULT 0 AFTER `wallet_id`");
-            }
-            if (!in_array('has_credit', $expCols, true)) {
-                $conn->query("ALTER TABLE `expenses` ADD COLUMN `has_credit` TINYINT(1) NOT NULL DEFAULT 0 AFTER `is_recurring`");
-            }
-        }
-
-        // expense_credits
-        $conn->query("
-            CREATE TABLE IF NOT EXISTS `expense_credits` (
-              `id` INT NOT NULL AUTO_INCREMENT,
-              `user_id` INT NOT NULL,
-              `expense_id` INT NOT NULL,
-              `creditor_name` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-              `creditor_phone` VARCHAR(50) NULL DEFAULT NULL,
-              `total_amount` DECIMAL(15,3) NOT NULL DEFAULT 0.000,
-              `paid_amount` DECIMAL(15,3) NOT NULL DEFAULT 0.000,
-              `remaining_amount` DECIMAL(15,3) NOT NULL DEFAULT 0.000,
-              `currency` VARCHAR(10) NOT NULL DEFAULT 'IQD',
-              `due_date` DATE NULL DEFAULT NULL,
-              `payment_terms` TEXT NULL,
-              `notes` TEXT NULL,
-              `status` ENUM('active','pending','completed','overdue') NOT NULL DEFAULT 'active',
-              `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-              PRIMARY KEY (`id`),
-              KEY `idx_user_id` (`user_id`),
-              KEY `idx_expense_id` (`expense_id`),
-              KEY `idx_status` (`status`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-        ");
-
-        // expense_credit_payments
-        $conn->query("
-            CREATE TABLE IF NOT EXISTS `expense_credit_payments` (
-              `id` INT NOT NULL AUTO_INCREMENT,
-              `user_id` INT NOT NULL,
-              `expense_credit_id` INT NOT NULL,
-              `payment_amount` DECIMAL(15,3) NOT NULL DEFAULT 0.000,
-              `currency` VARCHAR(10) NOT NULL DEFAULT 'IQD',
-              `payment_method` VARCHAR(50) NOT NULL DEFAULT 'cash',
-              `wallet_id` INT NULL DEFAULT NULL,
-              `payment_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              `receipt_number` VARCHAR(100) NULL DEFAULT NULL,
-              `notes` TEXT NULL,
-              `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              PRIMARY KEY (`id`),
-              KEY `idx_user_id` (`user_id`),
-              KEY `idx_credit_id` (`expense_credit_id`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-        ");
-    } catch (Throwable $e) {
-        error_log("ensureExpensesSchemaTables error: " . $e->getMessage());
-    }
-}
-
-/**
- * ڕێگەپێدان/ڕێگەگرتن بۆ module ی خەرجیەکان (hide-and-block policy)
- */
-function requireExpensesModuleAccess($lockMessage = null) {
-    if (!isUser()) {
-        return;
-    }
-
-    ensureExpensesSchemaTables();
-
-    $usageSuffix = getPackageFeatureUsageSuffix('expenses_manage', 'بەڕێوەبردنی خەرجیەکان');
-    if ($lockMessage === null) {
-        $lockMessage = getPremiumLockPackageTexts($usageSuffix)['description'];
-    }
-
-    requireFeaturePermission('expenses_manage', $lockMessage, $usageSuffix, [
-        'page_title' => 'خەرجیەکان',
-        'skeleton' => 'expenses',
-        'back_url' => function_exists('url') ? url('user/expenses/main.php') : '/user/expenses/main.php',
-        'back_label' => 'گەڕانەوە بۆ خەرجیەکان',
     ]);
 }
 
