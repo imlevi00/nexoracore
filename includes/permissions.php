@@ -1281,9 +1281,11 @@ function requireCustomersAccountStatementAccess($lockMessage = null): void
 /**
  * چالاکی بەڕێوەبردنی خەرجیەکان بەپێی پاکێج
  */
-function hasExpensesModuleAccess(): bool
-{
-    return hasFeaturePermission('expenses_manage');
+if (!function_exists('hasExpensesModuleAccess')) {
+    function hasExpensesModuleAccess(): bool
+    {
+        return hasFeaturePermission('expenses_manage');
+    }
 }
 
 /**
@@ -1648,16 +1650,10 @@ function requireWalletsModuleAccess($lockMessage = null) {
 /**
  * چیکردنی چالاکی module ی خەرجیەکان بەپێی پاکێجی بەکارهێنەری ئێستا
  */
-function isExpensesModuleEnabledForCurrentPackage() {
-    return hasFeaturePermission('expenses_manage');
-}
-
-/**
- * چالاکی module ی خەرجیەکان بەپێی پاکێج
- */
-function hasExpensesModuleAccess()
-{
-    return isExpensesModuleEnabledForCurrentPackage();
+if (!function_exists('isExpensesModuleEnabledForCurrentPackage')) {
+    function isExpensesModuleEnabledForCurrentPackage() {
+        return hasFeaturePermission('expenses_manage');
+    }
 }
 
 /**
