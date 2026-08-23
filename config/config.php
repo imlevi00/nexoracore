@@ -378,23 +378,17 @@ if (!defined('NO_CACHE_HEADERS')) {
 }
 
 // بەکارهێنان
-require_once __DIR__ . '/database.php';
-require_once __DIR__ . '/../includes/functions.php';
-require_once __DIR__ . '/../includes/permissions.php';
-require_once __DIR__ . '/../includes/timezone.php';
-
-// دەستپێکردنی session ـی ئامن و Remember Me (یەک شوێن تەنها) — product_images لە کۆتایی security.php بار دەکرێت
-require_once __DIR__ . '/security.php';
-
+require_once 'database.php';
+require_once '../includes/functions.php';
+require_once '../includes/permissions.php';
+require_once '../includes/timezone.php';
 // لایەری «بزنسی چالاک» (چەندین بزنس) — دوای دەستپێکردنی session و Remember Me.
 // بۆ بەکارهێنەری تاک/کارمەند بێ-زیانە (no-op)؛ تەنها بۆ خاوەنی ڕێکخراو re-scope دەکات.
-require_once __DIR__ . '/../includes/business_context.php';
-if (function_exists('resolveBusinessContext')) {
+require_once '../includes/business_context.php';
     resolveBusinessContext();
 }
 
 require_once ROOT_PATH . '/includes/theme_bootstrap.php';
-
 if (!function_exists('kasher_theme_output_injector')) {
     function kasher_theme_output_injector($buffer) {
         if (!kasher_should_apply_theme_bootstrap()) {

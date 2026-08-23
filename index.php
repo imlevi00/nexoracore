@@ -2,8 +2,8 @@
 /**
  * پەڕەی سەرەکی - index.php
  */
-require_once __DIR__ . '/config/config.php';
-require_once __DIR__ . '/config/security.php';
+require_once 'config/config.php';
+require_once 'config/security.php';
 
 if (isUser()) {
     redirect('user/dashboard/index.php');
