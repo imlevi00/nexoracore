@@ -249,23 +249,37 @@ $csrf_token = Security::generateCSRFToken();
 
     <link href="settings.css" rel="stylesheet">
 </head>
-<body class="settings-module-page settings-detail-page settings-page">
+<body class="settings-module-page settings-page">
     <!-- Navigation -->
     <?php include_once '../../includes/navigation.php'; ?>
 
-<div class="container py-4 hub-page-content">
+<div class="container py-4">
         
         <!-- Header -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h2 class="mb-1">
-                            <i class="bi bi-gear text-primary"></i>
+        <div class="settings-header-card">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <nav class="small text-muted mb-2" aria-label="breadcrumb">
+                        <a href="<?php echo url('user/dashboard/index.php'); ?>" class="text-decoration-none text-muted">
+                            <i class="bi bi-speedometer2"></i> داشبۆرد
+                        </a>
+                        <span class="mx-2">/</span>
+                        <a href="<?php echo url('user/settings/main.php'); ?>" class="text-decoration-none text-muted">
                             ڕێکخستنەکان
-                        </h2>
-                        <p class="text-muted mb-0">بەڕێوەبردنی زانیاریەکانی ئەکاونتەکەت</p>
-                    </div>
+                        </a>
+                        <span class="mx-2">/</span>
+                        <span class="text-primary fw-medium">ڕێکخستنە سەرەکییەکان</span>
+                    </nav>
+                    <h2 class="mb-1 d-flex align-items-center gap-2">
+                        <i class="bi bi-sliders text-primary"></i>
+                        ڕێکخستنە سەرەکییەکان
+                    </h2>
+                    <p class="text-muted mb-0">بەڕێوەبردنی زانیاریەکانی ئەکاونت، فرۆشگا، ڕووکار و چاپکردن</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="<?php echo url('user/settings/main.php'); ?>" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-right"></i> گەڕانەوە
+                    </a>
                 </div>
             </div>
         </div>
@@ -465,23 +479,25 @@ $csrf_token = Security::generateCSRFToken();
                             <div class="d-flex flex-column gap-2">
                                 <?php foreach ($businessTypes as $bt): ?>
                                 <?php $isCurtainShopType = (trim((string)($bt['code'] ?? '')) === 'curtain_shop'); ?>
-                                <div class="form-check border rounded p-3<?php echo $isCurtainShopType ? ' border-primary' : ''; ?>">
+                                <label class="selectable-card-option <?php echo $isCurtainShopType ? 'border-primary' : ''; ?>" for="business_type_<?php echo (int)$bt['id']; ?>">
                                     <input class="form-check-input" type="radio" name="business_type_id" 
                                            id="business_type_<?php echo (int)$bt['id']; ?>" 
                                            value="<?php echo (int)$bt['id']; ?>"
                                            <?php echo ($currentBusinessTypeId === (int)$bt['id']) ? 'checked' : ''; ?> required>
-                                    <label class="form-check-label w-100 d-flex align-items-center justify-content-between gap-2" for="business_type_<?php echo (int)$bt['id']; ?>">
+                                    <span class="w-100 d-flex align-items-center justify-content-between gap-2">
                                         <span>
                                             <?php if ($isCurtainShopType): ?>
-                                            <i class="bi bi-window me-1"></i>
+                                            <i class="bi bi-window text-primary me-1"></i>
+                                            <?php else: ?>
+                                            <i class="bi bi-shop me-1 text-muted"></i>
                                             <?php endif; ?>
                                             <?php echo htmlspecialchars($bt['name_ku']); ?>
                                         </span>
                                         <?php if ($isCurtainShopType): ?>
                                         <span class="badge bg-primary">تایبەت</span>
                                         <?php endif; ?>
-                                    </label>
-                                </div>
+                                    </span>
+                                </label>
                                 <?php endforeach; ?>
                             </div>
                             <?php if (empty($businessTypes)): ?>
@@ -518,25 +534,25 @@ $csrf_token = Security::generateCSRFToken();
                         <input type="hidden" name="action" value="update_theme_mode">
                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
 
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold d-block">هەڵبژاردنی دۆخ</label>
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold d-block mb-3">هەڵبژاردنی دۆخ</label>
                             <div class="d-flex flex-column gap-2">
-                                <label class="form-check border rounded p-3 theme-choice">
+                                <label class="selectable-card-option theme-choice">
                                     <input class="form-check-input" type="radio" name="theme_mode" value="light" <?php echo $themeMode === 'light' ? 'checked' : ''; ?>>
-                                    <span class="form-check-label ms-2">
-                                        <i class="bi bi-sun"></i> دۆخی ڕووناک
+                                    <span class="d-flex align-items-center gap-2 fw-medium">
+                                        <i class="bi bi-sun text-warning fs-5"></i> دۆخی ڕووناک (Light)
                                     </span>
                                 </label>
-                                <label class="form-check border rounded p-3 theme-choice">
+                                <label class="selectable-card-option theme-choice">
                                     <input class="form-check-input" type="radio" name="theme_mode" value="dark" <?php echo $themeMode === 'dark' ? 'checked' : ''; ?>>
-                                    <span class="form-check-label ms-2">
-                                        <i class="bi bi-moon-stars"></i> دۆخی تاریک
+                                    <span class="d-flex align-items-center gap-2 fw-medium">
+                                        <i class="bi bi-moon-stars text-primary fs-5"></i> دۆخی تاریک (Dark)
                                     </span>
                                 </label>
-                                <label class="form-check border rounded p-3 theme-choice">
+                                <label class="selectable-card-option theme-choice">
                                     <input class="form-check-input" type="radio" name="theme_mode" value="system" <?php echo $themeMode === 'system' ? 'checked' : ''; ?>>
-                                    <span class="form-check-label ms-2">
-                                        <i class="bi bi-laptop"></i> دۆخی سیستەم (ئۆتۆماتیک)
+                                    <span class="d-flex align-items-center gap-2 fw-medium">
+                                        <i class="bi bi-laptop text-info fs-5"></i> دۆخی سیستەم (ئۆتۆماتیک)
                                     </span>
                                 </label>
                             </div>

@@ -144,242 +144,271 @@ $csrf_token = Security::generateCSRFToken();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="<?php echo asset('css/style.css'); ?>" rel="stylesheet">
     <link href="<?php echo asset('css/modules-responsive.css'); ?>" rel="stylesheet">
-
-    <style>
-        .settings-detail-card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .btn-save {
-            background: linear-gradient(135deg, #047857, #0e7490);
-            border: none;
-            color: white;
-            padding: 12px 40px;
-            border-radius: 25px;
-            font-weight: 500;
-        }
-        .btn-save:hover {
-            color: white;
-            filter: brightness(1.05);
-        }
-    </style>
+    <link href="<?php echo asset('user/settings/settings.css'); ?>" rel="stylesheet">
 </head>
-<body class="settings-module-page settings-detail-page bg-light">
+<body class="settings-module-page settings-page">
 
     <?php include_once '../../includes/navigation.php'; ?>
 
     <div class="container py-4">
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h2 class="mb-1">
-                            <i class="bi bi-sliders"></i>
-                            وردەکارییەکان
-                        </h2>
-                        <p class="text-muted mb-0">ڕێکخستنەکانی تایبەت بە هەژمارەکەت</p>
-                    </div>
-                    <a href="<?php echo url('user/settings/main.php'); ?>" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-right"></i> گەڕانەوە
-                    </a>
+        
+        <!-- Header -->
+        <div class="settings-header-card">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <nav class="small text-muted mb-2" aria-label="breadcrumb">
+                        <a href="<?php echo url('user/dashboard/index.php'); ?>" class="text-decoration-none text-muted">
+                            <i class="bi bi-speedometer2"></i> داشبۆرد
+                        </a>
+                        <span class="mx-2">/</span>
+                        <a href="<?php echo url('user/settings/main.php'); ?>" class="text-decoration-none text-muted">
+                            ڕێکخستنەکان
+                        </a>
+                        <span class="mx-2">/</span>
+                        <span class="text-primary fw-medium">وردەکارییەکانی هەژمار</span>
+                    </nav>
+                    <h2 class="mb-1 d-flex align-items-center gap-2">
+                        <i class="bi bi-sliders2-vertical text-primary"></i>
+                        وردەکارییەکانی هەژمار
+                    </h2>
+                    <p class="text-muted mb-0">ڕێکخستنەکانی تایبەت بە فرۆشتن (POS)، وەسڵی A4، کۆگا و قازانج</p>
                 </div>
+                <a href="<?php echo url('user/settings/main.php'); ?>" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-right"></i> گەڕانەوە
+                </a>
             </div>
         </div>
 
         <?php if ($success): ?>
-            <div class="alert alert-success alert-dismissible fade show">
-                <i class="bi bi-check-circle"></i> <?php echo htmlspecialchars($success, ENT_QUOTES, 'UTF-8'); ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill me-1"></i> <?php echo htmlspecialchars($success, ENT_QUOTES, 'UTF-8'); ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="داخستن"></button>
             </div>
         <?php endif; ?>
 
         <?php if ($error): ?>
-            <div class="alert alert-danger alert-dismissible fade show">
-                <i class="bi bi-exclamation-triangle"></i> <?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i> <?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="داخستن"></button>
             </div>
         <?php endif; ?>
 
         <?php if (!$zanyariOk): ?>
             <div class="alert alert-warning">
-                <i class="bi bi-database-x"></i> داتابەیسی زانیارییەکان بەردەست نییە؛ ڕێکخستنەکان پاشەکەوت ناکرێن تا پەیوەندی چاک بکرێتەوە.
+                <i class="bi bi-database-x me-1"></i> داتابەیسی زانیارییەکان بەردەست نییە؛ ڕێکخستنەکان پاشەکەوت ناکرێن تا پەیوەندی چاک بکرێتەوە.
             </div>
         <?php endif; ?>
 
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="card settings-detail-card">
-                    <div class="card-body p-4 p-md-5">
-                        <h4 class="mb-3">
-                            <i class="bi bi-shop text-success"></i>
-                            فرۆشتنی کاڵاکان (POS)
-                        </h4>
-                        <p class="text-muted mb-4">
-                            کاتێک لە بەشی فرۆشتندا کار دەکەیت، ئایا کاڵاکانی ڕێژەیان سفر بووە (تەواو بوون) لە لیستدا دەربکەون؟
-                        </p>
+        <form method="post" action="">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
 
-                        <form method="post" action="">
-                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
-
-                            <div class="form-check form-switch mb-4 ps-0">
-                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 border rounded-3 p-3 bg-white">
-                                    <label class="form-check-label mb-0 flex-grow-1" for="pos_show_zero_stock_products">
-                                        <strong>نیشاندانی کاڵای تەواوبوو</strong>
-                                        <span class="d-block small text-muted mt-1">
-                                            چالاک بێت: کاڵاکانی ڕێژە سفر لە لیستدا دەردەکەون. ناچالاک: شاردراونەوە.
-                                        </span>
-                                    </label>
-                                    <input class="form-check-input ms-2" type="checkbox" role="switch"
-                                           id="pos_show_zero_stock_products"
-                                           name="pos_show_zero_stock_products"
-                                           value="1"
-                                           <?php echo $posShowZeroStock ? 'checked' : ''; ?>
-                                           <?php echo !$zanyariOk ? 'disabled' : ''; ?>>
-                                </div>
+            <div class="row g-4">
+                
+                <!-- فرۆشتنی کاڵاکان (POS) -->
+                <div class="col-12 col-lg-6">
+                    <div class="settings-card card p-4 h-100">
+                        <div class="settings-card-header-accent">
+                            <div class="settings-icon section-business">
+                                <i class="bi bi-shop"></i>
                             </div>
-
-                            <div class="border rounded-3 p-3 bg-white mb-4">
-                                <label class="form-label fw-semibold mb-2 d-block">دیفۆڵتی دراو لە فرۆشتن</label>
-                                <p class="small text-muted mb-3">کاتێک POS دەکەیتەوە، سەرەتا دینار یان دۆلار هەڵبژێرێت.</p>
-                                <div class="btn-group w-100" role="group" aria-label="دیفۆڵتی دراو">
-                                    <input type="radio" class="btn-check" name="pos_default_sale_currency" id="pos_cur_iqd" value="IQD"
-                                           <?php echo $posDefaultSaleCurrency === 'IQD' ? 'checked' : ''; ?>
-                                           <?php echo !$zanyariOk ? 'disabled' : ''; ?>>
-                                    <label class="btn btn-outline-primary" for="pos_cur_iqd"><i class="bi bi-cash-coin"></i> دینار</label>
-                                    <input type="radio" class="btn-check" name="pos_default_sale_currency" id="pos_cur_usd" value="USD"
-                                           <?php echo $posDefaultSaleCurrency === 'USD' ? 'checked' : ''; ?>
-                                           <?php echo !$zanyariOk ? 'disabled' : ''; ?>>
-                                    <label class="btn btn-outline-primary" for="pos_cur_usd"><i class="bi bi-currency-dollar"></i> دۆلار</label>
-                                </div>
+                            <div>
+                                <h4 class="mb-1">فرۆشتنی کاڵاکان (POS)</h4>
+                                <p class="text-muted small mb-0">ڕێکخستنی شێوازی کارکردنی سیستەمی فرۆشتن</p>
                             </div>
-
-                            <div class="border rounded-3 p-3 bg-white mb-4">
-                                <label class="form-label fw-semibold mb-2 d-block">دیفۆڵتی بنەڕەتی نرخ لە فرۆشتن</label>
-                                <p class="small text-muted mb-3">کاتێک POS دەکەیتەوە یان فرۆشتنی نوێ دەست پێدەکەیت، ئەم جۆرە نرخە سەرەتا هەڵبژێردرێت.</p>
-                                <div class="btn-group w-100" role="group" aria-label="دیفۆڵتی بنەڕەتی نرخ">
-                                    <input type="radio" class="btn-check" name="pos_default_price_type" id="pos_price_type_retail" value="retail"
-                                           <?php echo $posDefaultPriceType === 'retail' ? 'checked' : ''; ?>
-                                           <?php echo !$zanyariOk ? 'disabled' : ''; ?>>
-                                    <label class="btn btn-outline-primary" for="pos_price_type_retail"><i class="bi bi-1-circle"></i> تاک</label>
-                                    <input type="radio" class="btn-check" name="pos_default_price_type" id="pos_price_type_wholesale" value="wholesale"
-                                           <?php echo $posDefaultPriceType === 'wholesale' ? 'checked' : ''; ?>
-                                           <?php echo !$zanyariOk ? 'disabled' : ''; ?>>
-                                    <label class="btn btn-outline-primary" for="pos_price_type_wholesale"><i class="bi bi-2-circle"></i> جوملە</label>
-                                    <input type="radio" class="btn-check" name="pos_default_price_type" id="pos_price_type_special" value="special"
-                                           <?php echo $posDefaultPriceType === 'special' ? 'checked' : ''; ?>
-                                           <?php echo !$zanyariOk ? 'disabled' : ''; ?>>
-                                    <label class="btn btn-outline-primary" for="pos_price_type_special"><i class="bi bi-star"></i> تایبەت</label>
-                                </div>
-                            </div>
-
-                            <div class="form-check form-switch mb-4 ps-0">
-                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 border rounded-3 p-3 bg-white">
-                                    <label class="form-check-label mb-0 flex-grow-1" for="pos_default_payment_is_credit">
-                                        <strong>دیفۆڵتی پارەدان: قەرز</strong>
-                                        <span class="d-block small text-muted mt-1">
-                                            چالاک: تاب و فرۆشتنی نوێ بە شێوەی قەرز دەست پێدەکات (پێویستە کڕیار هەڵبژێریت). ناچالاک: کاش وەک پێشتر.
-                                        </span>
-                                    </label>
-                                    <input class="form-check-input ms-2" type="checkbox" role="switch"
-                                           id="pos_default_payment_is_credit"
-                                           name="pos_default_payment_is_credit"
-                                           value="1"
-                                           <?php echo $posDefaultPaymentIsCredit ? 'checked' : ''; ?>
-                                           <?php echo !$zanyariOk ? 'disabled' : ''; ?>>
-                                </div>
-                            </div>
-
-                        <hr class="my-4">
-
-                        <h4 class="mb-3">
-                            <i class="bi bi-file-earmark-text text-primary"></i>
-                            وەسڵی A4 (قەبارەی فۆنتی خشتەی کاڵا)
-                        </h4>
-                        <p class="text-muted mb-3">
-                            قەبارەی فۆنتی ناو خشتەی کاڵاکان لە وەسڵی چاپی A4 دەگۆڕێت. فۆنتی بچووکتر = کاڵای زیاتر لە هەر لاپەڕەیەکدا. ئەمە تەنها خشتەی کاڵا و پێوەندیدارەکانی دەگۆڕێت.
-                        </p>
-                        <div class="border rounded-3 p-3 bg-white mb-3">
-                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-2">
-                                <label class="mb-0 fw-semibold" for="receipt_a4_items_font_size">قەبارەی فۆنت (پیکسڵ)</label>
-                                <div class="d-flex align-items-center gap-2">
-                                    <button type="button" class="btn btn-outline-secondary btn-sm receipt-a4-fs-dec" aria-label="کەمکردنەوە" <?php echo !$zanyariOk ? 'disabled' : ''; ?>>−</button>
-                                    <span class="fs-5 fw-bold text-primary" id="receipt_a4_fs_display" style="min-width:2.5rem;text-align:center;"><?php echo (int) $receiptA4ItemsFontSize; ?></span>
-                                    <button type="button" class="btn btn-outline-secondary btn-sm receipt-a4-fs-inc" aria-label="زیادکردن" <?php echo !$zanyariOk ? 'disabled' : ''; ?>>+</button>
-                                </div>
-                            </div>
-                            <input type="range" class="form-range mb-0" name="receipt_a4_items_font_size" id="receipt_a4_items_font_size"
-                                   min="10" max="22" step="1" value="<?php echo (int) $receiptA4ItemsFontSize; ?>"
-                                   <?php echo !$zanyariOk ? 'disabled' : ''; ?>>
                         </div>
 
-                        <hr class="my-4">
+                        <!-- Show zero stock products switch -->
+                        <div class="selectable-card-option mb-3">
+                            <input class="form-check-input" type="checkbox" role="switch"
+                                   id="pos_show_zero_stock_products"
+                                   name="pos_show_zero_stock_products"
+                                   value="1"
+                                   <?php echo $posShowZeroStock ? 'checked' : ''; ?>
+                                   <?php echo !$zanyariOk ? 'disabled' : ''; ?>>
+                            <label class="form-check-label mb-0 flex-grow-1 cursor-pointer" for="pos_show_zero_stock_products">
+                                <strong class="d-block text-primary">نیشاندانی کاڵای تەواوبوو</strong>
+                                <span class="d-block small text-muted">
+                                    کاڵاکانی ڕێژە سفر لە لیستی فرۆشتندا دەربکەون
+                                </span>
+                            </label>
+                        </div>
 
-                        <h4 class="mb-3">
-                            <i class="bi bi-building text-primary"></i>
-                            وەسڵی کۆمپانیاکان (کڕین)
-                        </h4>
-                        <p class="text-muted mb-4">
-                            کاتێک وەسڵ تۆمار دەکەیت یان دەستکاری دەکەیت، نرخەکانی کۆگا چۆن نوێ بکرێنەوە؟
-                        </p>
-
-                        <div class="form-check form-switch mb-4 ps-0">
-                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 border rounded-3 p-3 bg-white">
-                                <label class="form-check-label mb-0 flex-grow-1" for="purchases_use_weighted_avg_prices">
-                                    <strong>نرخی تێکڕا بۆ کۆگا</strong>
-                                    <span class="d-block small text-muted mt-1">
-                                        چالاک: نرخەکان لەگەڵ کۆگای پێشوو تێکڕا دەبن (وەک پێشتر). ناچالاک: هەر نرخێک لە وەسڵدا دانراوە هەمانە بۆ کۆگا دادەنرێت.
-                                    </span>
+                        <!-- Default sale currency -->
+                        <div class="p-3 border rounded-3 mb-3" style="background: var(--surface-2);">
+                            <label class="form-label fw-semibold mb-2 d-block">
+                                <i class="bi bi-currency-exchange"></i> دیفۆڵتی دراو لە فرۆشتن
+                            </label>
+                            <p class="small text-muted mb-2">کاتێک POS دەکەیتەوە، سەرەتا دینار یان دۆلار هەڵبژێرێت.</p>
+                            <div class="d-flex gap-2">
+                                <label class="selectable-card-option flex-fill mb-0">
+                                    <input type="radio" name="pos_default_sale_currency" id="pos_cur_iqd" value="IQD"
+                                           <?php echo $posDefaultSaleCurrency === 'IQD' ? 'checked' : ''; ?>
+                                           <?php echo !$zanyariOk ? 'disabled' : ''; ?>>
+                                    <span class="fw-medium"><i class="bi bi-cash-coin text-success"></i> دینار (IQD)</span>
                                 </label>
-                                <input class="form-check-input ms-2" type="checkbox" role="switch"
+                                <label class="selectable-card-option flex-fill mb-0">
+                                    <input type="radio" name="pos_default_sale_currency" id="pos_cur_usd" value="USD"
+                                           <?php echo $posDefaultSaleCurrency === 'USD' ? 'checked' : ''; ?>
+                                           <?php echo !$zanyariOk ? 'disabled' : ''; ?>>
+                                    <span class="fw-medium"><i class="bi bi-currency-dollar text-primary"></i> دۆلار (USD)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Default price type -->
+                        <div class="p-3 border rounded-3 mb-3" style="background: var(--surface-2);">
+                            <label class="form-label fw-semibold mb-2 d-block">
+                                <i class="bi bi-tags"></i> دیفۆڵتی بنەڕەتی نرخ لە فرۆشتن
+                            </label>
+                            <p class="small text-muted mb-2">کاتێک POS دەکەیتەوە، ئەم جۆرە نرخە سەرەتا هەڵبژێردرێت.</p>
+                            <div class="d-flex flex-wrap gap-2">
+                                <label class="selectable-card-option flex-fill mb-0">
+                                    <input type="radio" name="pos_default_price_type" id="pos_price_type_retail" value="retail"
+                                           <?php echo $posDefaultPriceType === 'retail' ? 'checked' : ''; ?>
+                                           <?php echo !$zanyariOk ? 'disabled' : ''; ?>>
+                                    <span class="fw-medium"><i class="bi bi-1-circle text-primary"></i> تاک</span>
+                                </label>
+                                <label class="selectable-card-option flex-fill mb-0">
+                                    <input type="radio" name="pos_default_price_type" id="pos_price_type_wholesale" value="wholesale"
+                                           <?php echo $posDefaultPriceType === 'wholesale' ? 'checked' : ''; ?>
+                                           <?php echo !$zanyariOk ? 'disabled' : ''; ?>>
+                                    <span class="fw-medium"><i class="bi bi-2-circle text-success"></i> جوملە</span>
+                                </label>
+                                <label class="selectable-card-option flex-fill mb-0">
+                                    <input type="radio" name="pos_default_price_type" id="pos_price_type_special" value="special"
+                                           <?php echo $posDefaultPriceType === 'special' ? 'checked' : ''; ?>
+                                           <?php echo !$zanyariOk ? 'disabled' : ''; ?>>
+                                    <span class="fw-medium"><i class="bi bi-star text-warning"></i> تایبەت</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Default payment is credit -->
+                        <div class="selectable-card-option">
+                            <input class="form-check-input" type="checkbox" role="switch"
+                                   id="pos_default_payment_is_credit"
+                                   name="pos_default_payment_is_credit"
+                                   value="1"
+                                   <?php echo $posDefaultPaymentIsCredit ? 'checked' : ''; ?>
+                                   <?php echo !$zanyariOk ? 'disabled' : ''; ?>>
+                            <label class="form-check-label mb-0 flex-grow-1 cursor-pointer" for="pos_default_payment_is_credit">
+                                <strong class="d-block text-warning">دیفۆڵتی پارەدان: قەرز</strong>
+                                <span class="d-block small text-muted">
+                                    تاب و فرۆشتنی نوێ بە قەرز دەست پێدەکات (پێویستە کڕیار هەڵبژێریت)
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- بەشەکانی تر (وەسڵی A4، کڕین، قازانج) -->
+                <div class="col-12 col-lg-6">
+                    <div class="d-flex flex-column gap-4">
+                        
+                        <!-- وەسڵی A4 (قەبارەی فۆنتی خشتەی کاڵا) -->
+                        <div class="settings-card card p-4">
+                            <div class="settings-card-header-accent">
+                                <div class="settings-icon section-info">
+                                    <i class="bi bi-file-earmark-text"></i>
+                                </div>
+                                <div>
+                                    <h4 class="mb-1">وەسڵی A4</h4>
+                                    <p class="text-muted small mb-0">قەبارەی فۆنتی ناو خشتەی کاڵاکان لە چاپی A4</p>
+                                </div>
+                            </div>
+
+                            <p class="text-muted small mb-3">
+                                فۆنتی بچووکتر = کاڵای زیاتر لە هەر لاپەڕەیەکدا دەگونجێت.
+                            </p>
+
+                            <div class="p-3 border rounded-3" style="background: var(--surface-2);">
+                                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-2">
+                                    <label class="mb-0 fw-semibold" for="receipt_a4_items_font_size">قەبارەی فۆنت (پیکسڵ):</label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm receipt-a4-fs-dec" aria-label="کەمکردنەوە" <?php echo !$zanyariOk ? 'disabled' : ''; ?>>−</button>
+                                        <span class="fs-5 fw-bold text-primary px-2" id="receipt_a4_fs_display" style="min-width:2.5rem;text-align:center;"><?php echo (int) $receiptA4ItemsFontSize; ?></span>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm receipt-a4-fs-inc" aria-label="زیادکردن" <?php echo !$zanyariOk ? 'disabled' : ''; ?>>+</button>
+                                    </div>
+                                </div>
+                                <input type="range" class="form-range mb-0" name="receipt_a4_items_font_size" id="receipt_a4_items_font_size"
+                                       min="10" max="22" step="1" value="<?php echo (int) $receiptA4ItemsFontSize; ?>"
+                                       <?php echo !$zanyariOk ? 'disabled' : ''; ?>>
+                            </div>
+                        </div>
+
+                        <!-- وەسڵی کۆمپانیاکان (کڕین) -->
+                        <div class="settings-card card p-4">
+                            <div class="settings-card-header-accent">
+                                <div class="settings-icon section-dollar-price">
+                                    <i class="bi bi-building"></i>
+                                </div>
+                                <div>
+                                    <h4 class="mb-1">وەسڵی کۆمپانیاکان (کڕین)</h4>
+                                    <p class="text-muted small mb-0">شێوازی نوێکردنەوەی نرخەکانی کۆگا لە کاتی کڕین</p>
+                                </div>
+                            </div>
+
+                            <div class="selectable-card-option">
+                                <input class="form-check-input" type="checkbox" role="switch"
                                        id="purchases_use_weighted_avg_prices"
                                        name="purchases_use_weighted_avg_prices"
                                        value="1"
                                        <?php echo $purchasesWeightedAvg ? 'checked' : ''; ?>
                                        <?php echo !$zanyariOk ? 'disabled' : ''; ?>>
+                                <label class="form-check-label mb-0 flex-grow-1 cursor-pointer" for="purchases_use_weighted_avg_prices">
+                                    <strong class="d-block text-primary">نرخی تێکڕا بۆ کۆگا (Weighted Average)</strong>
+                                    <span class="d-block small text-muted">
+                                        چالاک: نرخەکان لەگەڵ کۆگای پێشوو تێکڕا دەبن. ناچالاک: نرخی وەسڵ دادەنرێت.
+                                    </span>
+                                </label>
                             </div>
                         </div>
 
-                        <hr class="my-4">
+                        <!-- قازانج و داهاتی قەرزی کڕیاران -->
+                        <div class="settings-card card p-4">
+                            <div class="settings-card-header-accent">
+                                <div class="settings-icon section-business">
+                                    <i class="bi bi-cash-stack"></i>
+                                </div>
+                                <div>
+                                    <h4 class="mb-1">قازانج و داهاتی قەرز</h4>
+                                    <p class="text-muted small mb-0">شێوازی هەژمارکردنی داهاتی فرۆشتنی قەرز</p>
+                                </div>
+                            </div>
 
-                        <h4 class="mb-3">
-                            <i class="bi bi-cash-stack text-success"></i>
-                            قازانج و داهاتی قەرزی کڕیاران
-                        </h4>
-                        <p class="text-muted mb-4">
-                            لە بەشی قازانجدا داهات و قازانج بۆ فرۆشتن بە قەرز چۆن هەژمار بکرێت؟
-                        </p>
-
-                        <div class="form-check form-switch mb-4 ps-0">
-                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 border rounded-3 p-3 bg-white">
-                                <label class="form-check-label mb-0 flex-grow-1" for="recognize_customer_debt_revenue_at_sale">
-                                    <strong>داهاتی قەرز لە ڕۆژی فرۆشتن</strong>
-                                    <span class="d-block small text-muted mt-1">
-                                        چالاک: وەک پێشتر، کاتێک وەسڵ بە قەرز فرۆشرا لە هەمان ڕۆژدا لە داهات و قازانجدا دەرکەوێت. ناچالاک: تەنها کاتێک پارە لە قەرزی کڕیاران وەرگیرا، بە هەمان بڕ لەو ڕۆژەوە لە داهات و قازانجدا هەژمار دەکرێت.
-                                    </span>
-                                </label>
-                                <input class="form-check-input ms-2" type="checkbox" role="switch"
+                            <div class="selectable-card-option">
+                                <input class="form-check-input" type="checkbox" role="switch"
                                        id="recognize_customer_debt_revenue_at_sale"
                                        name="recognize_customer_debt_revenue_at_sale"
                                        value="1"
                                        <?php echo $recognizeDebtRevenueAtSale ? 'checked' : ''; ?>
                                        <?php echo !$zanyariOk ? 'disabled' : ''; ?>>
+                                <label class="form-check-label mb-0 flex-grow-1 cursor-pointer" for="recognize_customer_debt_revenue_at_sale">
+                                    <strong class="d-block text-success">داهاتی قەرز لە ڕۆژی فرۆشتن</strong>
+                                    <span class="d-block small text-muted">
+                                        چالاک: لە هەمان ڕۆژی فرۆشتن دەرکەوێت. ناچالاک: تەنها کاتێک پارە وەرگیرا لە قازانجدا هەژمار بکرێت.
+                                    </span>
+                                </label>
                             </div>
                         </div>
 
-                            <div class="d-flex justify-content-between flex-wrap gap-2">
-                                <a href="<?php echo url('user/settings/main.php'); ?>" class="btn btn-outline-secondary">
-                                    <i class="bi bi-arrow-right"></i> گەڕانەوە
-                                </a>
-                                <button type="submit" class="btn btn-save" <?php echo !$zanyariOk ? 'disabled' : ''; ?>>
-                                    <i class="bi bi-save"></i> پاشەکەوتکردن
-                                </button>
-                            </div>
-                        </form>
                     </div>
                 </div>
+
+                <!-- Submit Bar -->
+                <div class="col-12">
+                    <div class="settings-card card p-3 d-flex flex-row justify-content-between align-items-center flex-wrap gap-2">
+                        <a href="<?php echo url('user/settings/main.php'); ?>" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-right"></i> گەڕانەوە
+                        </a>
+                        <button type="submit" class="btn btn-save" <?php echo !$zanyariOk ? 'disabled' : ''; ?>>
+                            <i class="bi bi-check-lg"></i> پاشەکەوتکردنی ڕێکخستنەکان
+                        </button>
+                    </div>
+                </div>
+
             </div>
-        </div>
+        </form>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -418,7 +447,6 @@ $csrf_token = Security::generateCSRFToken();
         });
 
         sync();
-    })();
     </script>
 </body>
 </html>

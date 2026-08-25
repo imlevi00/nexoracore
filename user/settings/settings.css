@@ -1,309 +1,414 @@
-/* Settings Page Custom Styles */
+/* ============================================================
+   NexoraCore — Modern Settings Stylesheet
+   ============================================================ */
 
 .settings-page {
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     min-height: 100vh;
+    background: var(--surface-2);
+    background-image: var(--gradient-surface);
+    background-attachment: fixed;
 }
 
-.settings-card {
-    border: none;
+/* ---- Settings Page Header & Breadcrumbs ---- */
+.settings-header-card {
+    background: var(--surface-1);
+    border: 1px solid var(--border-default);
     border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.95);
+    padding: 1.5rem 1.75rem;
+    box-shadow: var(--box-shadow);
+    margin-bottom: 1.75rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.settings-header-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    inset-inline-start: 0;
+    width: 5px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--brand), var(--brand-2));
+}
+
+.settings-header-card h2,
+.settings-header-card h1 {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+/* ---- Modern Settings Card ---- */
+.settings-card {
+    background: var(--surface-1);
+    border: 1px solid var(--border-default);
+    border-radius: 20px;
+    box-shadow: var(--box-shadow);
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+    overflow: hidden;
+    position: relative;
 }
 
 .settings-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-glow), 0 12px 28px rgba(15, 23, 42, 0.08);
+    border-color: rgba(79, 70, 229, 0.3);
 }
 
+.settings-card-header-accent {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-default);
+}
+
+/* ---- Icon Squircles ---- */
 .settings-icon {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32px;
-    color: white;
-    margin: 0 auto 20px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    font-size: 26px;
+    color: #ffffff;
+    flex-shrink: 0;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    transition: transform 0.25s ease;
+}
+
+.settings-card:hover .settings-icon {
+    transform: scale(1.06) rotate(-2deg);
 }
 
 .section-business {
-    background: linear-gradient(135deg, #28a745, #20c997);
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25);
 }
 
 .section-security {
-    background: linear-gradient(135deg, #dc3545, #c82333);
+    background: linear-gradient(135deg, #e11d48 0%, #f43f5e 100%);
+    box-shadow: 0 8px 20px rgba(244, 63, 94, 0.25);
 }
 
 .section-info {
-    background: linear-gradient(135deg, #17a2b8, #138496);
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.25);
 }
 
-.form-control {
-    border-radius: 15px;
-    border: 2px solid #e9ecef;
-    padding: 12px 20px;
-    font-size: 16px;
-    transition: all 0.3s ease;
+.section-telegram {
+    background: linear-gradient(135deg, #0088cc 0%, #229ed9 100%);
+    box-shadow: 0 8px 20px rgba(34, 158, 217, 0.25);
 }
 
-.form-control:focus {
-    border-color: #28a745;
-    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+.section-dollar-price {
+    background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+    box-shadow: 0 8px 20px rgba(6, 182, 212, 0.25);
+}
+
+.section-detail-settings {
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.25);
+}
+
+/* ---- Account Overview Info Items ---- */
+.info-item {
+    background: var(--surface-2);
+    border: 1px solid var(--border-default);
+    border-radius: 14px;
+    padding: 1.1rem 1.25rem;
+    margin-bottom: 1rem;
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.info-item:hover {
     transform: translateY(-2px);
+    border-color: rgba(79, 70, 229, 0.35);
+    background: var(--surface-1);
+}
+
+.info-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.info-label i {
+    font-size: 1rem;
+    color: var(--brand);
+}
+
+.info-value {
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+/* ---- Modern Form Controls ---- */
+.form-control,
+.form-select {
+    border-radius: 12px;
+    border: 1.5px solid var(--border-default);
+    padding: 0.65rem 1rem;
+    font-size: 0.92rem;
+    background-color: var(--surface-1);
+    color: var(--text-primary);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 0.25rem var(--focus-ring);
+    background-color: var(--surface-1);
+    color: var(--text-primary);
 }
 
 .form-label {
     font-weight: 600;
-    color: #495057;
-    margin-bottom: 8px;
+    color: var(--text-primary);
+    font-size: 0.88rem;
+    margin-bottom: 0.45rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
 }
 
+.form-label i {
+    color: var(--brand);
+}
+
+/* ---- Buttons ---- */
 .btn-save {
-    background: linear-gradient(135deg, #28a745, #20c997);
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
     border: none;
-    color: white;
-    padding: 12px 40px;
-    border-radius: 30px;
-    font-weight: 600;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    color: #ffffff !important;
+    padding: 0.65rem 2rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.92rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 6px 18px rgba(79, 70, 229, 0.32);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
 .btn-save:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
-    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(79, 70, 229, 0.45);
+    color: #ffffff !important;
 }
 
 .btn-danger-custom {
-    background: linear-gradient(135deg, #dc3545, #c82333);
+    background: linear-gradient(135deg, #e11d48 0%, #f43f5e 100%);
     border: none;
-    color: white;
-    padding: 12px 40px;
-    border-radius: 30px;
-    font-weight: 600;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+    color: #ffffff !important;
+    padding: 0.65rem 2rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.92rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 6px 18px rgba(225, 29, 72, 0.3);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
 .btn-danger-custom:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(220, 53, 69, 0.4);
-    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(225, 29, 72, 0.45);
+    color: #ffffff !important;
 }
 
-.btn-excel {
-    background: linear-gradient(135deg, #28a745, #20c997);
-    border: none;
-    color: white;
-    padding: 12px 40px;
-    border-radius: 30px;
-    font-weight: 600;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+/* ---- Interactive Radio Selection Cards (Theme & Business Types) ---- */
+.selectable-card-option {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    border: 1.5px solid var(--border-default);
+    border-radius: 14px;
+    padding: 0.9rem 1.15rem;
+    background: var(--surface-1);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    position: relative;
 }
 
-.btn-excel:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
-    color: white;
+.selectable-card-option:hover {
+    border-color: var(--brand);
+    background: var(--surface-2);
+    transform: translateY(-1px);
 }
 
-.btn-pdf {
-    background: linear-gradient(135deg, #dc3545, #c82333);
-    border: none;
-    color: white;
-    padding: 12px 40px;
-    border-radius: 30px;
-    font-weight: 600;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+.selectable-card-option.active,
+.selectable-card-option:has(input:checked) {
+    border-color: var(--brand);
+    background: color-mix(in srgb, var(--brand) 8%, var(--surface-1));
+    box-shadow: 0 0 0 1px var(--brand);
 }
 
-.btn-pdf:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(220, 53, 69, 0.4);
-    color: white;
+.selectable-card-option input[type="radio"],
+.selectable-card-option input[type="checkbox"] {
+    cursor: pointer;
+    accent-color: var(--brand);
+    width: 1.15rem;
+    height: 1.15rem;
 }
 
-.info-item {
-    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-    border-radius: 15px;
-    padding: 20px;
-    margin-bottom: 15px;
-    border-left: 5px solid #28a745;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+.theme-choice {
+    cursor: pointer;
 }
 
-.info-item:hover {
-    transform: translateX(5px);
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+/* ---- Surface Soft & Upload Zones ---- */
+.surface-soft {
+    background: var(--surface-2) !important;
+    border: 1.5px dashed var(--border-default) !important;
+    border-radius: 16px !important;
+    padding: 1.25rem !important;
+    transition: border-color 0.2s ease, background 0.2s ease;
 }
 
-.info-label {
+.surface-soft:hover {
+    border-color: var(--brand) !important;
+}
+
+/* ---- Hub Bento Cards (for main.php) ---- */
+.hub-card-link {
+    text-decoration: none !important;
+    color: inherit !important;
+    display: block;
+    height: 100%;
+}
+
+.hub-bento-card {
+    background: var(--surface-1);
+    border: 1px solid var(--border-default);
+    border-radius: 20px;
+    padding: 1.5rem;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--box-shadow);
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.hub-bento-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    inset-inline: 0;
+    height: 3px;
+    background: var(--hub-accent, var(--brand));
+}
+
+.hub-bento-card::after {
+    content: '';
+    position: absolute;
+    inset-inline-end: -24px;
+    bottom: -24px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--hub-accent, var(--brand)) 10%, transparent);
+    pointer-events: none;
+}
+
+.hub-bento-card:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--hub-accent, var(--brand)) 40%, var(--border-default));
+    box-shadow: 0 14px 32px color-mix(in srgb, var(--hub-accent, var(--brand)) 20%, transparent);
+}
+
+.hub-bento-icon {
+    width: 58px;
+    height: 58px;
+    min-width: 58px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.65rem;
+    background: color-mix(in srgb, var(--hub-accent, var(--brand)) 12%, var(--surface-1));
+    color: var(--hub-accent, var(--brand));
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--hub-accent, var(--brand)) 16%, transparent);
+    transition: transform 0.25s ease;
+}
+
+.hub-bento-card:hover .hub-bento-icon {
+    transform: scale(1.08) rotate(-3deg);
+}
+
+.hub-bento-title {
+    font-size: 1.05rem;
     font-weight: 700;
-    color: #495057;
-    margin-bottom: 8px;
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
 }
 
-.info-value {
-    color: #6c757d;
-    font-size: 16px;
-    font-weight: 500;
+.hub-bento-desc {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    margin-bottom: 0;
+    line-height: 1.4;
 }
 
-.alert {
-    border-radius: 15px;
-    border: none;
-    padding: 15px 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+.hub-bento-arrow {
+    margin-inline-start: auto;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    flex-shrink: 0;
 }
 
-.alert-success {
-    background: linear-gradient(135deg, #d4edda, #c3e6cb);
-    color: #155724;
+.hub-bento-card:hover .hub-bento-arrow {
+    background: var(--brand);
+    color: #ffffff;
+    transform: translateX(-4px);
 }
 
-.alert-danger {
-    background: linear-gradient(135deg, #f8d7da, #f5c6cb);
-    color: #721c24;
-}
+/* Hub Accents */
+.hub-accent-settings { --hub-accent: #4f46e5; }
+.hub-accent-details { --hub-accent: #8b5cf6; }
+.hub-accent-telegram { --hub-accent: #0284c7; }
+.hub-accent-dollar { --hub-accent: #059669; }
+.hub-accent-exchange { --hub-accent: #0891b2; }
 
-.navbar-brand {
-    font-weight: 700;
-    font-size: 20px;
-}
-
-.navbar-brand:hover {
-    transform: translateX(-3px);
-    transition: all 0.3s ease;
-}
-
-/* Responsive Design */
+/* ---- Responsive Adjustments ---- */
 @media (max-width: 768px) {
+    .settings-header-card {
+        padding: 1.25rem;
+    }
     .settings-card {
-        margin-bottom: 20px;
+        padding: 1.25rem !important;
     }
-    
     .settings-icon {
-        width: 60px;
-        height: 60px;
-        font-size: 24px;
+        width: 52px;
+        height: 52px;
+        font-size: 22px;
     }
-    
     .btn-save, .btn-danger-custom {
-        padding: 10px 30px;
-        font-size: 14px;
+        width: 100%;
+        padding: 0.65rem 1.25rem;
     }
-    
-    .info-item {
-        padding: 15px;
-    }
-}
-
-/* Animation for page load */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.settings-card {
-    animation: fadeInUp 0.6s ease-out;
-}
-
-.settings-card:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-.settings-card:nth-child(3) {
-    animation-delay: 0.4s;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #28a745, #20c997);
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #20c997, #28a745);
-}
-
-html[data-bs-theme='dark'] .settings-page {
-    background: linear-gradient(135deg, #0b1220 0%, #111827 100%);
-}
-
-html[data-bs-theme='dark'] .settings-card {
-    background: rgba(17, 24, 39, 0.95);
-    color: #e5e7eb;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-}
-
-html[data-bs-theme='dark'] .form-control {
-    background: #1f2937;
-    color: #f3f4f6;
-    border-color: #4b5563;
-}
-
-html[data-bs-theme='dark'] .form-label,
-html[data-bs-theme='dark'] .info-label {
-    color: #d1d5db;
-}
-
-html[data-bs-theme='dark'] .info-item {
-    background: linear-gradient(135deg, #111827, #1f2937);
-    border-color: #374151;
-}
-
-html[data-bs-theme='dark'] .info-value,
-html[data-bs-theme='dark'] .text-muted {
-    color: #9ca3af !important;
-}
-
-html[data-bs-theme='dark'] .alert-success {
-    background: linear-gradient(135deg, #0f2e22, #14532d);
-    color: #bbf7d0;
-}
-
-html[data-bs-theme='dark'] .alert-danger {
-    background: linear-gradient(135deg, #3b1016, #4c1d1d);
-    color: #fecaca;
-}
-
-html[data-bs-theme='dark'] ::-webkit-scrollbar-track {
-    background: #111827;
-}
-
-html[data-bs-theme='dark'] ::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #1f2937, #374151);
 }

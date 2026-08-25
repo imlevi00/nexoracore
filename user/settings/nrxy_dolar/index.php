@@ -63,114 +63,136 @@ $selfUrl = url('user/settings/nrxy_dolar/index.php');
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="<?php echo asset('css/style.css'); ?>" rel="stylesheet">
     <link href="<?php echo asset('css/modules-responsive.css'); ?>" rel="stylesheet">
+    <link href="<?php echo asset('user/settings/settings.css'); ?>" rel="stylesheet">
 
     <style>
-        .dollar-page .price-block {
-            font-size: clamp(2.25rem, 8vw, 3.25rem);
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            color: #0f766e;
-            line-height: 1.15;
+        .dollar-widget-card {
+            background: var(--surface-1);
+            border: 1px solid var(--border-default);
+            border-radius: 24px;
+            box-shadow: var(--box-shadow);
+            position: relative;
+            overflow: hidden;
         }
-        .dollar-page .meta-line {
-            font-size: 0.9rem;
-            color: #64748b;
+        .dollar-widget-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            inset-inline: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #059669, #10b981, #06b6d4);
         }
-        .dollar-page .card-main {
-            border: none;
-            border-radius: 16px;
-            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.06);
+        .dollar-rate-value {
+            font-size: clamp(2.5rem, 9vw, 3.75rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: #10b981;
+            line-height: 1.1;
         }
-        .dollar-page .soft-badge {
-            width: 56px;
-            height: 56px;
-            border-radius: 14px;
-            background: rgba(15, 118, 110, 0.1);
-            color: #0f766e;
+        .dollar-badge-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: #ffffff;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.6rem;
+            font-size: 2.2rem;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
         }
-        .dollar-page .divider {
-            height: 1px;
-            background: #e2e8f0;
-            margin: 1.25rem 0;
+        .dollar-stat-row {
+            background: var(--surface-2);
+            border: 1px solid var(--border-default);
+            border-radius: 14px;
+            padding: 0.9rem 1.25rem;
         }
     </style>
 </head>
-<body class="settings-module-page dollar-page bg-light">
+<body class="settings-module-page settings-page">
 
     <?php include_once '../../../includes/navigation.php'; ?>
 
     <div class="container py-4">
-        <div class="row mb-3">
-            <div class="col-12">
-                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
-                    <div>
-                        <nav class="small text-muted mb-1" aria-label="breadcrumb">
-                            <a href="<?php echo url('user/settings/main.php'); ?>" class="text-decoration-none text-muted">ڕێکخستنەکان</a>
-                            <span class="mx-1">/</span>
-                            <span>نرخی دۆلار</span>
-                        </nav>
-                        <h1 class="h3 mb-0 fw-semibold">نرخی دۆلاری ئەمڕۆ</h1>
+        
+        <!-- Header -->
+        <div class="settings-header-card">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <nav class="small text-muted mb-2" aria-label="breadcrumb">
+                        <a href="<?php echo url('user/dashboard/index.php'); ?>" class="text-decoration-none text-muted">
+                            <i class="bi bi-speedometer2"></i> داشبۆرد
+                        </a>
+                        <span class="mx-2">/</span>
+                        <a href="<?php echo url('user/settings/main.php'); ?>" class="text-decoration-none text-muted">
+                            ڕێکخستنەکان
+                        </a>
+                        <span class="mx-2">/</span>
+                        <span class="text-primary fw-medium">نرخی دۆلار</span>
+                    </nav>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="settings-icon section-dollar-price" style="width:52px;height:52px;font-size:24px;">
+                            <i class="bi bi-currency-dollar"></i>
+                        </div>
+                        <div>
+                            <h2 class="mb-0">نرخی دۆلاری ئەمڕۆ</h2>
+                            <p class="text-muted small mb-0">بینینی نرخی کاتی بازاڕ و دوایین نوێکردنەوە لە سیستەم</p>
+                        </div>
                     </div>
-                    <a href="<?php echo url('user/settings/main.php'); ?>" class="btn btn-outline-secondary btn-sm">
-                        <i class="bi bi-arrow-right"></i> گەڕانەوە
-                    </a>
                 </div>
+                <a href="<?php echo url('user/settings/main.php'); ?>" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-right"></i> گەڕانەوە
+                </a>
             </div>
         </div>
 
         <div class="row justify-content-center">
-            <div class="col-lg-5 col-md-7">
-                <div class="card card-main">
-                    <div class="card-body p-4 p-md-5 text-center">
+            <div class="col-lg-6 col-md-8">
+                <div class="dollar-widget-card p-4 p-md-5 text-center">
 
-                        <div class="soft-badge mx-auto mb-3" aria-hidden="true">
-                            <i class="bi bi-currency-dollar"></i>
+                    <div class="dollar-badge-icon mx-auto mb-4" aria-hidden="true">
+                        <i class="bi bi-currency-dollar"></i>
+                    </div>
+
+                    <?php if ($dollarPrice): ?>
+                        <p class="text-muted fw-semibold mb-2">نرخی پیشنیارکراوی دۆلار بە دیناری عێراقی</p>
+                        <div class="dollar-rate-value mb-2">
+                            <?php echo rtrim(rtrim(number_format($dollarPrice, 3, '.', ','), '0'), '.'); ?>
+                        </div>
+                        <p class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill mb-4">
+                            بۆ هەر ١ دۆلاری ئەمریکی ($1)
+                        </p>
+
+                        <div class="d-flex flex-column gap-2 text-start small mb-4">
+                            <div class="dollar-stat-row d-flex justify-content-between align-items-center">
+                                <span class="text-muted"><i class="bi bi-calendar-event me-1"></i> دوایین بەرواری نوێکردنەوە</span>
+                                <span class="fw-bold"><?php echo date('Y/m/d', strtotime($lastUpdated)); ?> <span class="text-muted fw-normal"><?php echo date('H:i', strtotime($lastUpdated)); ?></span></span>
+                            </div>
+                            <div class="dollar-stat-row d-flex justify-content-between align-items-center">
+                                <span class="text-muted"><i class="bi bi-stopwatch me-1"></i> کاتی تێپەڕیو</span>
+                                <span class="fw-bold text-success"><i class="bi bi-clock-history me-1"></i><?php echo htmlspecialchars($timeAgo); ?></span>
+                            </div>
                         </div>
 
-                        <?php if ($dollarPrice): ?>
-                            <p class="meta-line mb-2">نرخی پیشنیارکراو (دینار)</p>
-                            <div class="price-block">
-                                <?php echo rtrim(rtrim(number_format($dollarPrice, 3, '.', ','), '0'), '.'); ?>
-                            </div>
-                            <p class="small text-muted mt-2 mb-0">بۆ هەر ١ دۆلار</p>
-
-                            <div class="divider"></div>
-
-                            <div class="text-start small">
-                                <div class="d-flex justify-content-between py-1 border-bottom border-light-subtle">
-                                    <span class="text-muted">دوایین نوێکردنەوە</span>
-                                    <span class="fw-medium"><?php echo date('Y-m-d', strtotime($lastUpdated)); ?> <span class="text-muted"><?php echo date('H:i', strtotime($lastUpdated)); ?></span></span>
-                                </div>
-                                <div class="d-flex justify-content-between py-2">
-                                    <span class="text-muted">کاتی تێپەڕیو</span>
-                                    <span class="text-teal" style="color:#0f766e;"><?php echo htmlspecialchars($timeAgo); ?></span>
-                                </div>
-                            </div>
-
-                            <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
-                                <a href="<?php echo htmlspecialchars($selfUrl); ?>" class="btn btn-outline-secondary">
-                                    <i class="bi bi-arrow-clockwise"></i> نوێکردنەوە
-                                </a>
-                                <a href="<?php echo url('user/dashboard/index.php'); ?>" class="btn btn-outline-primary">
-                                    <i class="bi bi-house"></i> داشبۆرد
-                                </a>
-                            </div>
-                        <?php else: ?>
-                            <p class="text-danger mb-3">
-                                <i class="bi bi-exclamation-circle"></i>
-                                هیچ نرخێک تۆمار نەکراوە
-                            </p>
-                            <p class="meta-line mb-4">کاتێک نرخ لە سیستەمەکەدا هەبێت، لێرە دەردەکەوێت.</p>
-                            <a href="<?php echo url('user/settings/main.php'); ?>" class="btn btn-primary">
+                        <div class="d-flex flex-wrap justify-content-center gap-2">
+                            <a href="<?php echo htmlspecialchars($selfUrl); ?>" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-clockwise"></i> نوێکردنەوەی پەڕە
+                            </a>
+                            <a href="<?php echo url('user/settings/currency_exchange.php'); ?>" class="btn btn-save">
+                                <i class="bi bi-sliders"></i> ڕێکخستنی ڕێژەی ئاڵوگۆڕ
+                            </a>
+                        </div>
+                    <?php else: ?>
+                        <div class="py-4">
+                            <i class="bi bi-exclamation-circle text-warning fs-1 d-block mb-3"></i>
+                            <h5 class="fw-bold mb-2">هیچ نرخێک تۆمار نەکراوە</h5>
+                            <p class="text-muted small mb-4">کاتێک نرخ لە سیستەمەکەدا نوێ بکرێتەوە، لێرەدا دەردەکەوێت.</p>
+                            <a href="<?php echo url('user/settings/main.php'); ?>" class="btn btn-save">
                                 <i class="bi bi-arrow-right"></i> گەڕانەوە بۆ ڕێکخستنەکان
                             </a>
-                        <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
 
-                    </div>
                 </div>
             </div>
         </div>
