@@ -3,11 +3,17 @@
  * API بۆ وەرگرتنی داتای قازانج - user/reports/api/get_profit_data.php
  */
 
-require_once '../../../config/config.php';
-require_once '../../../config/security.php';
-require_once '../../../includes/permissions.php';
-require_once '../../../includes/zanyari_user_settings.php';
-require_once '../../../includes/profit_stats.php';
+require_once __DIR__ . '/../../../config/config.php';
+require_once __DIR__ . '/../../../config/database.php';
+require_once __DIR__ . '/../../../config/security.php';
+require_once __DIR__ . '/../../../includes/permissions.php';
+require_once __DIR__ . '/../../../includes/zanyari_user_settings.php';
+require_once __DIR__ . '/../../../includes/profit_stats.php';
+
+if (!isset($conn) || !($conn instanceof mysqli)) {
+    $database = new Database();
+    $conn = $database->connect();
+}
 
 // تاقیکردنی دەسەڵاتی بەکارهێنەر
 SessionManager::requireAuth('user');

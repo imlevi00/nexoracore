@@ -3,12 +3,21 @@
  * زیادکردنی خەرجی نوێ (نوێکراوەتەوە) - user/expenses/add.php
  */
 
-require_once '../../config/config.php';
-require_once '../../config/security.php';
-require_once '../../includes/functions.php';
-require_once '../../includes/permissions.php';
-require_once '../../includes/theme_bootstrap.php';
-require_once '../../includes/wallet_service.php';
+require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../config/security.php';
+require_once __DIR__ . '/../../includes/functions.php';
+require_once __DIR__ . '/../../includes/permissions.php';
+require_once __DIR__ . '/../../includes/theme_bootstrap.php';
+require_once __DIR__ . '/../../includes/wallet_service.php';
+
+if (!isset($conn) || !($conn instanceof mysqli)) {
+    $database = new Database();
+    $conn = $database->connect();
+}
+
+if (function_exists('ensureExpensesSchemaTables')) {
+    ensureExpensesSchemaTables($conn);
+}
 
 // تاقیکردنی دەسەڵاتی بەکارهێنەر
 SessionManager::requireAuth('user');
@@ -23,6 +32,22 @@ $userId = (int)$currentUser['id'];
 
 $message = null;
 $saved_expense_id = null;
+
+// نرخە سەرەتاییەکان بۆ فۆرم
+$expense_name = '';
+$amount = '';
+$currency = 'IQD';
+$payment_method = 'cash';
+$wallet_id = 0;
+$is_recurring = 0;
+$description = '';
+$receipt_number = '';
+$expense_date = date('Y-m-d\TH:i');
+$creditor_name = '';
+$creditor_phone = '';
+$due_date = '';
+$payment_terms = '';
+$credit_notes = '';
 
 // پرۆسێسکردنی فۆرم
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -73,24 +98,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // ئەگەر خەرجی دووبارە بێت، جۆری خەرجی خەزن بکە
                 if ($is_recurring) {
                     // بگەڕێ بەدوای جۆری خەرجی هاوشێوە
-                    $check_type = $conn->prepare("SELECT id FROM expense_types WHERE user_id = ? AND name = ? AND is_recurring = 1");
-                    $check_type->bind_param("is", $userId, $expense_name);
-                    $check_type->execute();
-                    $type_result = $check_type->get_result();
-                    
-                    if ($type_result->num_rows > 0) {
-                        // جۆری خەرجی هەیە، ئەویش بەکاربێنە
-                        $expense_type_id = (int)$type_result->fetch_assoc()['id'];
-                    } else {
-                        // جۆری خەرجی نوێ دروست بکە
-                        $insert_type = $conn->prepare("INSERT INTO expense_types (user_id, name, description, is_recurring) VALUES (?, ?, ?, 1)");
-                        $insert_type->bind_param("iss", $userId, $expense_name, $description);
+                    $check_type = $conn->prepare("SELECT id FROM expense_types WHERE user_id = ? AND name = ? AND is_recurring = 1 LIMIT 1");
+                    if ($check_type) {
+                        $check_type->bind_param("is", $userId, $expense_name);
+                        $check_type->execute();
+                        $type_result = $check_type->get_result();
                         
-                        if (!$insert_type->execute()) {
-                            throw new Exception('نەتوانرا جۆری خەرجی زیاد بکرێت!');
+                        if ($type_result && $type_result->num_rows > 0) {
+                            // جۆری خەرجی هەیە، ئەویش بەکاربێنە
+                            $expense_type_id = (int)$type_result->fetch_assoc()['id'];
+                        } else {
+                            // جۆری خەرجی نوێ دروست بکە
+                            $insert_type = $conn->prepare("INSERT INTO expense_types (user_id, name, description, is_recurring) VALUES (?, ?, ?, 1)");
+                            if ($insert_type) {
+                                $insert_type->bind_param("iss", $userId, $expense_name, $description);
+                                if (!$insert_type->execute()) {
+                                    throw new Exception('نەتوانرا جۆری خەرجی زیاد بکرێت: ' . $insert_type->error);
+                                }
+                                $expense_type_id = (int)$conn->insert_id;
+                                $insert_type->close();
+                            }
                         }
-                        
-                        $expense_type_id = (int)$conn->insert_id;
+                        $check_type->close();
                     }
                 }
                 
@@ -106,6 +135,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         receipt_number, expense_date
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ");
+                if (!$insert_expense) {
+                    throw new Exception('نەتوانرا خەرجی ئامادە بکرێت: ' . $conn->error);
+                }
 
                 $insert_expense->bind_param(
                     "iisdssiissss",
@@ -115,10 +147,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 );
                 
                 if (!$insert_expense->execute()) {
-                    throw new Exception('نەتوانرا خەرجی زیاد بکرێت!');
+                    throw new Exception('نەتوانرا خەرجی زیاد بکرێت: ' . $insert_expense->error);
                 }
                 
-                $expense_id = $conn->insert_id;
+                $expense_id = (int)$conn->insert_id;
+                $insert_expense->close();
 
                 if ($payment_method === 'cash') {
                     if (!walletPostEntry(
@@ -147,19 +180,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             payment_terms, notes
                         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ");
+                    if (!$insert_credit) {
+                        throw new Exception('نەتوانرا قەرز ئامادە بکرێت: ' . $conn->error);
+                    }
 
-                    $due_date_value = !empty($due_date) ? $due_date : null;
+                    $due_date_value = (!empty($due_date) && trim($due_date) !== '') ? trim($due_date) : null;
 
-                   $insert_credit->bind_param(
-    "iissddssss",
-    $userId, $expense_id, $creditor_name, $creditor_phone,
-    $amount, $amount, $currency, $due_date_value,
-    $payment_terms, $credit_notes
-);
+                    $insert_credit->bind_param(
+                        "iissddssss",
+                        $userId, $expense_id, $creditor_name, $creditor_phone,
+                        $amount, $amount, $currency, $due_date_value,
+                        $payment_terms, $credit_notes
+                    );
                     
                     if (!$insert_credit->execute()) {
-                        throw new Exception('نەتوانرا قەرزی خەرجی زیاد بکرێت!');
+                        throw new Exception('نەتوانرا قەرزی خەرجی زیاد بکرێت: ' . $insert_credit->error);
                     }
+                    $insert_credit->close();
                 }
                 
                 $conn->commit();
@@ -234,7 +271,7 @@ $csrf_token = Security::generateCSRFToken();
 </head>
 <body class="expenses-module-page expenses-form-page">
 
-    <?php include_once '../../includes/navigation.php'; ?>
+    <?php include_once __DIR__ . '/../../includes/navigation.php'; ?>
 
     <div class="container py-4 ex-wrap-narrow">
 

@@ -1,15 +1,21 @@
-﻿<?php
+<?php
 /**
  * بەشی سەرەکی ڕاپۆرتەکان - user/reports/main.php
  */
 
-require_once '../../config/config.php';
-require_once '../../config/security.php';
-require_once '../../includes/permissions.php';
-require_once '../../includes/theme_bootstrap.php';
-require_once '../../includes/zanyari_user_settings.php';
-require_once '../../includes/profit_stats.php';
-require_once '../../includes/reports_cache.php';
+require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../config/security.php';
+require_once __DIR__ . '/../../includes/permissions.php';
+require_once __DIR__ . '/../../includes/theme_bootstrap.php';
+require_once __DIR__ . '/../../includes/zanyari_user_settings.php';
+require_once __DIR__ . '/../../includes/profit_stats.php';
+require_once __DIR__ . '/../../includes/reports_cache.php';
+
+if (!isset($conn) || !($conn instanceof mysqli)) {
+    $database = new Database();
+    $conn = $database->connect();
+}
 
 // تاقیکردنی دەسەڵاتی بەکارهێنەر
 SessionManager::requireAuth('user');
@@ -206,7 +212,7 @@ $csrf_token = Security::generateCSRFToken();
             <small id="loaderProgressText" class="text-muted d-block mt-2">0%</small>
         </div>
     </div>
-    <?php include_once '../../includes/navigation.php'; ?>
+    <?php include_once __DIR__ . '/../../includes/navigation.php'; ?>
 
 <div class="container-fluid py-4 hub-page-content rp-wrap">
 

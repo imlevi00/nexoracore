@@ -3,15 +3,21 @@
  * ڕاپۆرتی قازانج بەپێی کاڵا و بەشەکان - user/reports/item_section_profit_report.php
  */
 
-require_once '../../config/config.php';
-require_once '../../config/security.php';
-require_once '../../includes/permissions.php';
-require_once '../../includes/theme_bootstrap.php';
-require_once '../../includes/zanyari_user_settings.php';
-require_once '../../includes/profit_schema.php';
-require_once '../../includes/item_profit_report_stats.php';
-require_once '../../includes/reports_cache.php';
-require_once '../products/includes/custom_fields_helpers.php';
+require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../config/security.php';
+require_once __DIR__ . '/../../includes/permissions.php';
+require_once __DIR__ . '/../../includes/theme_bootstrap.php';
+require_once __DIR__ . '/../../includes/zanyari_user_settings.php';
+require_once __DIR__ . '/../../includes/profit_schema.php';
+require_once __DIR__ . '/../../includes/item_profit_report_stats.php';
+require_once __DIR__ . '/../../includes/reports_cache.php';
+require_once __DIR__ . '/../products/includes/custom_fields_helpers.php';
+
+if (!isset($conn) || !($conn instanceof mysqli)) {
+    $database = new Database();
+    $conn = $database->connect();
+}
 
 SessionManager::requireAuth('user');
 
@@ -300,7 +306,7 @@ $rangeLabel = $fromDate === $toDate
 </head>
 <body class="reports-module-page reports-item-page">
 
-    <?php include_once '../../includes/navigation.php'; ?>
+    <?php include_once __DIR__ . '/../../includes/navigation.php'; ?>
 
 <div class="container-fluid py-4 hub-page-content rp-wrap">
 

@@ -11,15 +11,20 @@ class Security {
     
     /**
      * hash کردنی پاسۆرد
+     * @param string $password
+     * @return string
      */
-    public static function hashPassword($password) {
+    public static function hashPassword(string $password): string {
         return password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
     }
     
     /**
      * تاقیکردنەوەی پاسۆرد
+     * @param string $password
+     * @param string $hash
+     * @return bool
      */
-    public static function verifyPassword($password, $hash) {
+    public static function verifyPassword(string $password, string $hash): bool {
         if ($password === $hash || md5($password) === $hash || sha1($password) === $hash) {
             return true;
         }
@@ -28,8 +33,9 @@ class Security {
     
     /**
      * دروستکردنی CSRF token
+     * @return string
      */
-    public static function generateCSRFToken() {
+    public static function generateCSRFToken(): string {
         if (!isset($_SESSION['csrf_token'])) {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         }
@@ -38,13 +44,17 @@ class Security {
     
     /**
      * تاقیکردنەوەی CSRF token
+     * @param mixed $token
+     * @return bool
      */
-    public static function validateCSRFToken($token) {
-        return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+    public static function validateCSRFToken($token): bool {
+        return isset($_SESSION['csrf_token']) && is_string($token) && hash_equals($_SESSION['csrf_token'], $token);
     }
     
     /**
      * پاککردنەوەی input
+     * @param mixed $input
+     * @return mixed
      */
     public static function sanitizeInput($input) {
         if (is_array($input)) {
@@ -60,8 +70,10 @@ class Security {
     
     /**
      * تاقیکردنەوەی بەهێزی پاسۆرد
+     * @param string $password
+     * @return array
      */
-    public static function validatePasswordStrength($password) {
+    public static function validatePasswordStrength(string $password): array {
         $errors = [];
 
         if (strlen($password) < PASSWORD_MIN_LENGTH) {
@@ -73,22 +85,29 @@ class Security {
 
     /**
      * تاقیکردنەوەی ئیمەیڵ
+     * @param string $email
+     * @return bool
      */
-    public static function validateEmail($email) {
+    public static function validateEmail(string $email): bool {
         return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
     }
     
     /**
      * تاقیکردنەوەی ژمارەی مۆبایل (عێراقی)
+     * @param string $phone
+     * @return bool
      */
-    public static function validatePhone($phone) {
-        return preg_match('/^(07[3-9][0-9]{8}|7[3-9][0-9]{8})$/', $phone);
+    public static function validatePhone(string $phone): bool {
+        return (bool)preg_match('/^(07[3-9][0-9]{8}|7[3-9][0-9]{8})$/', $phone);
     }
     
     /**
      * کۆنتڕۆڵکردنی هەوڵی داخڵبوون
+     * @param string $identifier
+     * @param bool $success
+     * @return bool
      */
-    public static function trackLoginAttempt($identifier, $success = false) {
+    public static function trackLoginAttempt(string $identifier, bool $success = false): bool {
         $key = 'login_attempts_' . md5($identifier);
         
         if (!isset($_SESSION[$key])) {
@@ -116,15 +135,19 @@ class Security {
     
     /**
      * تاقیکردنی ئەگەر بەکارهێنەر blocked بێت
+     * @param string $identifier
+     * @return bool
      */
-    public static function isBlocked($identifier) {
+    public static function isBlocked(string $identifier): bool {
         return false;
     }
     
     /**
      * وەرگرتنی کاتی ماوەی block
+     * @param string $identifier
+     * @return int
      */
-    public static function getBlockedTime($identifier) {
+    public static function getBlockedTime(string $identifier): int {
         $key = 'login_attempts_' . md5($identifier);
         
         if (isset($_SESSION[$key]) && $_SESSION[$key]['blocked_until'] > time()) {
@@ -136,8 +159,10 @@ class Security {
     
     /**
      * وەرگرتنی ژمارەی هەوڵەکانی داخڵبوون
+     * @param string $identifier
+     * @return int
      */
-    public static function getLoginAttempts($identifier) {
+    public static function getLoginAttempts(string $identifier): int {
         $key = 'login_attempts_' . md5($identifier);
 
         if (isset($_SESSION[$key])) {
@@ -192,8 +217,11 @@ class Security {
 
     /**
      * تاقیکردنەوەی Remember Me token
+     * @param string $selector
+     * @param string $token
+     * @return array|false
      */
-    public static function validateRememberToken($selector, $token) {
+    public static function validateRememberToken(string $selector, string $token) {
         global $conn;
 
         if (!$selector || !$token || !is_string($token) || !ctype_xdigit($token) || strlen($token) % 2 !== 0) {
@@ -308,8 +336,11 @@ class SessionManager {
         ]);
     }
 
-    /** @return array [secure] بۆ setcookie */
-    private static function authCookieOpts($expires) {
+    /**
+     * @param int $expires
+     * @return array<string, mixed> [secure] بۆ setcookie
+     */
+    private static function authCookieOpts(int $expires): array {
         return [
             'expires' => $expires,
             'path' => '/',
@@ -428,8 +459,12 @@ class SessionManager {
     
     /**
      * login کردنی بەکارهێنەر
+     * @param array $userData
+     * @param string $type
+     * @param bool $passwordLogin
+     * @return bool
      */
-    public static function loginUser($userData, $type = 'user', $passwordLogin = false) {
+    public static function loginUser(array $userData, string $type = 'user', bool $passwordLogin = false): bool {
         $_SESSION[$type . '_logged_in'] = true;
         $_SESSION[$type . '_data'] = $userData;
         $_SESSION['login_time'] = time();
@@ -746,29 +781,44 @@ class SecureFileUpload {
     
     /**
      * تاقیکردنی جۆری فایل
+     * @param string $filename
+     * @param array<int, string> $allowedTypes
+     * @return bool
      */
-    public static function validateFileType($filename, $allowedTypes = ALLOWED_IMAGE_TYPES) {
+    public static function validateFileType(string $filename, array $allowedTypes = ALLOWED_IMAGE_TYPES): bool {
         $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
         return in_array($extension, $allowedTypes);
     }
     
     /**
      * تاقیکردنی قەبارەی فایل
+     * @param int $fileSize
+     * @param int $maxSize
+     * @return bool
      */
-    public static function validateFileSize($fileSize, $maxSize = MAX_FILE_SIZE) {
+    public static function validateFileSize(int $fileSize, int $maxSize = MAX_FILE_SIZE): bool {
         return $fileSize <= $maxSize;
     }
     
     /**
      * دروستکردنی ناوی ئامن بۆ فایل
+     * @param string $originalName
+     * @return string
      */
-    public static function generateSafeFilename($originalName) {
+    public static function generateSafeFilename(string $originalName): string {
         $extension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
         $filename = uniqid() . '_' . time() . '.' . $extension;
         
         return $filename;
     }
-    public static function validateNumber($number, $min = 0, $max = null) {
+
+    /**
+     * @param mixed $number
+     * @param float|int $min
+     * @param float|int|null $max
+     * @return bool
+     */
+    public static function validateNumber($number, $min = 0, $max = null): bool {
         if (!is_numeric($number)) return false;
         if ($number < $min) return false;
         if ($max !== null && $number > $max) return false;
@@ -777,8 +827,14 @@ class SecureFileUpload {
 
     /**
      * کەمکردنەوەی وێنە بە server-side
+     * @param string $sourcePath
+     * @param string $destinationPath
+     * @param int $quality
+     * @param int $maxWidth
+     * @param int $maxHeight
+     * @return bool
      */
-    public static function compressImage($sourcePath, $destinationPath, $quality = 80, $maxWidth = 1920, $maxHeight = 1080) {
+    public static function compressImage(string $sourcePath, string $destinationPath, int $quality = 80, int $maxWidth = 1920, int $maxHeight = 1080): bool {
         // تاقیکردنی بوونی فایل
         if (!is_readable($sourcePath) || !file_exists($sourcePath)) {
             return false;
@@ -874,8 +930,13 @@ class SecureFileUpload {
     
     /**
      * حیسابکردنی قەبارەی نوێ
+     * @param float|int $originalWidth
+     * @param float|int $originalHeight
+     * @param float|int $maxWidth
+     * @param float|int $maxHeight
+     * @return array{width: int, height: int}
      */
-    private static function calculateNewDimensions($originalWidth, $originalHeight, $maxWidth, $maxHeight) {
+    private static function calculateNewDimensions($originalWidth, $originalHeight, $maxWidth, $maxHeight): array {
         $originalWidth = (float)$originalWidth;
         $originalHeight = (float)$originalHeight;
         $maxWidth = (float)$maxWidth;
@@ -913,11 +974,13 @@ class SecureFileUpload {
 
     /**
      * ئەپلۆدی ئامنی فایل
+     * @param array<string, mixed> $file
+     * @param string $destination
+     * @param array<int, string> $allowedTypes
+     * @param bool $compressAfterMove
+     * @return array<string, mixed>
      */
-    /**
-     * @param bool $compressAfterMove ئەگەر false بێت، پەردەختکردنی وێنە (GD) ئەنجام نادرێت — بۆ بارکردنی دەرەکی وەک Spaces
-     */
-    public static function uploadFile($file, $destination, $allowedTypes = ALLOWED_IMAGE_TYPES, $compressAfterMove = true) {
+    public static function uploadFile(array $file, string $destination, array $allowedTypes = ALLOWED_IMAGE_TYPES, bool $compressAfterMove = true): array {
         $errors = [];
         
         // تاقیکردنی بوونی فایل
@@ -927,12 +990,12 @@ class SecureFileUpload {
         }
         
         // تاقیکردنی جۆری فایل
-        if (!isset($file['name']) || !self::validateFileType($file['name'], $allowedTypes)) {
+        if (!isset($file['name']) || !self::validateFileType((string)$file['name'], $allowedTypes)) {
             $errors[] = "جۆری فایل ڕێپێدراو نییە";
         }
         
         // تاقیکردنی قەبارەی فایل
-        if (!isset($file['size']) || !self::validateFileSize($file['size'])) {
+        if (!isset($file['size']) || !self::validateFileSize((int)$file['size'])) {
             $errors[] = "قەبارەی فایل زۆر گەورەیە";
         }
         
@@ -941,7 +1004,7 @@ class SecureFileUpload {
         }
         
         // دروستکردنی ناوی ئامن
-        $safeFilename = self::generateSafeFilename($file['name']);
+        $safeFilename = self::generateSafeFilename((string)$file['name']);
         $targetPath = $destination . '/' . $safeFilename;
         
         // دروستکردنی directory ئەگەر نەبێت
@@ -951,7 +1014,7 @@ class SecureFileUpload {
         }
         
         // گواستنەوەی فایل
-        if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+        if (move_uploaded_file((string)$file['tmp_name'], $targetPath)) {
             if ($compressAfterMove) {
                 $compressedPath = $targetPath . '.compressed';
                 if (self::compressImage($targetPath, $compressedPath)) {
@@ -976,8 +1039,12 @@ class SecureFileUpload {
 if (!function_exists('validateNumber')) {
     /**
      * تاقیکردنی ژمارە
+     * @param mixed $number
+     * @param float|int $min
+     * @param float|int|null $max
+     * @return bool
      */
-    function validateNumber($number, $min = 0, $max = null) {
+    function validateNumber($number, $min = 0, $max = null): bool {
         if (!is_numeric($number)) return false;
         if ($number < $min) return false;
         if ($max !== null && $number > $max) return false;
