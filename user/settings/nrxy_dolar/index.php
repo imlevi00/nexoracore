@@ -6,6 +6,7 @@
 require_once '../../../config/config.php';
 require_once '../../../config/security.php';
 require_once '../../../includes/permissions.php';
+require_once '../../../includes/theme_bootstrap.php';
 
 SessionManager::requireAuth('user');
 
@@ -58,12 +59,14 @@ $selfUrl = url('user/settings/nrxy_dolar/index.php');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <?php echo kasher_get_theme_bootstrap_markup(); ?>
     <title>نرخی دۆلار - <?php echo htmlspecialchars($currentUser['business_name']); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="<?php echo asset('css/style.css'); ?>" rel="stylesheet">
+    <link href="<?php echo asset('css/theme-modern.css'); ?>" rel="stylesheet">
     <link href="<?php echo asset('css/modules-responsive.css'); ?>" rel="stylesheet">
-    <link href="<?php echo asset('user/settings/settings.css'); ?>" rel="stylesheet">
+    <link href="<?php echo asset_url('user/settings/settings.css'); ?>" rel="stylesheet">
 
     <style>
         .dollar-widget-card {

@@ -915,6 +915,7 @@ $renderDashTile = static function (
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="<?php echo asset('css/style.css'); ?>" rel="stylesheet">
+    <link href="<?php echo asset('css/theme-modern.css'); ?>" rel="stylesheet">
     <link href="<?php echo asset('css/dashboard/dashboard-dark.css'); ?>" rel="stylesheet">
     <link href="<?php echo asset('css/dashboard.css'); ?>" rel="stylesheet">
     <link href="<?php echo asset('css/dashboard-page.css'); ?>" rel="stylesheet">
@@ -1276,7 +1277,6 @@ $renderDashTile = static function (
                 <?php echo $renderDashTile(url('user/chatbot/index.php'), 'section-kashery-ai', 'bi-robot', 'NexoraCore AI', null, 'یاریدەدەر · پرسیار'); ?>
             <?php endif; ?>
 
-            <?php echo $renderDashTile(url('user/website/'), 'section-website', 'bi-globe2', 'وێبسایت', null, 'فرۆشگای ئۆنلاین'); ?>
             <?php echo $renderDashTile(url('user/aboutsystem/main.php'), 'section-about-us', 'bi-info-circle', 'دەربارەی ئێمە و سیستم', null, 'وەشان · پشتگیری'); ?>
         </div>
 

@@ -76,43 +76,47 @@ if (!function_exists('kasher_resolve_theme_mode')) {
             return $themeMode;
         }
 
-        if (!defined('ROOT_PATH')) {
-            return 'light';
-        }
-
-        $dbFile = ROOT_PATH . '/config/kasher_zanyari/database.php';
-        if (file_exists($dbFile) && !isset($GLOBALS['conn_zanyari'])) {
-            require_once $dbFile;
-        }
-
-        $connZanyari = $GLOBALS['conn_zanyari'] ?? null;
-        $userId = (int)($_SESSION['user_data']['id'] ?? 0);
-        if (!($connZanyari instanceof mysqli) || $userId <= 0) {
-            return 'light';
+        $userId = (int)($_SESSION['user_data']['id'] ?? $_SESSION['user']['id'] ?? $_SESSION['user_id'] ?? 0);
+        if ($userId <= 0 && function_exists('getCurrentUser')) {
+            $cu = getCurrentUser();
+            $userId = (int)($cu['id'] ?? 0);
         }
 
         $themeMode = 'light';
-        try {
-            $stmt = $connZanyari->prepare('SELECT theme_mode FROM user_account_settings WHERE user_id = ? LIMIT 1');
-            if (!$stmt) {
-                return 'light';
+
+        if ($userId > 0) {
+            $dbFile = (defined('ROOT_PATH') ? ROOT_PATH : dirname(__DIR__)) . '/config/kasher_zanyari/database.php';
+            if (file_exists($dbFile) && !isset($GLOBALS['conn_zanyari'])) {
+                require_once $dbFile;
             }
 
-            $stmt->bind_param('i', $userId);
-            if ($stmt->execute()) {
-                $res = $stmt->get_result();
-                $row = $res ? $res->fetch_assoc() : null;
-                if ($row && isset($row['theme_mode']) && $row['theme_mode'] !== '') {
-                    $themeMode = kasher_normalize_theme_mode($row['theme_mode']);
+            $connZanyari = $GLOBALS['conn_zanyari'] ?? null;
+            if ($connZanyari instanceof mysqli) {
+                try {
+                    $stmt = $connZanyari->prepare('SELECT theme_mode FROM user_account_settings WHERE user_id = ? LIMIT 1');
+                    if ($stmt) {
+                        $stmt->bind_param('i', $userId);
+                        if ($stmt->execute()) {
+                            $res = $stmt->get_result();
+                            $row = $res ? $res->fetch_assoc() : null;
+                            if ($row && !empty($row['theme_mode'])) {
+                                $themeMode = kasher_normalize_theme_mode($row['theme_mode']);
+                            }
+                        }
+                        $stmt->close();
+                    }
+                } catch (\Exception $e) {
+                    $themeMode = 'light';
+                } catch (\Throwable $e) {
+                    $themeMode = 'light';
                 }
             }
-            $stmt->close();
-        } catch (Throwable $e) {
-            $themeMode = 'light';
         }
 
         $_SESSION['user_theme_mode'] = $themeMode;
-        $_SESSION['user_data']['theme_mode'] = $themeMode;
+        if (isset($_SESSION['user_data']) && is_array($_SESSION['user_data'])) {
+            $_SESSION['user_data']['theme_mode'] = $themeMode;
+        }
         return $themeMode;
     }
 }

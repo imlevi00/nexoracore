@@ -6,6 +6,7 @@
 require_once '../../config/config.php';
 require_once '../../config/security.php';
 require_once '../../includes/permissions.php';
+require_once '../../includes/theme_bootstrap.php';
 
 // تاقیکردنی دەسەڵاتی بەکارهێنەر
 SessionManager::requireAuth('user');
@@ -35,6 +36,7 @@ $csrf_token = Security::generateCSRFToken();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <?php echo kasher_get_theme_bootstrap_markup(); ?>
     <title>ڕێکخستنەکان - <?php echo SITE_NAME; ?></title>
     <meta name="theme-color" content="#4f46e5">
     
@@ -42,8 +44,10 @@ $csrf_token = Security::generateCSRFToken();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="<?php echo asset('css/style.css'); ?>" rel="stylesheet">
+    <link href="<?php echo asset('css/theme-modern.css'); ?>" rel="stylesheet">
+    <link href="<?php echo asset('css/hub-cards.css'); ?>" rel="stylesheet">
     <link href="<?php echo asset('css/modules-responsive.css'); ?>" rel="stylesheet">
-    <link href="<?php echo asset('user/settings/settings.css'); ?>" rel="stylesheet">
+    <link href="<?php echo asset_url('user/settings/settings.css'); ?>" rel="stylesheet">
 </head>
 <body class="settings-module-page settings-page">
 
@@ -62,7 +66,7 @@ $csrf_token = Security::generateCSRFToken();
                             <i class="bi bi-speedometer2"></i> داشبۆرد
                         </a>
                         <span class="mx-2">/</span>
-                        <span class="text-primary fw-medium">ڕێکخستنەکان</span>
+                        <span class="text-primary fw-bold">ڕێکخستنەکان</span>
                     </nav>
                     <h2 class="mb-1 d-flex align-items-center gap-2">
                         <i class="bi bi-gear-wide-connected text-primary"></i>
@@ -85,7 +89,7 @@ $csrf_token = Security::generateCSRFToken();
                 <a href="<?php echo url('user/settings/index.php'); ?>" class="hub-card-link">
                     <div class="hub-bento-card hub-accent-settings">
                         <div class="hub-bento-icon">
-                            <i class="bi bi-gear"></i>
+                            <i class="bi bi-gear-fill"></i>
                         </div>
                         <div class="flex-grow-1">
                             <h3 class="hub-bento-title">ڕێکخستنە سەرەکییەکان</h3>

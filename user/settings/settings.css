@@ -2,11 +2,45 @@
    NexoraCore — Modern Settings Stylesheet
    ============================================================ */
 
+:root {
+    --brand: #4f46e5;
+    --brand-2: #7c3aed;
+    --brand-3: #06b6d4;
+    --surface-1: #ffffff;
+    --surface-2: #f8fafc;
+    --surface-3: #f1f5f9;
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --border-default: #e2e8f0;
+    --focus-ring: rgba(79, 70, 229, 0.22);
+    --box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+    --shadow-glow: 0 8px 24px rgba(79, 70, 229, 0.18);
+    --gradient-surface: radial-gradient(1200px 600px at 90% -5%, rgba(124, 58, 237, 0.08), transparent 55%),
+                        radial-gradient(900px 500px at 0% 0%, rgba(6, 182, 212, 0.07), transparent 50%);
+}
+
+[data-bs-theme="dark"],
+html[data-bs-theme="dark"],
+body.dark-mode {
+    --surface-1: #1e293b;
+    --surface-2: #0f172a;
+    --surface-3: #273449;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --border-default: #334155;
+    --focus-ring: rgba(129, 140, 248, 0.35);
+    --box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+    --shadow-glow: 0 8px 30px rgba(79, 70, 229, 0.3);
+    --gradient-surface: radial-gradient(900px 500px at 80% -10%, rgba(124, 58, 237, 0.15), transparent 55%),
+                        radial-gradient(700px 400px at 0% 0%, rgba(6, 182, 212, 0.1), transparent 50%);
+}
+
 .settings-page {
     min-height: 100vh;
-    background: var(--surface-2);
-    background-image: var(--gradient-surface);
+    background-color: var(--surface-2) !important;
+    background-image: var(--gradient-surface) !important;
     background-attachment: fixed;
+    color: var(--text-primary);
 }
 
 /* ---- Settings Page Header & Breadcrumbs ---- */
@@ -35,6 +69,7 @@
 .settings-header-card h1 {
     font-weight: 800;
     letter-spacing: -0.02em;
+    color: var(--text-primary);
 }
 
 /* ---- Modern Settings Card ---- */
@@ -46,12 +81,13 @@
     transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
     overflow: hidden;
     position: relative;
+    color: var(--text-primary);
 }
 
 .settings-card:hover {
     transform: translateY(-3px);
     box-shadow: var(--shadow-glow), 0 12px 28px rgba(15, 23, 42, 0.08);
-    border-color: rgba(79, 70, 229, 0.3);
+    border-color: rgba(79, 70, 229, 0.4);
 }
 
 .settings-card-header-accent {
@@ -243,6 +279,7 @@
     transition: all 0.2s ease;
     user-select: none;
     position: relative;
+    color: var(--text-primary);
 }
 
 .selectable-card-option:hover {
@@ -254,7 +291,7 @@
 .selectable-card-option.active,
 .selectable-card-option:has(input:checked) {
     border-color: var(--brand);
-    background: color-mix(in srgb, var(--brand) 8%, var(--surface-1));
+    background: color-mix(in srgb, var(--brand) 12%, var(--surface-1));
     box-shadow: 0 0 0 1px var(--brand);
 }
 
@@ -291,11 +328,17 @@
     height: 100%;
 }
 
+.hub-card-link:hover,
+.hub-card-link:focus {
+    text-decoration: none !important;
+    color: inherit !important;
+}
+
 .hub-bento-card {
-    background: var(--surface-1);
-    border: 1px solid var(--border-default);
-    border-radius: 20px;
-    padding: 1.5rem;
+    background: var(--surface-1) !important;
+    border: 1px solid var(--border-default) !important;
+    border-radius: 20px !important;
+    padding: 1.6rem 1.5rem !important;
     height: 100%;
     display: flex;
     align-items: center;
@@ -304,6 +347,7 @@
     overflow: hidden;
     box-shadow: var(--box-shadow);
     transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+    text-decoration: none !important;
 }
 
 .hub-bento-card::before {
@@ -311,7 +355,7 @@
     position: absolute;
     top: 0;
     inset-inline: 0;
-    height: 3px;
+    height: 4px;
     background: var(--hub-accent, var(--brand));
 }
 
@@ -320,59 +364,64 @@
     position: absolute;
     inset-inline-end: -24px;
     bottom: -24px;
-    width: 80px;
-    height: 80px;
+    width: 84px;
+    height: 84px;
     border-radius: 50%;
-    background: color-mix(in srgb, var(--hub-accent, var(--brand)) 10%, transparent);
+    background: color-mix(in srgb, var(--hub-accent, var(--brand)) 12%, transparent);
     pointer-events: none;
 }
 
 .hub-bento-card:hover {
     transform: translateY(-4px);
-    border-color: color-mix(in srgb, var(--hub-accent, var(--brand)) 40%, var(--border-default));
-    box-shadow: 0 14px 32px color-mix(in srgb, var(--hub-accent, var(--brand)) 20%, transparent);
+    border-color: var(--hub-accent, var(--brand)) !important;
+    box-shadow: 0 14px 34px color-mix(in srgb, var(--hub-accent, var(--brand)) 25%, transparent) !important;
 }
 
 .hub-bento-icon {
-    width: 58px;
-    height: 58px;
-    min-width: 58px;
-    border-radius: 16px;
+    width: 60px;
+    height: 60px;
+    min-width: 60px;
+    border-radius: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.65rem;
-    background: color-mix(in srgb, var(--hub-accent, var(--brand)) 12%, var(--surface-1));
-    color: var(--hub-accent, var(--brand));
-    box-shadow: 0 4px 12px color-mix(in srgb, var(--hub-accent, var(--brand)) 16%, transparent);
+    font-size: 1.75rem;
+    background: color-mix(in srgb, var(--hub-accent, var(--brand)) 14%, var(--surface-1)) !important;
+    color: var(--hub-accent, var(--brand)) !important;
+    box-shadow: 0 6px 16px color-mix(in srgb, var(--hub-accent, var(--brand)) 22%, transparent);
     transition: transform 0.25s ease;
+    flex-shrink: 0;
 }
 
 .hub-bento-card:hover .hub-bento-icon {
-    transform: scale(1.08) rotate(-3deg);
+    transform: scale(1.1) rotate(-3deg);
 }
 
 .hub-bento-title {
-    font-size: 1.05rem;
-    font-weight: 700;
-    margin-bottom: 0.25rem;
-    color: var(--text-primary);
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+    margin-bottom: 0.35rem !important;
+    color: var(--text-primary) !important;
     letter-spacing: -0.01em;
+    text-decoration: none !important;
 }
 
 .hub-bento-desc {
-    font-size: 0.82rem;
-    color: var(--text-secondary);
-    margin-bottom: 0;
-    line-height: 1.4;
+    font-size: 0.84rem !important;
+    color: var(--text-secondary) !important;
+    margin-bottom: 0 !important;
+    line-height: 1.45;
+    text-decoration: none !important;
 }
 
 .hub-bento-arrow {
     margin-inline-start: auto;
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
     border-radius: 50%;
     background: var(--surface-2);
+    border: 1px solid var(--border-default);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -382,7 +431,8 @@
 }
 
 .hub-bento-card:hover .hub-bento-arrow {
-    background: var(--brand);
+    background: var(--hub-accent, var(--brand));
+    border-color: var(--hub-accent, var(--brand));
     color: #ffffff;
     transform: translateX(-4px);
 }

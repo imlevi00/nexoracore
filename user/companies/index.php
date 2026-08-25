@@ -5,6 +5,7 @@
  
 require_once '../../config/config.php';
 require_once '../../config/security.php';
+require_once '../../includes/theme_bootstrap.php';
 require_once '../../includes/permissions.php';
 require_once '../../includes/company_computed_debt.php';
 
@@ -138,370 +139,409 @@ $csrf_token = Security::generateCSRFToken();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <?php echo kasher_get_theme_bootstrap_markup(); ?>
     <title>بەڕێوبردنی کۆمپانیاکان - <?php echo SITE_NAME; ?></title>
     
     <!-- CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="<?php echo asset('css/style.css'); ?>" rel="stylesheet">
+    <link href="<?php echo asset('css/theme-modern.css'); ?>" rel="stylesheet">
     <link href="<?php echo asset('css/modules-responsive.css'); ?>" rel="stylesheet">
+    <link href="<?php echo asset_url('user/settings/settings.css'); ?>" rel="stylesheet">
 
-    
     <style>
-        .companies-page .table td,
-        .companies-page .table th {
-            vertical-align: middle;
+        .company-metric-card {
+            background: var(--surface-1);
+            border: 1px solid var(--border-default);
+            border-radius: 18px;
+            padding: 1.35rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+            height: 100%;
         }
-
-        /* مێنیوی "زیاتر" لەسەر هەموو شتەکان دەربکەوێت */
+        .company-metric-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+            border-color: rgba(79, 70, 229, 0.3);
+        }
+        .company-metric-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        .icon-blue {
+            background: rgba(59, 130, 246, 0.12);
+            color: #3b82f6;
+        }
+        .icon-green {
+            background: rgba(16, 185, 129, 0.12);
+            color: #10b981;
+        }
+        .icon-amber {
+            background: rgba(245, 158, 11, 0.12);
+            color: #f59e0b;
+        }
+        .icon-rose {
+            background: rgba(239, 68, 68, 0.12);
+            color: #ef4444;
+        }
+        .company-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: color-mix(in srgb, var(--brand) 12%, var(--surface-1));
+            color: var(--brand);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-left: 0.5rem;
+            flex-shrink: 0;
+            border: 1px solid color-mix(in srgb, var(--brand) 25%, transparent);
+        }
+        .companies-table-card {
+            background: var(--surface-1);
+            border: 1px solid var(--border-default);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+        }
+        .companies-filter-box {
+            background: var(--surface-1);
+            border: 1px solid var(--border-default);
+            border-radius: 18px;
+            padding: 1.25rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        }
         .companies-actions-cell .dropdown-menu.show {
             z-index: 1055;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+            border: 1px solid var(--border-default);
+            padding: 0.5rem;
         }
-
-        html[data-bs-theme='dark'] body.companies-page {
-            background-color: #0b1220 !important;
-            color: #e5e7eb;
-        }
-
-        html[data-bs-theme='dark'] .companies-page .card,
-        html[data-bs-theme='dark'] .companies-page .card-header,
-        html[data-bs-theme='dark'] .companies-page .card-body,
-        html[data-bs-theme='dark'] .companies-page .modal-content,
-        html[data-bs-theme='dark'] .companies-page .dropdown-menu {
-            background-color: #111827;
-            color: #e5e7eb;
-            border-color: #253247;
-        }
-
-        html[data-bs-theme='dark'] .companies-page .alert-warning {
-            background-color: #3b2f10;
-            color: #fef3c7;
-        }
-
-        html[data-bs-theme='dark'] .companies-page .alert-warning .text-warning {
-            color: #fbbf24 !important;
-        }
-
-        html[data-bs-theme='dark'] .companies-page .alert-warning .text-dark {
-            color: #fef3c7 !important;
-        }
-
-        html[data-bs-theme='dark'] .companies-page .card-header.bg-white {
-            background-color: #111827 !important;
-        }
-
-        html[data-bs-theme='dark'] .companies-page .table-light,
-        html[data-bs-theme='dark'] .companies-page .table-light th {
-            background-color: #172132 !important;
-            color: #cbd5e1;
-            border-color: #253247;
-        }
-
-        html[data-bs-theme='dark'] .companies-page .table td {
-            color: #e5e7eb;
-            border-color: #253247;
-        }
-
-        html[data-bs-theme='dark'] .companies-page .table-hover > tbody > tr:hover > * {
-            background-color: #1b2738;
-            color: #f8fafc;
-        }
-
-        html[data-bs-theme='dark'] .companies-page .text-muted,
-        html[data-bs-theme='dark'] .companies-page small.text-muted {
-            color: #94a3b8 !important;
-        }
-
-        html[data-bs-theme='dark'] .companies-page .form-control,
-        html[data-bs-theme='dark'] .companies-page .form-select,
-        html[data-bs-theme='dark'] .companies-page .page-link,
-        html[data-bs-theme='dark'] .companies-page .btn-outline-secondary {
-            background-color: #0f172a;
-            color: #e5e7eb;
-            border-color: #334155;
-        }
-
-        html[data-bs-theme='dark'] .companies-page .page-link:hover,
-        html[data-bs-theme='dark'] .companies-page .btn-outline-secondary:hover {
-            background-color: #334155;
-            color: #f8fafc;
-        }
-
-        html[data-bs-theme='dark'] .companies-page .dropdown-item {
-            color: #e2e8f0;
-        }
-
-        html[data-bs-theme='dark'] .companies-page .dropdown-item:hover,
-        html[data-bs-theme='dark'] .companies-page .dropdown-item:focus {
-            background-color: #1f2937;
-            color: #f8fafc;
-        }
-
-        html[data-bs-theme='dark'] .companies-page .dropdown-divider {
-            border-color: #334155;
+        .companies-actions-cell .dropdown-item {
+            border-radius: 8px;
+            padding: 0.5rem 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 500;
         }
     </style>
 </head>
-<body class="companies-module-page companies-list-page bg-light companies-page">
+<body class="companies-module-page companies-list-page settings-page">
 
-        <?php include_once '../../includes/navigation.php'; ?>
+    <!-- Navigation -->
+    <?php include_once '../../includes/navigation.php'; ?>
 
-<div class="container-fluid py-4 hub-page-content">
+    <div class="container-fluid px-lg-4 py-4">
 
-        <div class="row">
-            <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center hub-page-header flex-wrap gap-2 mb-4">
-                    <h1 class="h3 mb-0">
+        <!-- Header Card -->
+        <div class="settings-header-card mb-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <nav class="small text-muted mb-2" aria-label="breadcrumb">
+                        <a href="<?php echo url('user/dashboard/index.php'); ?>" class="text-decoration-none text-muted">
+                            <i class="bi bi-speedometer2"></i> داشبۆرد
+                        </a>
+                        <span class="mx-2">/</span>
+                        <span class="text-primary fw-bold">بەڕێوبردنی کۆمپانیاکان</span>
+                    </nav>
+                    <h2 class="mb-1 d-flex align-items-center gap-2">
                         <i class="bi bi-building text-primary"></i>
                         بەڕێوبردنی کۆمپانیاکان
-                    </h1>
-                    <div class="d-flex gap-2 flex-wrap">
-                        <a href="<?php echo url('user/purchases/index.php'); ?>" class="btn btn-outline-secondary">
-                            <i class="bi bi-receipt"></i> کڕینەکان
-                        </a>
-                        <a href="<?php echo url('user/companies/print/index.php'); ?>" class="btn btn-outline-primary">
-                            <i class="bi bi-printer"></i> چاپکردنی لیستی قەرز
-                        </a>
-                        <a href="<?php echo url('user/companies/add.php'); ?>" class="btn btn-primary">
-                            <i class="bi bi-plus-lg"></i> زیادکردنی کۆمپانیای نوێ
-                        </a>
-                    </div>
+                    </h2>
+                    <p class="text-muted mb-0">تۆمارکردن، بەدواداچوونی قەرز، دانەوەی پارە و مامەڵەکانی کڕین لەگەڵ کۆمپانیاکان</p>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="<?php echo url('user/purchases/index.php'); ?>" class="btn btn-outline-secondary">
+                        <i class="bi bi-receipt"></i> کڕینەکان
+                    </a>
+                    <a href="<?php echo url('user/companies/print/index.php'); ?>" class="btn btn-outline-primary">
+                        <i class="bi bi-printer"></i> چاپکردنی لیستی قەرز
+                    </a>
+                    <a href="<?php echo url('user/companies/add.php'); ?>" class="btn btn-save">
+                        <i class="bi bi-plus-lg"></i> زیادکردنی کۆمپانیای نوێ
+                    </a>
                 </div>
             </div>
         </div>
 
+        <!-- Metric Stats Cards -->
         <div class="row g-3 mb-4">
-            <div class="col-xl-3 col-md-6">
-                <div class="card border-0 shadow-sm bg-primary text-white">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-subtitle mb-2 opacity-75">گشتی کۆمپانیاکان</h6>
-                                <h2 class="card-title mb-0"><?php echo number_format((int)($stats['total_companies'] ?? 0)); ?></h2>
-                            </div>
-                            <div class="opacity-75">
-                                <i class="bi bi-building display-4"></i>
-                            </div>
+            <div class="col-xl-3 col-sm-6">
+                <div class="company-metric-card">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <span class="text-muted small fw-semibold d-block mb-1">گشتی کۆمپانیاکان</span>
+                            <h3 class="fw-bold mb-0"><?php echo number_format((int)($stats['total_companies'] ?? 0)); ?></h3>
+                            <small class="text-muted">کۆمپانیای تۆمارکراو</small>
+                        </div>
+                        <div class="company-metric-icon icon-blue">
+                            <i class="bi bi-buildings"></i>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-6">
-                <div class="card border-0 shadow-sm bg-success text-white">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-subtitle mb-2 opacity-75">کۆمپانیای چالاک</h6>
-                                <h2 class="card-title mb-0"><?php echo number_format((int)($stats['active_companies'] ?? 0)); ?></h2>
-                            </div>
-                            <div class="opacity-75">
-                                <i class="bi bi-check-circle display-4"></i>
-                            </div>
+
+            <div class="col-xl-3 col-sm-6">
+                <div class="company-metric-card">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <span class="text-muted small fw-semibold d-block mb-1">کۆمپانیای چالاک</span>
+                            <h3 class="fw-bold mb-0 text-success"><?php echo number_format((int)($stats['active_companies'] ?? 0)); ?></h3>
+                            <small class="text-success-emphasis">لە باری کارکردندا</small>
+                        </div>
+                        <div class="company-metric-icon icon-green">
+                            <i class="bi bi-check2-circle"></i>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-6">
-                <div class="card border-0 shadow-sm bg-warning text-dark">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-subtitle mb-2 opacity-75">کۆمپانیای قەرزدار</h6>
-                                <h2 class="card-title mb-0"><?php echo number_format((int)($stats['companies_with_debt'] ?? 0)); ?></h2>
-                            </div>
-                            <div class="opacity-75">
-                                <i class="bi bi-exclamation-triangle display-4"></i>
-                            </div>
+
+            <div class="col-xl-3 col-sm-6">
+                <div class="company-metric-card">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <span class="text-muted small fw-semibold d-block mb-1">کۆمپانیای قەرزدار</span>
+                            <h3 class="fw-bold mb-0 text-warning"><?php echo number_format((int)($stats['companies_with_debt'] ?? 0)); ?></h3>
+                            <small class="text-warning-emphasis">قەرزی ماوە لای تۆ</small>
+                        </div>
+                        <div class="company-metric-icon icon-amber">
+                            <i class="bi bi-exclamation-octagon"></i>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-6">
-                <div class="card border-0 shadow-sm bg-danger text-white">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-subtitle mb-2 opacity-75">کۆی قەرز</h6>
-                                <h2 class="card-title mb-0 fs-4"><?php echo htmlspecialchars(formatCurrencyAmount((float)($stats['total_debt'] ?? 0), 'IQD')); ?></h2>
-                                <?php if ((float)($stats['total_debt_usd'] ?? 0) > 0): ?>
-                                    <div class="mt-1 fw-semibold"><?php echo htmlspecialchars(formatCurrencyAmount((float)$stats['total_debt_usd'], 'USD')); ?></div>
-                                <?php endif; ?>
-                            </div>
-                            <div class="opacity-75">
-                                <i class="bi bi-currency-exchange display-4"></i>
-                            </div>
+
+            <div class="col-xl-3 col-sm-6">
+                <div class="company-metric-card">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <span class="text-muted small fw-semibold d-block mb-1">کۆی قەرزی ماوە</span>
+                            <h4 class="fw-bold mb-0 text-danger"><?php echo htmlspecialchars(formatCurrencyAmount((float)($stats['total_debt'] ?? 0), 'IQD')); ?></h4>
+                            <?php if ((float)($stats['total_debt_usd'] ?? 0) > 0): ?>
+                                <div class="text-danger small fw-bold mt-1"><?php echo htmlspecialchars(formatCurrencyAmount((float)$stats['total_debt_usd'], 'USD')); ?></div>
+                            <?php else: ?>
+                                <small class="text-muted">بە دیناری عێراقی</small>
+                            <?php endif; ?>
+                        </div>
+                        <div class="company-metric-icon icon-rose">
+                            <i class="bi bi-cash-stack"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card shadow-sm companies-filter-card">
-                    <div class="card-body">
-                        <form method="GET" class="row g-3">
-                            <div class="col-md-4">
-                                <label class="form-label">گەڕان</label>
-                                <input type="text" class="form-control" name="search"
-                                       value="<?php echo htmlspecialchars($search); ?>"
-                                       placeholder="ناو، تەلەفۆن یان ناونیشان..."
-                                       autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">دۆخ</label>
-                                <select class="form-select" name="status">
-                                    <option value="" <?php echo $statusFilter === '' ? 'selected' : ''; ?>>هەموو</option>
-                                    <option value="active" <?php echo $statusFilter === 'active' ? 'selected' : ''; ?>>چالاک</option>
-                                    <option value="inactive" <?php echo $statusFilter === 'inactive' ? 'selected' : ''; ?>>ناچالاک</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">&nbsp;</label>
-                                <button type="submit" class="btn btn-secondary w-100">
-                                    <i class="bi bi-search"></i> گەڕان
-                                </button>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">&nbsp;</label>
-                                <a href="<?php echo url('user/companies/index.php'); ?>" class="btn btn-outline-secondary w-100">
-                                    <i class="bi bi-arrow-clockwise"></i> ڕێکخستنەوە
-                                </a>
-                            </div>
-                        </form>
+        <!-- Filter and Search -->
+        <div class="companies-filter-box mb-4">
+            <form method="GET" class="row g-3 align-items-end">
+                <div class="col-lg-5 col-md-6">
+                    <label class="form-label fw-semibold small text-muted">گەڕان بەدوای کۆمپانیا</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-body-tertiary"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" class="form-control" name="search"
+                               value="<?php echo htmlspecialchars($search); ?>"
+                               placeholder="ناوی کۆمپانیا، ژمارەی مۆبایل یان ناونیشان..."
+                               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
                     </div>
                 </div>
-            </div>
+                <div class="col-lg-3 col-md-3">
+                    <label class="form-label fw-semibold small text-muted">دۆخی کارکردن</label>
+                    <select class="form-select" name="status">
+                        <option value="" <?php echo $statusFilter === '' ? 'selected' : ''; ?>>هەموو دۆخەکان</option>
+                        <option value="active" <?php echo $statusFilter === 'active' ? 'selected' : ''; ?>>چالاک</option>
+                        <option value="inactive" <?php echo $statusFilter === 'inactive' ? 'selected' : ''; ?>>ناچالاک</option>
+                    </select>
+                </div>
+                <div class="col-lg-2 col-md-3 col-6">
+                    <button type="submit" class="btn btn-save w-100">
+                        <i class="bi bi-funnel"></i> فیلتەرکردن
+                    </button>
+                </div>
+                <div class="col-lg-2 col-md-12 col-6">
+                    <a href="<?php echo url('user/companies/index.php'); ?>" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-arrow-clockwise"></i> پاککردنەوە
+                    </a>
+                </div>
+            </form>
         </div>
 
-        <div class="row">
-            <div class="col-12">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <h5 class="mb-0">
-                            <i class="bi bi-list-ul"></i>
-                            لیستی کۆمپانیاکان
-                        </h5>
-                        <a href="<?php echo url('user/companies/print/index.php'); ?>" class="btn btn-outline-primary btn-sm">
-                            <i class="bi bi-printer"></i> چاپکردنی لیست
+        <!-- Companies Table Card -->
+        <div class="companies-table-card">
+            <div class="p-3 px-4 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <h5 class="mb-0 fw-bold d-flex align-items-center gap-2">
+                    <i class="bi bi-list-task text-primary"></i>
+                    لیستی کۆمپانیا تۆمارکراوەکان
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill fs-7"><?php echo number_format($totalRecords); ?> کۆمپانیا</span>
+                </h5>
+                <a href="<?php echo url('user/companies/print/index.php'); ?>" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-printer"></i> چاپکردنی لیست
+                </a>
+            </div>
+            
+            <div class="p-0">
+                <?php if (empty($companies)): ?>
+                    <div class="text-center py-5 px-3">
+                        <div class="company-metric-icon icon-blue mx-auto mb-3" style="width: 70px; height: 70px; font-size: 2rem;">
+                            <i class="bi bi-building"></i>
+                        </div>
+                        <h5 class="fw-bold">هیچ کۆمپانیایەک نەدۆزرایەوە</h5>
+                        <p class="text-muted mb-3">
+                            <?php if (!empty($search) || !empty($statusFilter)): ?>
+                                هیچ ئەنجامێک بەپێی ئەم فیلتەرانە نەدۆزرایەوە، دەتوانیت گەڕانەکە ڕێکبخەیتەوە.
+                            <?php else: ?>
+                                هێشتا هیچ کۆمپانیایەکت لە سیستەم تۆمار نەکردووە.
+                            <?php endif; ?>
+                        </p>
+                        <a href="<?php echo url('user/companies/add.php'); ?>" class="btn btn-save">
+                            <i class="bi bi-plus-lg"></i> زیادکردنی یەکەم کۆمپانیا
                         </a>
                     </div>
-                    <div class="card-body p-0">
-                        <?php if (empty($companies)): ?>
-                            <div class="text-center py-5 px-3">
-                                <i class="bi bi-building display-3 text-muted"></i>
-                                <p class="text-muted mt-3 mb-0">
-                                    <?php if (!empty($search) || !empty($statusFilter)): ?>
-                                        هیچ کۆمپانیاک بە ئەم فیلتەرانە نەدۆزرایەوە
-                                    <?php else: ?>
-                                        هیچ کۆمپانیاک تۆمار نەکراوە
-                                    <?php endif; ?>
-                                </p>
-                                <a href="<?php echo url('user/companies/add.php'); ?>" class="btn btn-primary mt-3">
-                                    <i class="bi bi-plus-lg"></i> زیادکردنی کۆمپانیای نوێ
-                                </a>
-                            </div>
-                        <?php else: ?>
-                            <div class="table-responsive">
-                                <table class="table table-hover mb-0 align-middle companies-list-table">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>ناو</th>
-                                            <th>تەلەفۆن</th>
-                                            <th>دۆخ</th>
-                                            <th>قەرز</th>
-                                            <th>وەسڵی قەرز</th>
-                                            <th>مامەڵە</th>
-                                            <th>بەروار</th>
-                                            <th class="text-end">کردارەکان</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($companies as $company): ?>
-                                            <tr>
-                                                <td class="fw-semibold" data-label="ناو">
-                                                    <i class="bi bi-building text-primary me-1"></i>
-                                                    <?php echo htmlspecialchars($company['name']); ?>
-                                                </td>
-                                                <td data-label="تەلەفۆن"><?php echo !empty($company['phone']) ? htmlspecialchars($company['phone']) : '—'; ?></td>
-                                                <td data-label="دۆخ">
-                                                    <?php if ($company['status'] === 'active'): ?>
-                                                        <span class="badge bg-success">چالاک</span>
-                                                    <?php else: ?>
-                                                        <span class="badge bg-secondary">ناچالاک</span>
+                <?php else: ?>
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle companies-list-table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">ناوی کۆمپانیا</th>
+                                    <th>مۆبایل / پەیوەندی</th>
+                                    <th>دۆخ</th>
+                                    <th>قەرزی ماوە</th>
+                                    <th>وەسڵی قەرز</th>
+                                    <th>کۆی مامەڵە</th>
+                                    <th>بەرواری تۆمارکردن</th>
+                                    <th class="text-end pe-4">کردارەکان</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($companies as $company): ?>
+                                    <?php
+                                        $rowDebt = (float)($company['computed_remaining_debt'] ?? 0);
+                                        $rowDebtUsd = (float)($company['computed_remaining_debt_usd'] ?? 0);
+                                        $firstChar = mb_substr(trim($company['name']), 0, 1, 'UTF-8');
+                                    ?>
+                                    <tr>
+                                        <td class="ps-4" data-label="ناو">
+                                            <div class="d-flex align-items-center">
+                                                <div class="company-avatar">
+                                                    <?php echo htmlspecialchars($firstChar); ?>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold text-dark-emphasis"><?php echo htmlspecialchars($company['name']); ?></div>
+                                                    <?php if (!empty($company['address'])): ?>
+                                                        <small class="text-muted d-block text-truncate" style="max-width: 180px;"><i class="bi bi-geo-alt"></i> <?php echo htmlspecialchars($company['address']); ?></small>
                                                     <?php endif; ?>
-                                                </td>
-                                                <td data-label="قەرز">
-                                                    <?php
-                                                        $rowDebt = (float)($company['computed_remaining_debt'] ?? 0);
-                                                        $rowDebtUsd = (float)($company['computed_remaining_debt_usd'] ?? 0);
-                                                    ?>
-                                                    <span class="<?php echo $rowDebt > 0 ? 'text-danger fw-semibold' : 'text-success'; ?>">
-                                                        <?php echo htmlspecialchars(formatCurrencyAmount($rowDebt, 'IQD')); ?>
-                                                    </span>
-                                                    <?php if ($rowDebtUsd > 0): ?>
-                                                        <div class="text-danger fw-semibold small mt-1"><?php echo htmlspecialchars(formatCurrencyAmount($rowDebtUsd, 'USD')); ?></div>
-                                                    <?php endif; ?>
-                                                </td>
-                                                <td data-label="وەسڵی قەرز">
-                                                    <?php if ((int)$company['installment_count'] > 0): ?>
-                                                        <span class="badge bg-warning text-dark"><?php echo (int)$company['installment_count']; ?> وەسڵ</span>
-                                                        <a href="<?php echo url('user/purchases/index.php?company_id=' . (int)$company['id'] . '&payment_type=debt'); ?>" class="btn btn-link btn-sm p-0 ms-1" title="بینین">بینین</a>
-                                                    <?php else: ?>
-                                                        <span class="text-muted">—</span>
-                                                    <?php endif; ?>
-                                                </td>
-                                                <td data-label="مامەڵە"><?php echo number_format((int)$company['debt_count'] + (int)$company['payment_count']); ?></td>
-                                                <td data-label="بەروار"><small class="text-muted"><?php echo date('Y/m/d', strtotime($company['created_at'])); ?></small></td>
-                                                <td class="text-end text-nowrap companies-actions-cell" data-label="کردارەکان">
-                                                    <a href="<?php echo url('user/companies/debts.php?company_id=' . (int)$company['id']); ?>" class="btn btn-sm btn-outline-primary">
-                                                        <i class="bi bi-list-check"></i> قەرزەکان
-                                                    </a>
-                                                    <div class="dropdown d-inline-block">
-                                                        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                                            زیاتر
-                                                        </button>
-                                                        <ul class="dropdown-menu dropdown-menu-end">
-                                                            <li>
-                                                                <a class="dropdown-item" href="<?php echo url('user/companies/edit.php?id=' . (int)$company['id']); ?>">
-                                                                    <i class="bi bi-pencil-square text-primary"></i> دەستکاری
-                                                                </a>
-                                                            </li>
-                                                            <li>
-                                                                <a class="dropdown-item" href="<?php echo url('user/companies/debts.php?company_id=' . (int)$company['id']); ?>">
-                                                                    <i class="bi bi-cash-coin text-success"></i> دانەوەی پارە
-                                                                </a>
-                                                            </li>
-                                                            <li>
-                                                                <a class="dropdown-item" href="<?php echo url('user/purchases/index.php?company_id=' . (int)$company['id']); ?>">
-                                                                    <i class="bi bi-receipt text-info"></i> کڕینەکان
-                                                                </a>
-                                                            </li>
-                                                            <li>
-                                                                <a class="dropdown-item" href="<?php echo url('user/purchases/add.php?company_id=' . (int)$company['id']); ?>">
-                                                                    <i class="bi bi-plus-circle text-success"></i> کڕینی نوێ
-                                                                </a>
-                                                            </li>
-                                                            <li><hr class="dropdown-divider"></li>
-                                                            <li>
-                                                                <a class="dropdown-item text-danger" href="#" onclick="deleteCompany(<?php echo (int)$company['id']; ?>); return false;">
-                                                                    <i class="bi bi-trash"></i> سڕینەوە
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        <?php endif; ?>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td data-label="تەلەفۆن">
+                                            <?php if (!empty($company['phone'])): ?>
+                                                <a href="tel:<?php echo htmlspecialchars($company['phone']); ?>" class="text-decoration-none fw-medium text-body">
+                                                    <i class="bi bi-telephone text-muted me-1"></i><?php echo htmlspecialchars($company['phone']); ?>
+                                                </a>
+                                            <?php else: ?>
+                                                <span class="text-muted">—</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td data-label="دۆخ">
+                                            <?php if ($company['status'] === 'active'): ?>
+                                                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill">چالاک</span>
+                                            <?php else: ?>
+                                                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-1 rounded-pill">ناچالاک</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td data-label="قەرز">
+                                            <?php if ($rowDebt > 0): ?>
+                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1 rounded-pill fw-bold">
+                                                    <?php echo htmlspecialchars(formatCurrencyAmount($rowDebt, 'IQD')); ?>
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill">
+                                                    ٠ دینار
+                                                </span>
+                                            <?php endif; ?>
+
+                                            <?php if ($rowDebtUsd > 0): ?>
+                                                <div class="text-danger fw-bold small mt-1">
+                                                    <?php echo htmlspecialchars(formatCurrencyAmount($rowDebtUsd, 'USD')); ?>
+                                                </div>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td data-label="وەسڵی قەرز">
+                                            <?php if ((int)$company['installment_count'] > 0): ?>
+                                                <a href="<?php echo url('user/purchases/index.php?company_id=' . (int)$company['id'] . '&payment_type=debt'); ?>" class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-1 rounded-pill text-decoration-none" title="بینینی وەسڵەکان">
+                                                    <i class="bi bi-file-earmark-text me-1"></i><?php echo (int)$company['installment_count']; ?> وەسڵ
+                                                </a>
+                                            <?php else: ?>
+                                                <span class="text-muted">—</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td data-label="مامەڵە">
+                                            <span class="fw-semibold"><?php echo number_format((int)$company['debt_count'] + (int)$company['payment_count']); ?></span>
+                                            <small class="text-muted">تۆمار</small>
+                                        </td>
+                                        <td data-label="بەروار">
+                                            <small class="text-muted"><?php echo date('Y/m/d', strtotime($company['created_at'])); ?></small>
+                                        </td>
+                                        <td class="text-end pe-4 text-nowrap companies-actions-cell" data-label="کردارەکان">
+                                            <a href="<?php echo url('user/companies/debts.php?company_id=' . (int)$company['id']); ?>" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-cash-stack"></i> قەرزەکان
+                                            </a>
+                                            <div class="dropdown d-inline-block">
+                                                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    کردارەکان
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                                    <li>
+                                                        <a class="dropdown-item" href="<?php echo url('user/companies/edit.php?id=' . (int)$company['id']); ?>">
+                                                            <i class="bi bi-pencil-square text-primary"></i> دەستکاری کۆمپانیا
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item" href="<?php echo url('user/companies/debts.php?company_id=' . (int)$company['id']); ?>">
+                                                            <i class="bi bi-cash-coin text-success"></i> وەرگرتن / دانەوەی پارە
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item" href="<?php echo url('user/purchases/index.php?company_id=' . (int)$company['id']); ?>">
+                                                            <i class="bi bi-receipt text-info"></i> پسوولەکانی کڕین
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item" href="<?php echo url('user/purchases/add.php?company_id=' . (int)$company['id']); ?>">
+                                                            <i class="bi bi-plus-circle text-success"></i> وەسڵی نوێی کڕین
+                                                        </a>
+                                                    </li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li>
+                                                        <a class="dropdown-item text-danger" href="#" onclick="deleteCompany(<?php echo (int)$company['id']; ?>); return false;">
+                                                            <i class="bi bi-trash"></i> سڕینەوەی کۆمپانیا
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     </div>
-                </div>
+                <?php endif; ?>
             </div>
         </div>
 
+        <!-- Pagination -->
         <?php if ($totalPages > 1): ?>
             <nav aria-label="لاپەڕە" class="mt-4">
                 <ul class="pagination justify-content-center flex-wrap">
@@ -564,22 +604,27 @@ $csrf_token = Security::generateCSRFToken();
         <?php endif; ?>
     </div>
 
+    <!-- Delete Confirmation Modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">دڵنیاییکردنەوە</h5>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold text-danger d-flex align-items-center gap-2">
+                        <i class="bi bi-exclamation-triangle-fill"></i> دڵنیاییکردنەوەی سڕینەوە
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="داخستن"></button>
                 </div>
-                <div class="modal-body">
-                    <p class="mb-0">دڵنیای لە سڕینەوەی ئەم کۆمپانیایە؟</p>
+                <div class="modal-body py-3">
+                    <p class="mb-0 text-muted">ئایا دڵنیایت لە سڕینەوەی ئەم کۆمپانیایە؟ ئەم کردارە ناگەڕێتەوە.</p>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">پاشگەز</button>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">پاشگەزبوونەوە</button>
                     <form method="POST" class="d-inline">
                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
                         <input type="hidden" name="company_id" id="deleteCompanyId" value="">
-                        <button type="submit" name="delete" value="1" class="btn btn-danger">سڕینەوە</button>
+                        <button type="submit" name="delete" value="1" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> بەڵێ، بسڕەوە
+                        </button>
                     </form>
                 </div>
             </div>
@@ -593,8 +638,6 @@ $csrf_token = Security::generateCSRFToken();
             new bootstrap.Modal(document.getElementById('deleteModal')).show();
         }
 
-        // چارەسەری بڕینی مێنیوی "زیاتر" لەلایەن overflow ـی .table-responsive
-        // مێنیوەکە بە strategy=fixed دەربکەوێت تا لەسەر هەموو شتەکان بێت نەک بەژێریانەوە
         document.querySelectorAll('.companies-list-table [data-bs-toggle="dropdown"]').forEach(function (toggle) {
             bootstrap.Dropdown.getOrCreateInstance(toggle, {
                 popperConfig: function (defaultConfig) {

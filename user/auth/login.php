@@ -86,6 +86,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'approved_at' => $user['approved_at']
                 ], 'user', true);
 
+                // Set theme mode (default to light)
+                $userThemeMode = 'light';
+                $dbZFile = __DIR__ . '/../../config/kasher_zanyari/database.php';
+                if (file_exists($dbZFile)) {
+                    require_once $dbZFile;
+                    if (isset($conn_zanyari) && $conn_zanyari instanceof mysqli) {
+                        $tStmt = $conn_zanyari->prepare('SELECT theme_mode FROM user_account_settings WHERE user_id = ? LIMIT 1');
+                        if ($tStmt) {
+                            $tStmt->bind_param('i', $user['id']);
+                            if ($tStmt->execute()) {
+                                $tRes = $tStmt->get_result();
+                                $tRow = $tRes ? $tRes->fetch_assoc() : null;
+                                if ($tRow && !empty($tRow['theme_mode'])) {
+                                    $userThemeMode = strtolower((string)$tRow['theme_mode']);
+                                }
+                            }
+                            $tStmt->close();
+                        }
+                    }
+                }
+                $_SESSION['user_theme_mode'] = $userThemeMode;
+                $_SESSION['user_data']['theme_mode'] = $userThemeMode;
+
                 // Handle Remember Me
                 if (isset($_POST['remember']) && $_POST['remember'] == 'on') {
                     $tokenData = Security::createRememberToken($user['id'], 'user');
@@ -155,6 +178,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 'permissions' => json_decode($subUser['permissions'], true),
                                 'user_type' => 'sub'
                             ], 'user', true);
+
+                            $_SESSION['user_theme_mode'] = 'light';
+                            $_SESSION['user_data']['theme_mode'] = 'light';
 
                             // Handle Remember Me for sub-user
                             if (isset($_POST['remember']) && $_POST['remember'] == 'on') {
