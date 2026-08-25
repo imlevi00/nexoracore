@@ -77,18 +77,6 @@ $csrf_token = Security::generateCSRFToken();
                 </a>
             </div>
             
-            <!-- پاڵپشتی -->
-            <div class="dashboard-card-wrapper">
-                <a href="<?php echo url('user/support/index.php'); ?>" class="text-decoration-none">
-                    <div class="dashboard-card section-support p-4 h-100">
-                        <div class="text-center text-white">
-                            <div class="card-icon mx-auto mb-3">
-                                <i class="bi bi-heart-fill"></i>
-                            </div>
-                            <h6 class="mb-0">پاڵپشتی</h6>
-                        </div>
-                    </div>
-                </a>
             </div>
             
             <!-- پرسیار و وەڵامە باوەکان -->
