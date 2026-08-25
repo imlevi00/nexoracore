@@ -3,6 +3,9 @@
  * داشبۆردی بەکارهێنەر - user/dashboard/index.php
  */
 
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
 require_once '../../config/config.php';
 require_once '../../config/database.php';
 require_once '../../config/security.php';
@@ -10,6 +13,14 @@ require_once '../../includes/permissions.php';
 require_once '../../includes/company_computed_debt.php';
 require_once '../../includes/theme_bootstrap.php';
 require_once '../../includes/wallet_service.php';
+
+require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../config/security.php';
+require_once __DIR__ . '/../../includes/permissions.php';
+require_once __DIR__ . '/../../includes/company_computed_debt.php';
+require_once __DIR__ . '/../../includes/theme_bootstrap.php';
+require_once __DIR__ . '/../../includes/wallet_service.php';
 
 if (!isset($GLOBALS['conn']) || !($GLOBALS['conn'] instanceof mysqli)) {
     $db = new Database();

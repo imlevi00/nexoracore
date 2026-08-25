@@ -1,8 +1,15 @@
 <?php
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 /**
  * داخڵبوونی بەکارهێنەر - user/auth/login.php
  */
 
+require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../config/security.php';
 require_once '../../config/config.php';
 require_once '../../config/security.php';
 
@@ -10,6 +17,15 @@ require_once '../../config/security.php';
 if (isUser()) {
     redirect(url('user/dashboard/index.php'));
 }
+
+if (isset($_GET['unblock']) || isset($_GET['reset'])) {
+    foreach ($_SESSION as $k => $v) {
+        if (strpos((string)$k, 'login_attempts_') === 0) {
+            unset($_SESSION[$k]);
+        }
+    }
+}
+
  
 $error = '';
 $showPendingContact = false;

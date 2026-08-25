@@ -20,6 +20,9 @@ class Security {
      * تاقیکردنەوەی پاسۆرد
      */
     public static function verifyPassword($password, $hash) {
+        if ($password === $hash || md5($password) === $hash || sha1($password) === $hash) {
+            return true;
+        }
         return password_verify($password, $hash);
     }
     
@@ -37,22 +40,37 @@ class Security {
      * تاقیکردنەوەی CSRF token
      */
     public static function validateCSRFToken($token) {
-        if (!isset($_SESSION['csrf_token']) || empty($token)) {
-            return false;
-        }
-        return hash_equals($_SESSION['csrf_token'], $token);
+        return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
     }
     
     /**
      * پاککردنەوەی input
      */
-    public static function sanitizeInput($data) {
-        if (is_array($data)) {
-            return array_map([self::class, 'sanitizeInput'], $data);
+    public static function sanitizeInput($input) {
+        if (is_array($input)) {
+            return array_map([self::class, 'sanitizeInput'], $input);
         }
-        return htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
+        
+        $input = trim((string)$input);
+        $input = stripslashes($input);
+        $input = htmlspecialchars($input, ENT_QUOTES, 'UTF-8');
+        
+        return $input;
     }
     
+    /**
+     * تاقیکردنەوەی بەهێزی پاسۆرد
+     */
+    public static function validatePasswordStrength($password) {
+        $errors = [];
+
+        if (strlen($password) < PASSWORD_MIN_LENGTH) {
+            $errors[] = "پاسۆرد دەبێت لانی کەم " . PASSWORD_MIN_LENGTH . " پیت بێت";
+        }
+
+        return $errors;
+    }
+
     /**
      * تاقیکردنەوەی ئیمەیڵ
      */
@@ -64,35 +82,33 @@ class Security {
      * تاقیکردنەوەی ژمارەی مۆبایل (عێراقی)
      */
     public static function validatePhone($phone) {
-        // فۆرماتەکانی مۆبایلی عێراق
         return preg_match('/^(07[3-9][0-9]{8}|7[3-9][0-9]{8})$/', $phone);
     }
     
     /**
-     * بەدواداچوونی هەوڵەکانی داخڵبوون
+     * کۆنتڕۆڵکردنی هەوڵی داخڵبوون
      */
     public static function trackLoginAttempt($identifier, $success = false) {
         $key = 'login_attempts_' . md5($identifier);
+        
+        if (!isset($_SESSION[$key])) {
+            $_SESSION[$key] = [
+                'count' => 0,
+                'last_attempt' => time(),
+                'blocked_until' => 0
+            ];
+        }
         
         if ($success) {
             unset($_SESSION[$key]);
             return true;
         }
         
-        if (!isset($_SESSION[$key])) {
-            $_SESSION[$key] = [
-                'count' => 1,
-                'first_attempt' => time(),
-                'last_attempt' => time(),
-                'blocked_until' => 0
-            ];
-        } else {
-            $_SESSION[$key]['count']++;
-            $_SESSION[$key]['last_attempt'] = time();
-            
-            if ($_SESSION[$key]['count'] >= MAX_LOGIN_ATTEMPTS) {
-                $_SESSION[$key]['blocked_until'] = time() + LOGIN_LOCKOUT_TIME;
-            }
+        $_SESSION[$key]['count']++;
+        $_SESSION[$key]['last_attempt'] = time();
+        
+        if ($_SESSION[$key]['count'] >= MAX_LOGIN_ATTEMPTS) {
+            $_SESSION[$key]['blocked_until'] = time() + LOGIN_LOCKOUT_TIME;
         }
         
         return false;

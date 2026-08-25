@@ -12,7 +12,7 @@ require_once __DIR__ . '/env.php';
 
 // ڕێکخستنەکانی سایت
 define('SITE_NAME', 'NexoraCore');
-if (!defined('SITE_URL')) define('SITE_URL', 'https://kasheryai.com/');
+if (!defined('SITE_URL')) define('SITE_URL', 'http://169.58.215.11/Ka.sheryAi/');
 define('SITE_VERSION', '1.0.8'); // بۆ cache busting
 
 // ڕێگاکانی فایلەکان
@@ -378,13 +378,18 @@ if (!defined('NO_CACHE_HEADERS')) {
 }
 
 // بەکارهێنان
-require_once 'database.php';
-require_once '../includes/functions.php';
-require_once '../includes/permissions.php';
-require_once '../includes/timezone.php';
+require_once __DIR__ . '/database.php';
+require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__ . '/../includes/permissions.php';
+require_once __DIR__ . '/../includes/timezone.php';
+
+// دەستپێکردنی session ـی ئامن و Remember Me (یەک شوێن تەنها) — product_images لە کۆتایی security.php بار دەکرێت
+require_once __DIR__ . '/security.php';
+
 // لایەری «بزنسی چالاک» (چەندین بزنس) — دوای دەستپێکردنی session و Remember Me.
 // بۆ بەکارهێنەری تاک/کارمەند بێ-زیانە (no-op)؛ تەنها بۆ خاوەنی ڕێکخراو re-scope دەکات.
-require_once '../includes/business_context.php';
+require_once __DIR__ . '/../includes/business_context.php';
+if (function_exists('resolveBusinessContext')) {
     resolveBusinessContext();
 }
 
