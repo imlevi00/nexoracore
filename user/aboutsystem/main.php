@@ -77,22 +77,7 @@ $csrf_token = Security::generateCSRFToken();
                 </a>
             </div>
             
-            </div>
-            
-            <!-- پرسیار و وەڵامە باوەکان -->
-            <div class="dashboard-card-wrapper">
-                <a href="<?php echo url('questions_and_answers.html'); ?>" target="_blank" class="text-decoration-none">
-                    <div class="dashboard-card section-faq p-4 h-100">
-                        <div class="text-center text-white">
-                            <div class="card-icon mx-auto mb-3">
-                                <i class="bi bi-question-circle"></i>
-                            </div>
-                            <h6 class="mb-0">پرسیار و وەڵامە باوەکان</h6>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            
+  
         </div>
 
     </div>
