@@ -4,9 +4,15 @@
  */
 
 require_once '../../config/config.php';
+require_once '../../config/database.php';
 require_once '../../config/security.php';
 require_once '../../config/kasher_zanyari/database.php';
 require_once '../../includes/permissions.php';
+
+/** @var mysqli $conn */
+if (!isset($conn) || !($conn instanceof mysqli)) {
+    $conn = $GLOBALS['conn'] ?? (new Database())->connect();
+}
 
 // تاقیکردنی دەسەڵاتی بەکارهێنەر
 SessionManager::requireAuth('user');
