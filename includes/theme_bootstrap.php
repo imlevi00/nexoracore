@@ -9,7 +9,7 @@ if (!function_exists('kasher_normalize_theme_mode')) {
         if ($value === 'light' || $value === 'dark' || $value === 'system') {
             return $value;
         }
-        return 'system';
+        return 'light';
     }
 }
 
@@ -59,11 +59,11 @@ if (!function_exists('kasher_should_apply_theme_bootstrap')) {
 if (!function_exists('kasher_resolve_theme_mode')) {
     function kasher_resolve_theme_mode() {
         if (kasher_is_admin_path()) {
-            return 'system';
+            return 'light';
         }
 
         if (!function_exists('isUser') || !isUser()) {
-            return 'system';
+            return 'light';
         }
 
         if (!empty($_SESSION['user_theme_mode'])) {
@@ -77,7 +77,7 @@ if (!function_exists('kasher_resolve_theme_mode')) {
         }
 
         if (!defined('ROOT_PATH')) {
-            return 'system';
+            return 'light';
         }
 
         $dbFile = ROOT_PATH . '/config/kasher_zanyari/database.php';
@@ -88,27 +88,27 @@ if (!function_exists('kasher_resolve_theme_mode')) {
         $connZanyari = $GLOBALS['conn_zanyari'] ?? null;
         $userId = (int)($_SESSION['user_data']['id'] ?? 0);
         if (!($connZanyari instanceof mysqli) || $userId <= 0) {
-            return 'system';
+            return 'light';
         }
 
-        $themeMode = 'system';
+        $themeMode = 'light';
         try {
             $stmt = $connZanyari->prepare('SELECT theme_mode FROM user_account_settings WHERE user_id = ? LIMIT 1');
             if (!$stmt) {
-                return 'system';
+                return 'light';
             }
 
             $stmt->bind_param('i', $userId);
             if ($stmt->execute()) {
                 $res = $stmt->get_result();
                 $row = $res ? $res->fetch_assoc() : null;
-                if ($row && isset($row['theme_mode'])) {
+                if ($row && isset($row['theme_mode']) && $row['theme_mode'] !== '') {
                     $themeMode = kasher_normalize_theme_mode($row['theme_mode']);
                 }
             }
             $stmt->close();
         } catch (Throwable $e) {
-            $themeMode = 'system';
+            $themeMode = 'light';
         }
 
         $_SESSION['user_theme_mode'] = $themeMode;
@@ -147,7 +147,7 @@ if (!function_exists('kasher_get_theme_bootstrap_markup')) {
             . 'window.__kasherTheme={'
             . 'getMode:function(){return mode;},'
             . 'setMode:function(nextMode){'
-            . 'var normalized=(nextMode==="dark"||nextMode==="light"||nextMode==="system")?nextMode:"system";'
+            . 'var normalized=(nextMode==="dark"||nextMode==="light"||nextMode==="system")?nextMode:"light";'
             . 'mode=normalized;'
             . 'applyTheme();'
             . '}'

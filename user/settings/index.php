@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * ڕێکخستنەکان - user/settings/index.php
  */
@@ -18,7 +18,7 @@ enforceAuthorizationOrDeny($currentUser, 'settings.view', [
 ], 'redirect');
 $userId = $currentUser['id'];
 $dbZanyari = $conn_zanyari instanceof mysqli ? $conn_zanyari : null;
-$themeMode = 'system';
+$themeMode = 'light';
 
 $success = '';
 $error = '';
@@ -168,7 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     elseif ($action === 'update_theme_mode') {
-        $postedThemeMode = strtolower((string)($_POST['theme_mode'] ?? 'system'));
+        $postedThemeMode = strtolower((string)($_POST['theme_mode'] ?? 'light'));
         if (!in_array($postedThemeMode, ['light', 'dark', 'system'], true)) {
             $error = 'دۆخی ڕووکار نادروستە';
         } elseif ($dbZanyari === null) {

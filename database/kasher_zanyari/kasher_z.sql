@@ -60,8 +60,7 @@ CREATE TABLE `user_account_settings` (
   `pos_default_sale_currency` enum('IQD','USD') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'IQD' COMMENT 'دیفۆڵتی دراو لە بەشی فرۆشتن',
   `pos_default_price_type` enum('retail','wholesale','special') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'retail' COMMENT 'دیفۆڵتی بنەڕەتی نرخ لە POS',
   `pos_default_payment_is_credit` tinyint(1) NOT NULL DEFAULT '0' COMMENT '1=دیفۆڵت قەرز، 0=دیفۆڵت کاش',
-  `theme_mode` enum('light','dark','system') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'system' COMMENT 'دۆخی ڕووکار بۆ بەکارهێنەر',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `theme_mode` enum('light','dark','system') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'light' COMMENT 'دۆخی ڕووکار بۆ بەکارهێنەر',
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ڕێکخستنەکانی هەژمار؛ فراوانکردنی داهاتوو بە ستوونی نوێ';
 
