@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } elseif ($user['expiration_date'] && strtotime($user['expiration_date']) < time()) {
                 // Account has expired
                 $expiredDate = date('Y/m/d', strtotime($user['expiration_date']));
-                $error = "ئەکاونتەکەت پێوستی بە نوێکردنەوەیە<br>پەیوەندیمان پێوەبکە تا وەکوو بەزووترین کات ئەکاوەنتەکەتان بۆ نوێ بکەینەوە<br>لە تیلیگرام نامە بنێرە: <a href='https://t.me/itz_levi0' target='_blank' class='text-primary'>@Amir_Kurdish_1</a>";
+                $error = "ئەکاونتەکەت پێوستی بە نوێکردنەوەیە<br>پەیوەندیمان پێوەبکە تا وەکوو بەزووترین کات ئەکاوەنتەکەتان بۆ نوێ بکەینەوە<br>لە تیلیگرام نامە بنێرە: <a href='https://t.me/itz_levi0' target='_blank' class='text-primary'>@itz_levi0</a>";
             } elseif (Security::verifyPassword($password, $user['password'])) {
                 // Successful main user login
                 Security::trackLoginAttempt($email, true);
@@ -125,14 +125,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     
                     if ($isExpired) {
-                        $error = "ئەکاونتەکەت پێوستی بە نوێکردنەوەیە<br>پەیوەندیمان پێوەبکە تا وەکوو بەزووترین کات ئەکاوەنتەکەتان بۆ نوێ بکەینەوە<br>لە تیلیگرام نامە بنێرە: <a href='https://t.me/itz_levi0' target='_blank' class='text-primary'>@Amir_Kurdish_1</a>";
+                        $error = "ئەکاونتەکەت پێوستی بە نوێکردنەوەیە<br>پەیوەندیمان پێوەبکە تا وەکوو بەزووترین کات ئەکاوەنتەکەتان بۆ نوێ بکەینەوە<br>لە تیلیگرام نامە بنێرە: <a href='https://t.me/itz_levi0' target='_blank' class='text-primary'>@itz_levi0</a>";
                     } elseif (Security::verifyPassword($password, $subUser['password'])) {
                         // تاقیکردنی سنووری کارمەندان بەپێی پاکێجی بەکارهێنەری سەرەکی
                         $maxEmployees = getMaxEmployeesForUser($subUser['main_user_id']);
                         $currentEmployeeCount = getEmployeeCountForUser($subUser['main_user_id']);
                         
                         if ($maxEmployees <= 0 || $currentEmployeeCount > $maxEmployees) {
-                            $error = "ئەم خزمەتگوزارییە بۆ تۆ بەردەست نییە<br>ژمارەی کارمەندەکان ($currentEmployeeCount) زیاترە لەوەی لە پاکێجەکەدا دانراوە ($maxEmployees)<br>پێویستە پاکێجەکەتان بەرزبکەنەوە<br>لە تیلیگرام پەیوەندی بە بەڕێوەبەرەوە بکەن: <a href='https://t.me/itz_levi0' target='_blank' class='text-primary'>@Amir_Kurdish_1</a>";
+                            $error = "ئەم خزمەتگوزارییە بۆ تۆ بەردەست نییە<br>ژمارەی کارمەندەکان ($currentEmployeeCount) زیاترە لەوەی لە پاکێجەکەدا دانراوە ($maxEmployees)<br>پێویستە پاکێجەکەتان بەرزبکەنەوە<br>لە تیلیگرام پەیوەندی بە بەڕێوەبەرەوە بکەن: <a href='https://t.me/itz_levi0' target='_blank' class='text-primary'>@itz_levi0</a>";
                             writeLog("Sub-user login blocked (count=$currentEmployeeCount, max=$maxEmployees): {$subUser['email']} from IP: " . $_SERVER['REMOTE_ADDR']);
                         } else {
                             // Successful sub-user login
@@ -208,14 +208,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 
                 if ($isExpired) {
-                    $error = "ئەکاونتەکەت پێوستی بە نوێکردنەوەیە<br>پەیوەندیمان پێوەبکە تا وەکوو بەزووترین کات ئەکاوەنتەکەتان بۆ نوێ بکەینەوە<br>لە تیلیگرام نامە بنێرە: <a href='https://t.me/itz_levi0' target='_blank' class='text-primary'>@Amir_Kurdish_1</a>";
+                    $error = "ئەکاونتەکەت پێوستی بە نوێکردنەوەیە<br>پەیوەندیمان پێوەبکە تا وەکوو بەزووترین کات ئەکاوەنتەکەتان بۆ نوێ بکەینەوە<br>لە تیلیگرام نامە بنێرە: <a href='https://t.me/itz_levi0' target='_blank' class='text-primary'>@itz_levi0</a>";
                 } elseif (Security::verifyPassword($password, $subUser['password'])) {
                     // تاقیکردنی سنووری کارمەندان بەپێی پاکێجی بەکارهێنەری سەرەکی
                     $maxEmployees = getMaxEmployeesForUser($subUser['main_user_id']);
                     $currentEmployeeCount = getEmployeeCountForUser($subUser['main_user_id']);
                     
                     if ($maxEmployees <= 0 || $currentEmployeeCount > $maxEmployees) {
-                        $error = "ئەم خزمەتگوزارییە بۆ تۆ بەردەست نییە<br>ژمارەی کارمەندەکان ($currentEmployeeCount) زیاترە لەوەی لە پاکێجەکەدا دانراوە ($maxEmployees)<br>پێویستە پاکێجەکەتان بەرزبکەنەوە<br>لە تیلیگرام پەیوەندی بە بەڕێوەبەرەوە بکەن: <a href='https://t.me/itz_levi0' target='_blank' class='text-primary'>@Amir_Kurdish_1</a>";
+                        $error = "ئەم خزمەتگوزارییە بۆ تۆ بەردەست نییە<br>ژمارەی کارمەندەکان ($currentEmployeeCount) زیاترە لەوەی لە پاکێجەکەدا دانراوە ($maxEmployees)<br>پێویستە پاکێجەکەتان بەرزبکەنەوە<br>لە تیلیگرام پەیوەندی بە بەڕێوەبەرەوە بکەن: <a href='https://t.me/itz_levi0' target='_blank' class='text-primary'>@itz_levi0</a>";
                         writeLog("Sub-user login blocked (count=$currentEmployeeCount, max=$maxEmployees): {$subUser['email']} from IP: " . $_SERVER['REMOTE_ADDR']);
                     } else {
                         // Successful sub-user login

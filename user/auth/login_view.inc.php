@@ -26,14 +26,14 @@
                 <h1>بازرگانییەکەت بە زیرەکی بەڕێوەببە</h1>
                 <p>فرۆشتن، کۆگا، کڕیار و ڕاپۆرت — هەمووی لە یەک پلاتفۆرم. خێرا، ئاسان، ئامادە بۆ گەشەکردن.</p>
                 <ul class="login-showcase-list">
-                    <li><i class="bi bi-lightning-charge-fill"></i><span>POS خێرا بە پشتگیری ئۆفلاین</span></li>
-                    <li><i class="bi bi-box-seam"></i><span>کۆگا و ئاگادارکردنەوەی کاتی ڕاست</span></li>
-                    <li><i class="bi bi-graph-up-arrow"></i><span>ڕاپۆرت و شیکاری بە بڕیاردان</span></li>
+                    <li><i class="bi bi-lightning-charge-fill"></i><span>POS خێرای لە پشتگیری ئۆنلاین</span></li>
+                    <li><i class="bi bi-box-seam"></i><span>کۆگا و ئاگادارکردنەوەی خێرا</span></li>
+                    <li><i class="bi bi-graph-up-arrow"></i><span>ڕاپۆرت و شیکاری بەهێز</span></li>
                 </ul>
                 <div class="showcase-stat-row">
-                    <div class="showcase-stat"><strong>+۱۲K</strong><span>بازرگانی</span></div>
-                    <div class="showcase-stat"><strong>٪۹۹.۹</strong><span>کاتی کارکردن</span></div>
-                    <div class="showcase-stat"><strong>۲۴/۷</strong><span>پشتگیری</span></div>
+                    <div class="showcase-stat"><strong>+12</strong><span>بازرگانی</span></div>
+                    <div class="showcase-stat"><strong>٪99.9</strong><span>کاتی کارکردن</span></div>
+                    <div class="showcase-stat"><strong>24/7</strong><span>پشتگیری</span></div>
                 </div>
             </div>
         </aside>
