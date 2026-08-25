@@ -249,7 +249,14 @@ function isprBuildQueryUrl(array $overrides = [])
     return url('user/reports/item_section_profit_report.php?' . http_build_query($params));
 }
 
-function isprSortLink($column, $label, $currentSort, $currentDir)
+/**
+ * @param string $column
+ * @param string $label
+ * @param string $currentSort
+ * @param string $currentDir
+ * @return string
+ */
+function isprSortLink(string $column, string $label, string $currentSort, string $currentDir): string
 {
     $newDir = ($currentSort === $column && $currentDir === 'desc') ? 'asc' : 'desc';
     $href = isprBuildQueryUrl(['sort' => $column, 'dir' => $newDir, 'page' => 1, 'tab' => 'products']);
@@ -261,7 +268,15 @@ function isprSortLink($column, $label, $currentSort, $currentDir)
     return '<a class="ispr-sort-link' . $active . '" href="' . htmlspecialchars($href) . '">' . htmlspecialchars($label) . $icon . '</a>';
 }
 
-function isprRenderOptionButtons($tree, $fieldId, $filterFieldId, $filterOptionId, $depth = 0)
+/**
+ * @param array<int, array<string, mixed>> $tree
+ * @param int $fieldId
+ * @param int|null $filterFieldId
+ * @param int|null $filterOptionId
+ * @param int $depth
+ * @return string
+ */
+function isprRenderOptionButtons(array $tree, int $fieldId, $filterFieldId, $filterOptionId, int $depth = 0): string
 {
     $html = '';
     foreach ($tree as $node) {

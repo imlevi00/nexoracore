@@ -43,7 +43,15 @@ if (empty($fromDate) || empty($toDate)) {
 $recognizeDebtRevenueAtSale = getRecognizeCustomerDebtRevenueAtSale($userId);
 
 // حیسابکردنی داتای چارت (بۆ هەردوو دراو بە جیایی)
-function getProfitChartData($conn, $userId, $fromDate, $toDate, $recognizeDebtRevenueAtSale) {
+/**
+ * @param mysqli $conn
+ * @param int $userId
+ * @param string $fromDate
+ * @param string $toDate
+ * @param bool $recognizeDebtRevenueAtSale
+ * @return array<int, array<string, mixed>>
+ */
+function getProfitChartData(mysqli $conn, int $userId, string $fromDate, string $toDate, bool $recognizeDebtRevenueAtSale): array {
     $chartData = [];
     $startDate = new DateTime($fromDate);
     $endDate = new DateTime($toDate);

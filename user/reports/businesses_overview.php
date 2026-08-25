@@ -85,8 +85,13 @@ foreach (['IQD', 'USD'] as $cur) {
     if ($maxExp <= 0) { $best[$cur]['top_expense'] = null; }
 }
 
-/** فۆرماتی دراو */
-function mbo_fmt($amount, $currency) {
+/**
+ * فۆرماتی دراو
+ * @param float|int $amount
+ * @param string $currency
+ * @return string
+ */
+function mbo_fmt($amount, string $currency): string {
     if ($currency === 'USD') {
         return '$' . number_format((float)$amount, 2);
     }
