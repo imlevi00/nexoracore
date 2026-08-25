@@ -159,8 +159,8 @@ function spaces_http_send(string $method, string $url, string $body, array $head
  * @throws RuntimeException
  */
 function spaces_put_object(string $objectKey, string $body, string $contentType = 'application/octet-stream'): void {
-    // ژینگەی لۆکاڵ → خەزنی ناوخۆیی لەبری Spaces
-    if (kasher_storage_is_local()) {
+    // ژینگەی لۆکاڵ یان نەبوونی ڕێکخستنی Spaces → خەزنی ناوخۆیی لەبری Spaces
+    if (kasher_storage_is_local() || SPACES_KEY === '' || SPACES_SECRET === '' || SPACES_BUCKET === '' || SPACES_ENDPOINT === '') {
         kasher_local_put_object($objectKey, $body);
         return;
     }
@@ -202,8 +202,8 @@ function spaces_put_object(string $objectKey, string $body, string $contentType 
  * @throws RuntimeException
  */
 function spaces_delete_object(string $objectKey): void {
-    // ژینگەی لۆکاڵ → سڕینەوەی فایلی ناوخۆیی
-    if (kasher_storage_is_local()) {
+    // ژینگەی لۆکاڵ یان نەبوونی ڕێکخستنی Spaces → سڕینەوەی فایلی ناوخۆیی
+    if (kasher_storage_is_local() || SPACES_KEY === '' || SPACES_SECRET === '' || SPACES_BUCKET === '' || SPACES_ENDPOINT === '') {
         kasher_local_delete_object($objectKey);
         return;
     }
@@ -241,24 +241,24 @@ function spaces_delete_object(string $objectKey): void {
  * URL ی گشتی بۆ object key (هەمان شێوازی product_image_url — بەشی path بە rawurlencode)
  */
 function spaces_public_url_for_object_key(string $objectKey): ?string {
-    // ژینگەی لۆکاڵ → URL ـی ناوخۆیی (SITE_URL/assets/uploads/…)
-    if (kasher_storage_is_local()) {
-        return kasher_local_public_url_for_object_key($objectKey);
-    }
     $objectKey = ltrim(str_replace('\\', '/', $objectKey), '/');
     if ($objectKey === '') {
         return null;
     }
-    $parts = explode('/', $objectKey);
-    $enc = array_map('rawurlencode', $parts);
-    $path = implode('/', $enc);
-    if (SPACES_PUBLIC_BASE_URL !== '') {
-        return SPACES_PUBLIC_BASE_URL . '/' . $path;
+    // ئەگەر لەسەر سێرڤەر بووین و ڕێکخستنی Spaces بەردەست بوو
+    if (!kasher_storage_is_local() && SPACES_KEY !== '' && SPACES_SECRET !== '' && SPACES_BUCKET !== '') {
+        $parts = explode('/', $objectKey);
+        $enc = array_map('rawurlencode', $parts);
+        $path = implode('/', $enc);
+        if (SPACES_PUBLIC_BASE_URL !== '') {
+            return SPACES_PUBLIC_BASE_URL . '/' . $path;
+        }
+        if (SPACES_REGION !== '') {
+            return 'https://' . SPACES_BUCKET . '.' . SPACES_REGION . '.cdn.digitaloceanspaces.com/' . $path;
+        }
     }
-    if (SPACES_BUCKET !== '' && SPACES_REGION !== '') {
-        return 'https://' . SPACES_BUCKET . '.' . SPACES_REGION . '.cdn.digitaloceanspaces.com/' . $path;
-    }
-    return null;
+    // ژینگەی لۆکاڵ یان fallback بۆ سێرڤەری بێ Spaces → URL ـی ناوخۆیی (SITE_URL/assets/uploads/…)
+    return kasher_local_public_url_for_object_key($objectKey);
 }
 
 /**

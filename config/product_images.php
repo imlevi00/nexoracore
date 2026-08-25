@@ -76,12 +76,8 @@ function spaces_optimized_image_upload_payload(string $sourcePath, string $origi
  * ئایا ڕێکخستنی پێویست بۆ بارکردن/سڕینەوە هەیە
  */
 function product_spaces_enabled(): bool {
-    // لە ژینگەی لۆکاڵ خەزنی ناوخۆیی بەکاردێت — پێویستی بە ڕێکخستنی Spaces نییە
-    if (kasher_storage_is_local()) {
-        return true;
-    }
-    return SPACES_KEY !== '' && SPACES_SECRET !== '' && SPACES_BUCKET !== ''
-        && SPACES_ENDPOINT !== '' && SPACES_PUBLIC_BASE_URL !== '' && SPACES_REGION !== '';
+    // هەمیشە ڕێگە بە بارکردن دەدرێت (ئەگەر Spaces نەبێت، بە خۆکاری لە فۆڵدەری ناوخۆیی assets/uploads خەزن دەبێت)
+    return true;
 }
 
 /**

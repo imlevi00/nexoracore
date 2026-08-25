@@ -1,109 +1,158 @@
 /*
- * POS index — fancy slim refresh (NexoraCore brand)
- * Loaded after pos-design.css on user/pos/index.php
+ * NexoraCore POS — Modern High-End Visual Refresh
+ * Enhanced design system with clean light & dark mode support
  */
 
-.pos-page {
+:root {
   --pos-brand: #4f46e5;
+  --pos-brand-light: #6366f1;
   --pos-brand-2: #7c3aed;
   --pos-accent: #10b981;
+  --pos-accent-dark: #059669;
+  --pos-warning: #f59e0b;
+  --pos-danger: #ef4444;
   --pos-surface: #ffffff;
   --pos-surface-2: #f8fafc;
+  --pos-surface-3: #f1f5f9;
+  --pos-text-main: #0f172a;
+  --pos-text-muted: #64748b;
   --pos-border: #e2e8f0;
-  --pos-glow: 0 8px 28px rgba(79, 70, 229, 0.12);
-  --pos-radius: 12px;
+  --pos-border-light: #edf2f7;
+  --pos-glow-brand: 0 8px 24px rgba(79, 70, 229, 0.18);
+  --pos-glow-accent: 0 8px 24px rgba(16, 185, 129, 0.22);
+  --pos-glow-danger: 0 8px 24px rgba(239, 68, 68, 0.22);
+  --pos-radius: 16px;
+  --pos-radius-md: 12px;
   --pos-radius-sm: 8px;
-  font-family: 'Vazirmatn', 'Noto Sans Arabic', system-ui, sans-serif;
+  --pos-radius-pill: 9999px;
 }
 
-.pos-page {
-  background: #f1f5f9;
-  background-image:
-    radial-gradient(900px 480px at 100% -5%, rgba(124, 58, 237, 0.07), transparent 55%),
-    radial-gradient(700px 400px at 0% 0%, rgba(6, 182, 212, 0.06), transparent 50%);
+[data-bs-theme="dark"] {
+  --pos-surface: #111827;
+  --pos-surface-2: #1e293b;
+  --pos-surface-3: #0f172a;
+  --pos-text-main: #f8fafc;
+  --pos-text-muted: #94a3b8;
+  --pos-border: #334155;
+  --pos-border-light: #1e293b;
+}
+
+/* Page Background */
+body.pos-page {
+  font-family: 'Vazirmatn', 'Noto Sans Arabic', system-ui, -apple-system, sans-serif !important;
+  background: var(--pos-surface-3) !important;
+  color: var(--pos-text-main);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
 .pos-page .pos-container {
   background: transparent;
+  padding: 0;
 }
 
 .pos-page .main-layout {
   background: var(--pos-surface);
-  border-radius: 0;
+  border: none;
   box-shadow: none;
-  border-top: 1px solid var(--pos-border);
 }
 
-/* ---- Left sidebar ---- */
+/* ==========================================================================
+   LEFT SECTION (Controls, Rate, Scanner, Numpad)
+   ========================================================================== */
 .pos-page .left-section {
   background: var(--pos-surface-2);
   border-inline-end: 1px solid var(--pos-border);
-  width: 26%;
-  min-width: 280px;
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .pos-page .control-section {
-  padding: 12px 14px;
-  background: transparent;
-  border-bottom: none;
-  margin: 0 10px 8px;
+  padding: 10px 12px;
   background: var(--pos-surface);
   border: 1px solid var(--pos-border);
-  border-radius: var(--pos-radius);
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  border-radius: var(--pos-radius-md);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.02);
+  margin: 0 0 6px 0;
+  transition: all 0.2s ease;
 }
 
 .pos-page .control-section h6 {
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 700;
   color: var(--pos-brand);
-  text-transform: none;
-  letter-spacing: 0;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
+.pos-page .control-section h6 i {
+  font-size: 0.95rem;
+}
+
+/* Navigation buttons (Top Left) */
 .pos-page .back-to-dashboard-small {
-  border-radius: 999px;
+  border-radius: var(--pos-radius-pill);
   border: 1px solid var(--pos-border);
   background: var(--pos-surface);
-  color: #475569;
+  color: var(--pos-text-muted);
   font-size: 0.82rem;
-  padding: 7px 12px;
-  box-shadow: none;
+  font-weight: 600;
+  padding: 6px 14px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.18s ease;
 }
 
 .pos-page .back-to-dashboard-small:hover {
-  border-color: color-mix(in srgb, var(--pos-brand) 35%, var(--pos-border));
+  border-color: var(--pos-brand);
   color: var(--pos-brand);
-  background: color-mix(in srgb, var(--pos-brand) 6%, white);
+  background: color-mix(in srgb, var(--pos-brand) 8%, var(--pos-surface));
+  transform: translateY(-1px);
 }
 
 .pos-page .sales-btn-custom {
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--pos-brand) 25%, var(--pos-border));
-  background: linear-gradient(135deg, rgba(79, 70, 229, 0.08), rgba(124, 58, 237, 0.06));
+  border-radius: var(--pos-radius-pill);
+  border: 1px solid color-mix(in srgb, var(--pos-brand) 30%, var(--pos-border));
+  background: color-mix(in srgb, var(--pos-brand) 8%, var(--pos-surface));
   color: var(--pos-brand);
   font-size: 0.82rem;
   font-weight: 700;
-  min-height: 36px;
+  padding: 6px 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  transition: all 0.18s ease;
 }
 
 .pos-page .sales-btn-custom:hover {
-  background: linear-gradient(135deg, var(--pos-brand), var(--pos-brand-2));
+  background: linear-gradient(135deg, var(--pos-brand) 0%, var(--pos-brand-2) 100%);
   color: #fff;
   border-color: transparent;
-  box-shadow: var(--pos-glow);
+  box-shadow: var(--pos-glow-brand);
+  transform: translateY(-1px);
 }
 
-/* Dollar rate card */
+/* Dollar Price Display Card */
 .pos-page .dollar-price-display {
-  background: linear-gradient(145deg, #fff 0%, #f5f3ff 100%);
-  border: 1px solid color-mix(in srgb, var(--pos-brand) 18%, var(--pos-border));
-  border-radius: var(--pos-radius);
+  background: linear-gradient(145deg, var(--pos-surface) 0%, color-mix(in srgb, var(--pos-brand) 4%, var(--pos-surface)) 100%);
+  border: 1px solid color-mix(in srgb, var(--pos-brand) 20%, var(--pos-border));
+  border-radius: var(--pos-radius-md);
   padding: 10px 14px;
-  box-shadow: var(--pos-glow);
+  text-align: center;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.05);
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .pos-page .dollar-price-display::before {
@@ -112,716 +161,679 @@
   top: 0;
   inset-inline: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--pos-brand), var(--pos-brand-2));
+  background: linear-gradient(90deg, var(--pos-accent) 0%, var(--pos-brand) 50%, var(--pos-brand-2) 100%);
+}
+
+.pos-page .dollar-price-display:hover {
+  transform: translateY(-2px);
+  border-color: var(--pos-brand);
+  box-shadow: 0 6px 18px rgba(79, 70, 229, 0.12);
 }
 
 .pos-page .dollar-price-display .price-label {
+  font-size: 0.78rem;
+  font-weight: 700;
   color: var(--pos-brand);
-  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.pos-page .dollar-price-display .dollar-edit-icon {
+  font-size: 0.75rem;
+  opacity: 0.6;
 }
 
 .pos-page .dollar-price-display .price-value {
-  font-size: 1.65rem;
+  font-size: 1.75rem;
   font-weight: 800;
-  color: #0f172a;
-  letter-spacing: -0.02em;
+  color: var(--pos-text-main);
+  line-height: 1.2;
+  margin: 2px 0;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
 }
 
 .pos-page .dollar-price-display .price-value i {
   color: var(--pos-accent);
+  font-size: 1.2rem;
 }
 
-/* Dropdowns */
+.pos-page .dollar-price-display .currency {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--pos-text-muted);
+}
+
+.pos-page .dollar-price-display .last-updated {
+  font-size: 0.7rem;
+  color: var(--pos-text-muted);
+  margin-top: 2px;
+}
+
+/* Custom Dropdown Buttons */
 .pos-page .custom-dropdown-btn {
   border-radius: var(--pos-radius-sm) !important;
   border: 1px solid var(--pos-border) !important;
   background: var(--pos-surface) !important;
+  color: var(--pos-text-main) !important;
   font-size: 0.85rem;
   font-weight: 600;
   min-height: 38px;
-  box-shadow: none !important;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  transition: all 0.18s ease;
 }
 
 .pos-page .custom-dropdown-btn:hover,
 .pos-page .custom-dropdown-select.show .custom-dropdown-btn {
   border-color: var(--pos-brand) !important;
-  background: color-mix(in srgb, var(--pos-brand) 5%, white) !important;
+  background: color-mix(in srgb, var(--pos-brand) 5%, var(--pos-surface)) !important;
+  color: var(--pos-brand) !important;
 }
 
 .pos-page .custom-dropdown-select .dropdown-menu {
-  border-radius: var(--pos-radius-sm);
+  border-radius: var(--pos-radius-md);
   border: 1px solid var(--pos-border);
-  box-shadow: var(--pos-glow);
+  background: var(--pos-surface);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
   padding: 6px;
 }
 
 .pos-page .custom-dropdown-select .dropdown-item {
-  border-radius: 6px;
+  border-radius: var(--pos-radius-sm);
   font-size: 0.85rem;
+  font-weight: 600;
+  padding: 8px 12px;
+  color: var(--pos-text-main);
+  transition: all 0.15s ease;
+}
+
+.pos-page .custom-dropdown-select .dropdown-item:hover {
+  background: color-mix(in srgb, var(--pos-brand) 8%, var(--pos-surface));
+  color: var(--pos-brand);
 }
 
 .pos-page .custom-dropdown-select .dropdown-item.active {
-  background: color-mix(in srgb, var(--pos-brand) 12%, white) !important;
-  color: var(--pos-brand);
-  font-weight: 600;
+  background: linear-gradient(135deg, var(--pos-brand) 0%, var(--pos-brand-2) 100%) !important;
+  color: #fff !important;
 }
 
+/* Products Drawer Toggle Button */
 .pos-page .products-toggle-btn {
-  border-radius: 999px !important;
-  padding: 8px 16px !important;
+  border-radius: var(--pos-radius-pill) !important;
+  padding: 7px 16px !important;
   font-size: 0.85rem !important;
   font-weight: 700 !important;
-  background: linear-gradient(135deg, var(--pos-brand), var(--pos-brand-2)) !important;
+  background: linear-gradient(135deg, var(--pos-brand) 0%, var(--pos-brand-2) 100%) !important;
   border: none !important;
   color: #fff !important;
-  box-shadow: 0 6px 18px rgba(79, 70, 229, 0.28) !important;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.28) !important;
+  transition: all 0.2s ease;
 }
 
 .pos-page .products-toggle-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 24px rgba(79, 70, 229, 0.35) !important;
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.38) !important;
   color: #fff !important;
 }
 
-.pos-page .barcode-input {
+/* Date and Time Pickers */
+.pos-page .pos-date-input {
+  border-radius: var(--pos-radius-sm) !important;
+  border: 1px solid var(--pos-border) !important;
+  background: var(--pos-surface) !important;
+  color: var(--pos-text-main) !important;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 4px 8px;
+}
+
+.pos-page .pos-btn-compact {
   border-radius: var(--pos-radius-sm);
-  border: 1px solid var(--pos-border);
-  background: var(--pos-surface-2);
-  font-size: 0.95rem;
-  padding: 10px 12px;
+  border-color: var(--pos-border);
+  padding: 4px 8px;
+}
+
+/* Barcode Input & Scanner */
+.pos-page .barcode-input {
+  border-radius: var(--pos-radius-md) 0 0 var(--pos-radius-md) !important;
+  border: 1px solid var(--pos-border) !important;
+  background: var(--pos-surface) !important;
+  color: var(--pos-text-main) !important;
+  font-size: 0.92rem;
+  font-weight: 600;
+  padding: 10px 14px;
+  height: 44px;
+  transition: all 0.18s ease;
 }
 
 .pos-page .barcode-input:focus {
-  border-color: var(--pos-brand);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
-  background: #fff;
+  border-color: var(--pos-brand) !important;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15) !important;
 }
 
-/* Numpad */
-.pos-page #numpadOverlay {
-  background: var(--pos-surface);
-  border: 1px solid var(--pos-border);
-  border-radius: var(--pos-radius);
-  padding: 10px !important;
-  margin-top: 12px !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
-}
-
-.pos-page .numpad-btn {
-  border-radius: 10px !important;
+.pos-page #scanBarcodeBtn {
+  border-radius: 0 var(--pos-radius-md) var(--pos-radius-md) 0 !important;
   border: 1px solid var(--pos-border) !important;
+  border-inline-start: none !important;
   background: var(--pos-surface) !important;
-  font-weight: 700;
+  color: var(--pos-brand) !important;
   height: 44px;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
-  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+  padding: 0 14px;
+  font-size: 1.1rem;
+  transition: all 0.18s ease;
 }
 
-.pos-page .numpad-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.12);
-  border-color: color-mix(in srgb, var(--pos-brand) 30%, var(--pos-border)) !important;
-}
-
-.pos-page .numpad-btn.btn-action {
-  background: color-mix(in srgb, var(--pos-brand) 8%, white) !important;
+.pos-page #scanBarcodeBtn:hover {
+  background: color-mix(in srgb, var(--pos-brand) 8%, var(--pos-surface)) !important;
   color: var(--pos-brand) !important;
 }
 
-/* ---- Right: cart area ---- */
-.pos-page .right-section {
+/* NumPad */
+.pos-page #numpadOverlay {
   background: var(--pos-surface);
-  border-inline-start: 1px solid var(--pos-border);
+  border: 1px solid var(--pos-border);
+  border-radius: var(--pos-radius-md);
+  padding: 8px !important;
+  margin-top: 10px !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.02);
 }
 
+.pos-page .numpad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.pos-page .numpad-btn {
+  border-radius: var(--pos-radius-sm) !important;
+  border: 1px solid var(--pos-border) !important;
+  background: var(--pos-surface) !important;
+  color: var(--pos-text-main) !important;
+  font-size: 1.1rem;
+  font-weight: 700;
+  height: 44px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+  display: grid;
+  place-items: center;
+}
+
+.pos-page .numpad-btn:hover {
+  background: color-mix(in srgb, var(--pos-brand) 6%, var(--pos-surface)) !important;
+  border-color: var(--pos-brand) !important;
+  color: var(--pos-brand) !important;
+  transform: translateY(-1px);
+}
+
+.pos-page .numpad-btn:active {
+  transform: scale(0.95);
+  background: color-mix(in srgb, var(--pos-brand) 15%, var(--pos-surface)) !important;
+}
+
+.pos-page .numpad-btn.btn-action {
+  background: color-mix(in srgb, var(--pos-danger) 8%, var(--pos-surface)) !important;
+  color: var(--pos-danger) !important;
+  border-color: color-mix(in srgb, var(--pos-danger) 25%, var(--pos-border)) !important;
+}
+
+.pos-page .numpad-btn.btn-action:hover {
+  background: var(--pos-danger) !important;
+  color: #fff !important;
+}
+
+/* ==========================================================================
+   RIGHT SECTION (Top controls, Tabs, Cart table, Summary)
+   ========================================================================== */
+.pos-page .right-section {
+  background: var(--pos-surface);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Top Controls Section */
 .pos-page .top-controls-section {
   background: var(--pos-surface-2);
   border-bottom: 1px solid var(--pos-border);
-  padding: 10px 12px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
+.pos-page .top-controls-section .customer-new-btn {
+  border-radius: var(--pos-radius-pill);
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border-color: var(--pos-border);
+  background: var(--pos-surface);
+  color: var(--pos-brand);
+  font-size: 1rem;
+  transition: all 0.18s ease;
+}
+
+.pos-page .top-controls-section .customer-new-btn:hover {
+  background: var(--pos-brand);
+  color: #fff;
+  border-color: var(--pos-brand);
+  box-shadow: var(--pos-glow-brand);
+}
+
 .pos-page .top-controls-section .customer-search-input-wrapper {
-  border-radius: 999px;
+  border-radius: var(--pos-radius-pill);
   border: 1px solid var(--pos-border);
   background: var(--pos-surface);
-  box-shadow: none;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  height: 38px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.02);
+  transition: all 0.18s ease;
 }
 
 .pos-page .top-controls-section .customer-search-input-wrapper:focus-within {
   border-color: var(--pos-brand);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.pos-page .top-controls-section .customer-search-input {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--pos-text-main);
+  padding: 0 6px;
 }
 
 .pos-page .top-controls-section .payment-dropdown-wrapper select,
 .pos-page .top-controls-section .sale-notes-wrapper input,
 .pos-page .top-controls-section .paid-amount-wrapper input {
-  border-radius: 999px !important;
+  border-radius: var(--pos-radius-pill) !important;
   border: 1px solid var(--pos-border) !important;
+  background: var(--pos-surface) !important;
+  color: var(--pos-text-main) !important;
   font-size: 0.85rem;
-  min-height: 36px;
+  font-weight: 600;
+  height: 38px;
+  padding: 6px 14px;
 }
 
-.pos-page .top-controls-section .customer-new-btn {
-  border-radius: 999px;
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  display: grid;
-  place-items: center;
+.pos-page .pos-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 4px 10px;
+  border-radius: var(--pos-radius-pill);
+  background: color-mix(in srgb, var(--pos-brand) 6%, var(--pos-surface));
+  border: 1px solid color-mix(in srgb, var(--pos-brand) 15%, var(--pos-border));
 }
 
-.pos-page .top-controls-section .customer-badge {
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--pos-brand) 20%, var(--pos-border));
-  background: color-mix(in srgb, var(--pos-brand) 6%, white);
+.pos-page .pos-brand-logo {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
 }
 
-/* Tabs */
+.pos-page .pos-brand-name {
+  font-weight: 800;
+  color: var(--pos-brand);
+  font-size: 0.9rem;
+}
+
+.pos-page .pos-brand-tech {
+  font-weight: 700;
+  color: var(--pos-brand-2);
+  font-size: 0.9rem;
+}
+
+/* Tabs Bar */
 .pos-page .tabs-container {
   background: var(--pos-surface-2);
   border-bottom: 1px solid var(--pos-border);
+  padding: 6px 12px;
 }
 
 .pos-page .tabs-header {
   background: transparent;
   border: none;
-  padding: 8px 12px 6px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pos-page .tabs-list {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
 }
 
 .pos-page .tab-item {
-  border-radius: 999px !important;
+  border-radius: var(--pos-radius-pill) !important;
   border: 1px solid var(--pos-border) !important;
   background: var(--pos-surface) !important;
-  padding: 5px 12px !important;
-  font-size: 0.8rem;
+  color: var(--pos-text-main) !important;
+  padding: 5px 14px !important;
+  font-size: 0.82rem;
   font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+
+.pos-page .tab-item:hover {
+  background: color-mix(in srgb, var(--pos-brand) 6%, var(--pos-surface)) !important;
+  border-color: var(--pos-brand) !important;
+  color: var(--pos-brand) !important;
 }
 
 .pos-page .tab-item.active {
-  background: linear-gradient(135deg, var(--pos-brand), var(--pos-brand-2)) !important;
+  background: linear-gradient(135deg, var(--pos-brand) 0%, var(--pos-brand-2) 100%) !important;
   border-color: transparent !important;
   color: #fff !important;
   box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25);
 }
 
-.pos-page .tab-item.active .tab-close {
-  color: rgba(255, 255, 255, 0.85) !important;
+.pos-page .tab-item .tab-close {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  transition: opacity 0.15s ease;
+}
+
+.pos-page .tab-item .tab-close:hover {
+  opacity: 1;
 }
 
 .pos-page #addTabBtn {
-  border-radius: 999px;
+  border-radius: var(--pos-radius-pill);
   width: 32px;
   height: 32px;
   padding: 0;
   display: grid;
   place-items: center;
+  border: 1px solid var(--pos-border);
+  background: var(--pos-surface);
+  color: var(--pos-brand);
+  font-size: 1rem;
+  transition: all 0.18s ease;
 }
 
-/* Cart header & table */
+.pos-page #addTabBtn:hover {
+  background: var(--pos-brand);
+  color: #fff;
+  border-color: var(--pos-brand);
+  transform: rotate(90deg);
+}
+
+/* Cart Header */
 .pos-page .cart-header {
-  background: linear-gradient(135deg, var(--pos-brand) 0%, var(--pos-brand-2) 100%) !important;
+  background: linear-gradient(135deg, var(--pos-brand) 0%, #6366f1 50%, var(--pos-brand-2) 100%) !important;
   padding: 10px 16px;
-  border-radius: 0;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .pos-page .cart-header h6 {
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .pos-page .cart-header .badge {
-  border-radius: 999px;
+  border-radius: var(--pos-radius-pill);
   font-weight: 700;
+  padding: 4px 10px;
   background: rgba(255, 255, 255, 0.22) !important;
   color: #fff !important;
   border: 1px solid rgba(255, 255, 255, 0.35);
 }
 
+/* Cart Table */
+.pos-page .cart-table-container {
+  background: var(--pos-surface);
+  overflow-y: auto;
+}
+
+.pos-page .cart-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
 .pos-page .cart-table th {
-  background: linear-gradient(135deg, #eef2ff, #f5f3ff) !important;
-  color: #4338ca !important;
-  font-size: 0.72rem;
+  background: color-mix(in srgb, var(--pos-brand) 8%, var(--pos-surface-2)) !important;
+  color: var(--pos-text-main) !important;
+  font-size: 0.78rem;
   font-weight: 700;
-  padding: 8px 6px !important;
-  border-bottom: 1px solid var(--pos-border) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  padding: 10px 8px !important;
+  border-bottom: 2px solid var(--pos-border) !important;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.pos-page .cart-table td {
+  padding: 10px 8px !important;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--pos-border);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.pos-page .cart-table tbody tr {
+  transition: background 0.15s ease;
 }
 
 .pos-page .cart-table tbody tr:hover {
-  background: color-mix(in srgb, var(--pos-brand) 4%, white) !important;
-  transform: none;
-}
-
-.pos-page .cart-table-container {
-  background: var(--pos-surface);
+  background: color-mix(in srgb, var(--pos-brand) 4%, var(--pos-surface)) !important;
 }
 
 .pos-page .quantity-btn {
   border-radius: 8px;
-  width: 26px;
-  height: 26px;
-  font-size: 0.95rem;
+  width: 28px;
+  height: 28px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--pos-border);
+  background: var(--pos-surface-2);
+  color: var(--pos-text-main);
+  font-weight: 700;
+  transition: all 0.15s ease;
 }
 
-/* Summary */
+.pos-page .quantity-btn:hover {
+  background: var(--pos-brand);
+  color: #fff;
+  border-color: var(--pos-brand);
+}
+
+.pos-page .quantity-input {
+  border-radius: 8px !important;
+  border: 1px solid var(--pos-border) !important;
+  font-weight: 700;
+  text-align: center;
+  height: 28px;
+}
+
+/* ==========================================================================
+   CART SUMMARY & ACTION BUTTONS
+   ========================================================================== */
 .pos-page .cart-summary {
-  background: linear-gradient(180deg, var(--pos-surface-2) 0%, #fff 100%);
-  border-top: 1px solid var(--pos-border);
-  padding: 14px 16px;
+  background: var(--pos-surface);
+  border-top: 2px solid var(--pos-border);
+  padding: 14px 18px;
   box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.04);
 }
 
+/* Total Display */
 .pos-page .total-display {
-  font-size: 2rem;
+  font-size: 2.25rem;
   font-weight: 800;
-  letter-spacing: -0.03em;
-  color: #0f172a;
-  background: linear-gradient(135deg, rgba(79, 70, 229, 0.08), rgba(16, 185, 129, 0.06));
-  border: 1px solid var(--pos-border);
-  border-radius: var(--pos-radius);
-  padding: 10px 16px;
-  margin: 0 0 12px;
+  letter-spacing: -0.02em;
+  color: var(--pos-text-main);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--pos-brand) 6%, var(--pos-surface)) 0%, color-mix(in srgb, var(--pos-accent) 6%, var(--pos-surface)) 100%);
+  border: 1.5px solid color-mix(in srgb, var(--pos-brand) 25%, var(--pos-border));
+  border-radius: var(--pos-radius-md);
+  padding: 12px 18px;
+  margin-bottom: 12px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.02);
+  transition: all 0.2s ease;
 }
 
-.pos-page .discount-container {
-  border-radius: var(--pos-radius-sm);
-  border: 1px solid var(--pos-border);
-  background: var(--pos-surface);
+.pos-page .total-display.pos-total-clickable:hover {
+  border-color: var(--pos-brand);
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.12);
+  cursor: pointer;
 }
 
+/* Sub-action buttons (Delegate, External, Change, Discount) */
 .pos-page .pos-action-btn {
   font-size: 0.82rem !important;
-  border-radius: 999px !important;
-  font-weight: 600;
+  font-weight: 600 !important;
+  border-radius: var(--pos-radius-pill) !important;
+  padding: 6px 14px !important;
+  border: 1px solid var(--pos-border) !important;
+  background: var(--pos-surface-2) !important;
+  color: var(--pos-text-main) !important;
+  transition: all 0.18s ease;
 }
 
+.pos-page .pos-action-btn:hover {
+  border-color: var(--pos-brand) !important;
+  background: color-mix(in srgb, var(--pos-brand) 8%, var(--pos-surface)) !important;
+  color: var(--pos-brand) !important;
+  transform: translateY(-1px);
+}
+
+/* Big Checkout & Action Buttons */
 .pos-page .btn-custom {
-  border-radius: 999px !important;
-  font-size: 0.88rem;
+  border-radius: var(--pos-radius-pill) !important;
+  font-size: 0.95rem;
   font-weight: 700;
-  padding: 10px 16px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .pos-page .btn-success-custom {
-  background: linear-gradient(135deg, #10b981, #059669) !important;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
   border: none !important;
-  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.28) !important;
+  color: #fff !important;
+  box-shadow: var(--pos-glow-accent) !important;
 }
 
 .pos-page .btn-success-custom:hover:not(:disabled) {
-  box-shadow: 0 12px 28px rgba(16, 185, 129, 0.35) !important;
+  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+  box-shadow: 0 10px 28px rgba(16, 185, 129, 0.35) !important;
+  transform: translateY(-2px);
 }
 
 .pos-page .btn-success-custom:disabled {
   opacity: 0.45;
-  filter: grayscale(0.3);
+  filter: grayscale(0.4);
+  box-shadow: none !important;
 }
 
 .pos-page .btn-warning-custom {
-  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
   border: none !important;
+  color: #fff !important;
+  box-shadow: 0 6px 18px rgba(245, 158, 11, 0.25) !important;
+}
+
+.pos-page .btn-warning-custom:hover {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important;
+  box-shadow: 0 10px 24px rgba(245, 158, 11, 0.35) !important;
+  transform: translateY(-2px);
 }
 
 .pos-page .btn-danger-custom {
-  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
   border: none !important;
+  color: #fff !important;
+  box-shadow: var(--pos-glow-danger) !important;
 }
 
-/* Products panel */
+.pos-page .btn-danger-custom:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+  box-shadow: 0 10px 24px rgba(239, 68, 68, 0.35) !important;
+  transform: translateY(-2px);
+}
+
+/* Floating Prescription Button (Medical Center) */
+.pos-page .pos-rx-pill,
+.pos-page #posPrescriptionBtn {
+  border-radius: var(--pos-radius-pill) !important;
+  background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%) !important;
+  border: none !important;
+  color: #fff !important;
+  box-shadow: 0 6px 20px rgba(13, 148, 136, 0.35) !important;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.pos-page .pos-rx-pill:hover,
+.pos-page #posPrescriptionBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(13, 148, 136, 0.45) !important;
+  color: #fff !important;
+}
+
+/* Products Center Drawer */
 .pos-page .center-section {
-  border-inline-end: 1px solid var(--pos-border);
   background: var(--pos-surface-2);
+  border-inline-end: 1px solid var(--pos-border);
 }
 
 .pos-page .products-header {
-  background: linear-gradient(135deg, var(--pos-brand), var(--pos-brand-2));
+  background: linear-gradient(135deg, var(--pos-brand) 0%, var(--pos-brand-2) 100%) !important;
   color: #fff;
   padding: 10px 14px;
-  border-radius: 0;
 }
 
-.pos-page .products-header h6,
-.pos-page .products-header .badge {
-  color: #fff;
-}
-
-.pos-page .product-card {
-  border-radius: var(--pos-radius-sm);
-  border: 1px solid var(--pos-border);
-  overflow: hidden;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.pos-page .product-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--pos-glow);
-  border-color: color-mix(in srgb, var(--pos-brand) 25%, var(--pos-border));
-}
-
-.pos-page .category-list-item,
-.pos-page .category-btn {
-  border-radius: 999px;
-  font-size: 0.82rem;
-}
-
-.pos-page .category-list-item.active,
-.pos-page .category-btn.active {
-  background: linear-gradient(135deg, var(--pos-brand), var(--pos-brand-2)) !important;
-  color: #fff !important;
-  border-color: transparent !important;
-}
-
-.pos-page .loading-overlay {
-  background: rgba(248, 250, 252, 0.88);
-  backdrop-filter: blur(8px);
-}
-
-/* Dark mode */
-html[data-bs-theme='dark'] .pos-page {
-  background: #0b1020;
-  background-image:
-    radial-gradient(800px 400px at 90% -10%, rgba(124, 58, 237, 0.12), transparent 55%),
-    radial-gradient(600px 350px at 0% 0%, rgba(6, 182, 212, 0.08), transparent 50%);
-}
-
-html[data-bs-theme='dark'] .pos-page .main-layout,
-html[data-bs-theme='dark'] .pos-page .left-section,
-html[data-bs-theme='dark'] .pos-page .right-section,
-html[data-bs-theme='dark'] .pos-page .control-section {
-  background: #111827 !important;
-  border-color: #334155 !important;
-}
-
-html[data-bs-theme='dark'] .pos-page .control-section {
-  background: #1e293b !important;
-}
-
-html[data-bs-theme='dark'] .pos-page .dollar-price-display {
-  background: linear-gradient(145deg, #1e293b, #1e1b4b) !important;
-  border-color: #4338ca !important;
-}
-
-html[data-bs-theme='dark'] .pos-page .total-display {
-  color: #f1f5f9;
-  background: rgba(79, 70, 229, 0.12);
-  border-color: #334155;
-}
-
-html[data-bs-theme='dark'] .pos-page .cart-table th {
-  background: linear-gradient(135deg, #312e81, #3730a3) !important;
-  color: #e0e7ff !important;
-}
-
-.pos-page .resize-handle {
-  background: var(--pos-border);
-  width: 4px;
-  transition: background 0.15s ease;
-}
-
-.pos-page .resize-handle:hover {
-  background: var(--pos-brand);
-}
-
-.pos-page .pos-date-input,
-.pos-page .date-picker,
-.pos-page .time-picker {
-  border-radius: var(--pos-radius-sm) !important;
-  border: 1px solid var(--pos-border) !important;
-}
-
-html[data-bs-theme='dark'] .pos-page .loading-overlay {
-  background: rgba(11, 16, 32, 0.88);
-}
-
-/* ========== Phase 2 — deeper polish ========== */
-
-/* Toolbar row (back + sales list) */
-.pos-page .control-section:first-of-type {
-  background: linear-gradient(135deg, rgba(79, 70, 229, 0.04), rgba(16, 185, 129, 0.03));
-  border-style: dashed;
-}
-
-.pos-page .control-section:first-of-type .d-flex {
-  gap: 8px;
-}
-
-/* Barcode input group */
-.pos-page .control-section .input-group {
-  border-radius: var(--pos-radius-sm);
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
-}
-
-.pos-page .control-section .input-group .form-control {
-  border: 1px solid var(--pos-border);
-  border-inline-end: none;
-}
-
-.pos-page .control-section .input-group .btn {
-  border-radius: 0 !important;
-  border: 1px solid var(--pos-border);
-  background: color-mix(in srgb, var(--pos-brand) 8%, white);
-  color: var(--pos-brand);
-  font-weight: 600;
-}
-
-.pos-page .control-section .input-group .btn:hover {
-  background: var(--pos-brand);
-  color: #fff;
-  border-color: var(--pos-brand);
-}
-
-/* Search results (barcode + customer) */
-.pos-page .search-results {
-  border-radius: var(--pos-radius-sm);
-  border: 1px solid var(--pos-border);
-  box-shadow: var(--pos-glow);
-  margin-top: 6px;
-  overflow: hidden;
-  background: var(--pos-surface) !important;
-}
-
-.pos-page .search-result-item {
-  padding: 10px 12px;
-  font-size: 0.85rem;
-  border-bottom: 1px solid var(--pos-border);
-  transition: background 0.12s ease;
-}
-
-.pos-page .search-result-item:hover {
-  background: color-mix(in srgb, var(--pos-brand) 8%, white) !important;
-  color: var(--pos-brand);
-}
-
-.pos-page .search-result-item:last-child {
-  border-bottom: none;
-}
-
-/* Empty cart */
-.pos-page .cart-table tbody td.text-muted {
-  padding: 2.5rem 1rem !important;
-}
-
-.pos-page .cart-table tbody td.text-muted i.display-4 {
-  font-size: 2.5rem !important;
-  color: color-mix(in srgb, var(--pos-brand) 35%, #94a3b8);
-  opacity: 0.85;
-}
-
-.pos-page .cart-table tbody td.text-muted p {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-secondary, #64748b);
-  margin-top: 0.5rem;
-}
-
-/* Cart row inputs */
-.pos-page .cart-table .form-control,
-.pos-page .cart-table .form-select {
-  min-height: 32px;
-  padding: 4px 8px;
-  font-size: 0.82rem;
-  border-radius: 8px;
-  border: 1px solid var(--pos-border);
-}
-
-.pos-page .cart-table .form-control:focus {
-  border-color: var(--pos-brand);
-  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.12);
-}
-
-/* Discount chips */
-.pos-page .pos-discount-chip {
-  padding: 4px 10px !important;
-  font-size: 0.75rem !important;
-  border-radius: 999px !important;
-  font-weight: 700;
-}
-
-.pos-page .discount-btn.active {
-  background: linear-gradient(135deg, var(--pos-brand), var(--pos-brand-2)) !important;
-  border-color: transparent !important;
-  color: #fff !important;
-}
-
-.pos-page .total-display.pos-total-clickable {
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.pos-page .total-display.pos-total-clickable:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--pos-glow);
-}
-
-/* Product grid view */
-.pos-page .products-grid-container {
-  padding: 10px;
-  gap: 10px;
-}
-
-.pos-page .product-grid-item {
-  border-radius: var(--pos-radius);
-  border: 1px solid var(--pos-border);
-  background: var(--pos-surface);
-  overflow: hidden;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
-}
-
-.pos-page .product-grid-item:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--pos-glow);
-  border-color: color-mix(in srgb, var(--pos-brand) 30%, var(--pos-border));
-}
-
-.pos-page .product-grid-image {
-  background: linear-gradient(180deg, #f8fafc, #fff);
-  border-bottom: 1px solid var(--pos-border);
-}
-
-.pos-page .product-grid-price {
-  color: var(--pos-brand);
-  font-weight: 800;
-  font-size: 0.95rem;
-}
-
-.pos-page .product-grid-stock {
-  font-size: 0.72rem;
-  font-weight: 600;
-  border-radius: 999px;
-  padding: 2px 8px;
-  background: color-mix(in srgb, var(--pos-accent) 12%, white);
-  color: #047857;
-}
-
-.pos-page .product-grid-item.out-of-stock {
-  opacity: 0.55;
-  filter: grayscale(0.4);
-}
-
-/* Product list view */
-.pos-page .product-list-item {
-  border-radius: var(--pos-radius-sm);
-  border: 1px solid var(--pos-border);
-  margin-bottom: 6px;
-  padding: 10px 12px;
-  background: var(--pos-surface);
-  transition: all 0.15s ease;
-}
-
-.pos-page .product-list-item:hover {
-  border-color: color-mix(in srgb, var(--pos-brand) 25%, var(--pos-border));
-  background: color-mix(in srgb, var(--pos-brand) 4%, white);
-  transform: translateX(-2px);
-}
-
-.pos-page .product-list-price {
-  color: var(--pos-brand);
-  font-weight: 800;
-}
-
-/* Categories sidebar */
 .pos-page .categories-side {
-  background: var(--pos-surface);
-  border-inline-end: 1px solid var(--pos-border);
+  background: var(--pos-surface-2);
+  border-inline-start: 1px solid var(--pos-border);
 }
 
 .pos-page .category-list-item {
-  border: 1px solid transparent;
-  margin-bottom: 4px;
+  border-radius: var(--pos-radius-sm);
+  border: 1px solid var(--pos-border);
+  background: var(--pos-surface);
+  color: var(--pos-text-main);
   padding: 8px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
   transition: all 0.15s ease;
 }
 
-.pos-page .category-list-item:hover:not(.active) {
-  background: color-mix(in srgb, var(--pos-brand) 6%, white);
-  border-color: var(--pos-border);
-}
-
-.pos-page .products-side-header {
-  background: var(--pos-surface-2);
-  border-bottom: 1px solid var(--pos-border);
-  padding: 8px 12px;
-}
-
-.pos-page .products-side-header h6 {
-  font-size: 0.85rem;
-  font-weight: 700;
-  margin: 0;
-}
-
-/* Modals on POS */
-.pos-page .modal-content {
-  border: none;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
-}
-
-.pos-page .modal-header {
-  background: linear-gradient(135deg, var(--pos-brand), var(--pos-brand-2));
+.pos-page .category-list-item:hover,
+.pos-page .category-list-item.active {
+  background: linear-gradient(135deg, var(--pos-brand) 0%, var(--pos-brand-2) 100%);
   color: #fff;
-  border: none;
-  padding: 14px 18px;
-}
-
-.pos-page .modal-header .btn-close {
-  filter: brightness(0) invert(1);
-  opacity: 0.85;
-}
-
-.pos-page .modal-footer {
-  border-top: 1px solid var(--pos-border);
-  background: var(--pos-surface-2);
-}
-
-.pos-page .modal-footer .btn-primary {
-  background: linear-gradient(135deg, var(--pos-brand), var(--pos-brand-2));
-  border: none;
-  border-radius: 999px;
-  font-weight: 700;
-  padding: 8px 20px;
-}
-
-/* Risk alert */
-.pos-page .risk-alert-btn.show {
-  animation: posPulse 2s ease infinite;
-}
-
-@keyframes posPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.35); }
-  50% { box-shadow: 0 0 0 6px rgba(220, 53, 69, 0); }
-}
-
-/* Subtle entrance */
-.pos-page .main-layout {
-  animation: posFadeIn 0.35s ease;
-}
-
-@keyframes posFadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Scrollbars */
-.pos-page .left-section::-webkit-scrollbar-thumb,
-.pos-page .cart-table-container::-webkit-scrollbar-thumb,
-.pos-page .products-list-container::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--pos-brand) 35%, #cbd5e1);
-  border-radius: 999px;
-}
-
-html[data-bs-theme='dark'] .pos-page .product-grid-item,
-html[data-bs-theme='dark'] .pos-page .product-list-item {
-  background: #1e293b !important;
-  border-color: #334155 !important;
-}
-
-html[data-bs-theme='dark'] .pos-page .search-result-item:hover {
-  background: rgba(79, 70, 229, 0.15) !important;
-}
-
-html[data-bs-theme='dark'] .pos-page .modal-header {
-  background: linear-gradient(135deg, #4338ca, #6d28d9);
+  border-color: transparent;
 }
