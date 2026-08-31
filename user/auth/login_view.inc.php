@@ -83,13 +83,6 @@
                             </div>
                         <?php endif; ?>
 
-                        <div class="login-demo-hint">
-                            <i class="bi bi-info-circle"></i>
-                            <div>
-                                بۆ تاقیکردنەوە: User <code>demo@kashery.local</code> · Pass <code>123456</code>
-                            </div>
-                        </div>
-
                         <form method="POST" class="needs-validation" novalidate id="loginForm">
                             <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
                             <input type="hidden" name="remember" value="on">
