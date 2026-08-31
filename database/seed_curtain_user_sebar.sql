@@ -81,9 +81,11 @@ SELECT `id`, 1, 1, 1, 16, 'IQD', 'retail', 0, 'system'
 FROM `users` WHERE `email` = 'sebar.home@kasher.com' LIMIT 1
 ON DUPLICATE KEY UPDATE `pos_show_zero_stock_products` = 1;
 
--- 7. یەکەکانی پێوانەی پەردە (مەتر، دانە، سانتیمەتر)
+-- 7. یەکەکانی پێوانەی پەردە (مەتر، تۆپ، دانە، سانتیمەتر)
 INSERT INTO `units` (`user_id`, `name`, `name_en`, `symbol`, `is_default`, `is_active`)
 SELECT `id`, 'مەتر', 'Meter', 'm', 1, 1 FROM `users` WHERE `email` = 'sebar.home@kasher.com'
+UNION ALL
+SELECT `id`, 'تۆپ', 'Roll', 'top', 0, 1 FROM `users` WHERE `email` = 'sebar.home@kasher.com'
 UNION ALL
 SELECT `id`, 'دانە / پارچە', 'Piece', 'pc', 0, 1 FROM `users` WHERE `email` = 'sebar.home@kasher.com'
 UNION ALL

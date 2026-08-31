@@ -1107,11 +1107,26 @@ include __DIR__ . '/includes/curtain_fabric_size_fields.php';
             const rightSel = document.getElementById('unitConvRightSelect');
             const fEl = document.getElementById('unitConversionFactorInput');
             const qEl = document.getElementById('unitConversionQuestion');
+            const calcEl = document.getElementById('unitConversionCalcHint');
             if (!leftSel || !rightSel || !qEl) return;
             const leftName = leftSel.selectedIndex >= 0 ? leftSel.options[leftSel.selectedIndex].textContent : '';
             const rightName = rightSel.selectedIndex >= 0 ? rightSel.options[rightSel.selectedIndex].textContent : '';
             const n = fEl && fEl.value ? fEl.value : '؟';
-            qEl.textContent = `١ ${leftName} = ${n} ${rightName}`;
+            qEl.innerHTML = `<span class="badge bg-primary fs-6 px-3 py-2">١ ${leftName} = ${n} ${rightName}</span>`;
+
+            if (calcEl) {
+                if (leftName.includes('تۆپ') || rightName.includes('تۆپ') || leftName.includes('مەتر') || rightName.includes('مەتر')) {
+                    const factorNum = parseFloat(n) || 0;
+                    calcEl.innerHTML = `
+                        <div class="alert alert-info py-2 px-3 mt-2 mb-0 small">
+                            <i class="bi bi-calculator me-1"></i>
+                            <strong>یاسای حیسابکردن:</strong> قەبارەی قوماش (بە مەتر) = <strong>ژمارەی تۆپ × ${factorNum > 0 ? factorNum : 'مەتری تۆپ'}</strong>
+                        </div>
+                    `;
+                } else {
+                    calcEl.innerHTML = '';
+                }
+            }
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -1317,11 +1332,17 @@ include __DIR__ . '/includes/curtain_fabric_size_fields.php';
             const stockClass = isPrimary ? 'unit-stock-primary' : 'unit-stock-derived';
             const minClass = isPrimary ? 'unit-stock-primary' : 'unit-stock-derived';
 
+            const primaryUnitName = (units.find(u => u.is_default == 1) || units[0] || {}).name || 'مەتر';
+            const ratioBadge = !isPrimary && factorVal != 1 
+                ? `<span class="badge bg-info-subtle text-info-emphasis border border-info-subtle ms-2"><i class="bi bi-link-45deg"></i> ١ ${unitName} = ${factorVal} ${primaryUnitName}</span>` 
+                : '';
+
             return `
                 <div class="card-header d-flex justify-content-between align-items-center pf-unit-head">
                     <h6 class="mb-0">
                         <i class="bi bi-rulers"></i> ${unitName} ${unitSymbol ? '(' + unitSymbol + ')' : ''}
                         ${isPrimary ? '<span class="badge bg-primary ms-2">یەکەی بنەڕەت</span>' : ''}
+                        ${ratioBadge}
                     </h6>
                     <div class="d-flex gap-2">
                         ${unitsManageEnabled ? `<button type="button" class="btn btn-sm btn-outline-danger remove-unit">
@@ -1576,16 +1597,27 @@ include __DIR__ . '/includes/curtain_fabric_size_fields.php';
                 <div class="modal-body">
                     <p class="text-muted small mb-3">
                         <i class="bi bi-info-circle"></i>
-                        ڕێژەی نێوان یەکەکان دیاری بکە. یەکەکان بگۆڕە بۆ ئەوەی بتوانیت ژمارەیەکی تەواو بنووسیت (نموونە: ١٢).
+                        ڕێژەی نێوان یەکەکان دیاری بکە (بۆ نموونە: <strong>ئەم تۆپە چەند مەترە؟</strong>).
                     </p>
                     <div class="d-flex align-items-center flex-wrap gap-2">
                         <span class="fw-semibold">١</span>
                         <select id="unitConvLeftSelect" class="form-select" style="width:auto; min-width:120px;"></select>
                         <span class="fw-semibold">=</span>
-                        <input type="number" class="form-control" id="unitConversionFactorInput" style="width:110px;" min="0.0001" step="any" placeholder="نموونە: ١٢">
+                        <input type="number" class="form-control" id="unitConversionFactorInput" style="width:110px;" min="0.0001" step="any" placeholder="مەتری تۆپ">
                         <select id="unitConvRightSelect" class="form-select" style="width:auto; min-width:120px;"></select>
                     </div>
+
+                    <!-- Quick buttons for common curtain roll lengths -->
+                    <div class="d-flex flex-wrap gap-1 mt-2 align-items-center">
+                        <span class="small text-muted me-1">هەڵبژاردنی خێرا:</span>
+                        <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 rounded-pill" onclick="document.getElementById('unitConversionFactorInput').value='20'; updateConversionPreview();">٢٠ مەتر</button>
+                        <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 rounded-pill" onclick="document.getElementById('unitConversionFactorInput').value='25'; updateConversionPreview();">٢٥ مەتر</button>
+                        <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 rounded-pill" onclick="document.getElementById('unitConversionFactorInput').value='30'; updateConversionPreview();">٣٠ مەتر</button>
+                        <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 rounded-pill" onclick="document.getElementById('unitConversionFactorInput').value='50'; updateConversionPreview();">٥٠ مەتر</button>
+                    </div>
+
                     <p id="unitConversionQuestion" class="fw-semibold mt-3 mb-0 text-primary"></p>
+                    <div id="unitConversionCalcHint"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">پاشگەزبوونەوە</button>

@@ -18,9 +18,9 @@ $isCli = (PHP_SAPI === 'cli');
 
 $targetEmail = 'sebar.home@kasher.com';
 $targetPassword = '87654321';
-$targetBusinessName = 'دوکانی پەردەی سێبار هۆم (Sebar Home)';
+$targetBusinessName = 'دوکانی پەردەی سێبەر هۆم';
 $targetPhone = '07500000000';
-$targetAddress = 'هەولێر - کوردستان';
+$targetAddress = 'سلێمانی - کوردستان';
 
 function provisionCurtainShopUser(mysqli $conn, string $email, string $password, string $businessName, string $phone, string $address): array {
     global $isCli;
@@ -136,6 +136,7 @@ function provisionCurtainShopUser(mysqli $conn, string $email, string $password,
     // 7. زیادکردنی یەکەکانی پێوانەی پەردە (Units)
     $units = [
         ['name' => 'مەتر', 'name_en' => 'Meter', 'symbol' => 'm', 'is_default' => 1],
+        ['name' => 'تۆپ', 'name_en' => 'Roll', 'symbol' => 'top', 'is_default' => 0],
         ['name' => 'دانە / پارچە', 'name_en' => 'Piece', 'symbol' => 'pc', 'is_default' => 0],
         ['name' => 'سانتیمەتر', 'name_en' => 'Centimeter', 'symbol' => 'cm', 'is_default' => 0]
     ];
