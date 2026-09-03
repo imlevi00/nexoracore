@@ -316,21 +316,98 @@
             return roundPriceByCurrency(Math.max(0, paidAmount - finalAmount), POS.currentCurrency);
         }
 
-        function updateQuantityInput(index, newQuantity) {
+        function updateQuantityInput(index, newQuantity, element) {
             if (index >= 0 && index < POS.cart.length) {
                 const item = POS.cart[index];
-                const quantity = parseFloat(newQuantity);
-                
-                if (quantity <= 0) {
-                    removeFromCart(index);
+                const qtyStr = String(newQuantity ?? '').trim();
+                if (qtyStr === '' || qtyStr === '.') return;
+
+                const quantity = parseFloat(qtyStr);
+                if (isNaN(quantity) || quantity <= 0) {
+                    if (!element) {
+                        removeFromCart(index);
+                    }
                     return;
                 }
                 
                 item.quantity = quantity;
                 item.total = roundPriceByCurrency(item.quantity * item.price, POS.currentCurrency);
                 
+                const factor = parseFloat(item.conversion_factor) || 1;
+                const totalMeters = Number((quantity * factor).toFixed(3));
+
+                if (element) {
+                    const row = element.closest('tr');
+                    if (row) {
+                        const meterInput = row.querySelector('.fabric-meter-input');
+                        if (meterInput && document.activeElement !== meterInput) {
+                            meterInput.value = totalMeters;
+                        }
+                        const totalInput = row.querySelector('.total-input');
+                        if (totalInput && document.activeElement !== totalInput) {
+                            totalInput.value = item.total;
+                        }
+                    }
+                    updateTotalDisplay();
+                    saveCartToStorage();
+                } else {
+                    updateCartDisplay();
+                    saveCartToStorage();
+                }
+            }
+        }
+
+        function updateCartFabricMeters(index, newMeters, element) {
+            if (index >= 0 && index < POS.cart.length) {
+                const item = POS.cart[index];
+                const metersStr = String(newMeters ?? '').trim();
+                if (metersStr === '' || metersStr === '.') return;
+
+                const meters = parseFloat(metersStr);
+                if (isNaN(meters) || meters <= 0) return;
+
+                const factor = parseFloat(item.conversion_factor) || 1;
+                const unitName = (item.unit_name || '').trim();
+                
+                if (unitName.includes('تۆپ') || (factor > 1 && !unitName.includes('مەتر') && !unitName.includes('سم'))) {
+                    item.quantity = Math.round((meters / factor) * 1000) / 1000;
+                } else {
+                    item.quantity = meters;
+                }
+                
+                item.total = roundPriceByCurrency(item.quantity * item.price, POS.currentCurrency);
+
+                if (element) {
+                    const row = element.closest('tr');
+                    if (row) {
+                        const qtyInput = row.querySelector('.quantity-input');
+                        if (qtyInput && document.activeElement !== qtyInput) {
+                            qtyInput.value = item.quantity;
+                        }
+                        const totalInput = row.querySelector('.total-input');
+                        if (totalInput && document.activeElement !== totalInput) {
+                            totalInput.value = item.total;
+                        }
+                    }
+                    updateTotalDisplay();
+                    saveCartToStorage();
+                } else {
+                    updateCartDisplay();
+                    saveCartToStorage();
+                }
+            }
+        }
+
+        function finishCartFabricMeters(index, newMeters, element) {
+            if (index >= 0 && index < POS.cart.length) {
+                const item = POS.cart[index];
+                const meters = parseFloat(newMeters);
+                if (isNaN(meters) || meters <= 0) {
+                    updateCartDisplay();
+                    return;
+                }
+                updateCartFabricMeters(index, newMeters, element);
                 updateCartDisplay();
-                saveCartToStorage();
             }
         }
 

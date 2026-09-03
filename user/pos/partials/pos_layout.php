@@ -181,7 +181,7 @@
                             <button class="numpad-btn btn-number" data-value="7">7</button>
                             <button class="numpad-btn btn-number" data-value="8">8</button>
                             <button class="numpad-btn btn-number" data-value="9">9</button>
-                            <button class="numpad-btn btn-number" data-value="000">000</button>
+                            <button class="numpad-btn btn-number fw-bold fs-4" data-value="." title="خاڵ / پۆینت">.</button>
                             <button class="numpad-btn btn-number" data-value="0">0</button>
                             <button class="numpad-btn btn-action" data-action="backspace"><i class="bi bi-backspace"></i></button>
                         </div>
@@ -388,19 +388,20 @@
                     <table class="cart-table" id="cartTable">
                         <thead>
                             <tr>
-                                <th style="width: 5%;">ژ</th>
-                                <th style="width: 24%;">ناوی کاڵا</th>
-                                <th style="width: 12%;">بارکۆد</th>
-                                <th style="width: 8%;">یەکە</th>
-                                <th style="width: 10%;">نرخ</th>
-                                <th style="width: 15%;">بڕ</th>
-                                <th style="width: 14%;">کۆی نرخ</th>
-                                <th style="width: 5%;">سڕینەوە</th>
+                                <th style="width: 4%; text-align: center;">ژ</th>
+                                <th style="width: 20%; text-align: right;">ناوی کاڵا</th>
+                                <th style="width: 10%; text-align: center;">بارکۆد</th>
+                                <th style="width: 8%; text-align: center;">یەکە</th>
+                                <th style="width: 13%; text-align: center;">قیاس (مەتر)</th>
+                                <th style="width: 11%; text-align: center;">نرخ</th>
+                                <th style="width: 13%; text-align: center;">بڕ</th>
+                                <th style="width: 16%; text-align: center;">کۆی نرخ</th>
+                                <th style="width: 5%; text-align: center;">سڕینەوە</th>
                             </tr>
                         </thead>
                         <tbody id="cartTableBody">
                             <tr>
-                                <td colspan="8" class="text-center py-5 text-muted">
+                                <td colspan="9" class="text-center py-5 text-muted">
                                     <i class="bi bi-cart-x display-4 mb-3"></i>
                                     <p>سەبەتە بەتاڵە</p>
                                 </td>

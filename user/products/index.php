@@ -967,9 +967,11 @@ $filterBaseQs = 'search=' . urlencode($search) . '&category=' . urlencode((strin
                 <a href="<?php echo url('user/products/categories.php'); ?>" class="pl-btn pl-btn-ghost">
                     <i class="bi bi-tags"></i> کەتەلۆگەکان
                 </a>
+                <?php if (empty($isCurtainShopMode)): ?>
                 <a href="<?php echo url('user/products/expired.php'); ?>" class="pl-btn pl-btn-warn">
                     <i class="bi bi-calendar-x"></i> بەسەرچووەکان
                 </a>
+                <?php endif; ?>
                 <?php if ($totalProducts > 20 && !$show_all): ?>
                     <a href="?page=1&search=<?php echo urlencode($search); ?>&category=<?php echo $category_filter; ?>&filter=<?php echo $stock_filter; ?>&show_all=1"
                        class="pl-btn pl-btn-ghost">
@@ -1280,7 +1282,7 @@ $filterBaseQs = 'search=' . urlencode($search) . '&category=' . urlencode((strin
                                         }
                                         
                                         $isExpired = false;
-                                        if ($product['expiry_date'] && strtotime($product['expiry_date']) <= time()) {
+                                        if (empty($isCurtainShopMode) && $product['expiry_date'] && strtotime($product['expiry_date']) <= time()) {
                                             $isExpired = true;
                                         }
 
@@ -1342,14 +1344,16 @@ $filterBaseQs = 'search=' . urlencode($search) . '&category=' . urlencode((strin
                                                         <?php if ($isLossProduct): ?>
                                                             <br><span class="pl-loss-badge"><i class="bi bi-graph-down-arrow"></i> بەزەرەر</span>
                                                         <?php endif; ?>
-                                                        <?php if ($isExpired): ?>
-                                                            <br><small class="text-danger">
-                                                                <i class="bi bi-calendar-x"></i> بەسەرچووە
-                                                            </small>
-                                                        <?php elseif ($product['expiry_date'] && strtotime($product['expiry_date']) <= strtotime('+30 days')): ?>
-                                                            <br><small class="text-warning">
-                                                                <i class="bi bi-clock"></i> نزیکە بەسەرچێت
-                                                            </small>
+                                                        <?php if (empty($isCurtainShopMode)): ?>
+                                                            <?php if ($isExpired): ?>
+                                                                <br><small class="text-danger">
+                                                                    <i class="bi bi-calendar-x"></i> بەسەرچووە
+                                                                </small>
+                                                            <?php elseif ($product['expiry_date'] && strtotime($product['expiry_date']) <= strtotime('+30 days')): ?>
+                                                                <br><small class="text-warning">
+                                                                    <i class="bi bi-clock"></i> نزیکە بەسەرچێت
+                                                                </small>
+                                                            <?php endif; ?>
                                                         <?php endif; ?>
                                                     </div>
                                                 </div>

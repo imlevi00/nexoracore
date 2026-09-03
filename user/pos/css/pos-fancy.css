@@ -686,18 +686,18 @@ body.pos-page {
 
 /* Total Display */
 .pos-page .total-display {
-  font-size: 2.25rem;
-  font-weight: 800;
+  font-size: 2.75rem;
+  font-weight: 900;
   letter-spacing: -0.02em;
   color: var(--pos-text-main);
-  background: linear-gradient(135deg, color-mix(in srgb, var(--pos-brand) 6%, var(--pos-surface)) 0%, color-mix(in srgb, var(--pos-accent) 6%, var(--pos-surface)) 100%);
-  border: 1.5px solid color-mix(in srgb, var(--pos-brand) 25%, var(--pos-border));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--pos-brand) 8%, var(--pos-surface)) 0%, color-mix(in srgb, var(--pos-accent) 8%, var(--pos-surface)) 100%);
+  border: 2px solid color-mix(in srgb, var(--pos-brand) 30%, var(--pos-border));
   border-radius: var(--pos-radius-md);
-  padding: 12px 18px;
-  margin-bottom: 12px;
+  padding: 14px 20px;
+  margin-bottom: 14px;
   text-align: center;
   font-variant-numeric: tabular-nums;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
   transition: all 0.2s ease;
 }
 

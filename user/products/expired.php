@@ -5,9 +5,16 @@ require_once '../../includes/theme_bootstrap.php';
 
 // تاقیکردنی دەسەڵاتی بەکارهێنەر
 SessionManager::requireAuth('user');
+require_once '../../includes/business_type_helpers.php';
 
 $currentUser = getCurrentUser();
 $userId = $currentUser['id'];
+
+$isCurtainShopMode = isCurtainShopMode($conn, (int)$userId);
+if ($isCurtainShopMode) {
+    flash('info', 'سیستەمی دوکانی پەردە بەرواری بەسەرچوونی نییە.');
+    redirect('user/products/index.php');
+}
 
 // Get filter parameters
 $filter = $_GET['filter'] ?? 'expired';

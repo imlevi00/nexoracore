@@ -6,6 +6,7 @@
 require_once '../../../config/config.php';
 require_once '../../../config/security.php';
 require_once '../../../includes/functions.php';
+require_once '../../../includes/business_type_helpers.php';
 
 SessionManager::requireAuth('user');
 
@@ -18,6 +19,7 @@ if (!$input || !Security::validateCSRFToken($input['csrf_token'] ?? '')) {
 
 $currentUser = getCurrentUser();
 $userId = $currentUser['id'];
+$isCurtainShopMode = isCurtainShopMode($conn, (int)$userId);
 
 try {
     // وەرگرتنی هەموو کاڵاکان
@@ -81,9 +83,9 @@ try {
             'currency' => $row['currency'] ?? 'IQD',
             'stock_quantity' => (int)($row['stock_quantity'] ?? 0),
             'min_stock' => (int)($row['min_stock'] ?? 0),
-            'expiry_date' => $row['expiry_date'],
-            'expiry_date_formatted' => $row['expiry_date_formatted'],
-            'is_expired' => (bool)$row['is_expired'],
+            'expiry_date' => $isCurtainShopMode ? null : $row['expiry_date'],
+            'expiry_date_formatted' => $isCurtainShopMode ? null : $row['expiry_date_formatted'],
+            'is_expired' => $isCurtainShopMode ? false : (bool)$row['is_expired'],
             'is_low_stock' => (bool)$row['is_low_stock'],
             'image_path' => $row['image_path'] ?? null,
             'image_url' => product_image_url($row['image_path'] ?? null),

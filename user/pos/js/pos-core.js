@@ -1,4 +1,4 @@
-﻿        function initializePOS() {
+        function initializePOS() {
             // console.log('POS System Initializing...');
             POS.defaultPriceType = normalizePriceType(POS.defaultPriceType);
             POS.currentPriceType = normalizePriceType(POS.currentPriceType || POS.defaultPriceType);

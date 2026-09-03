@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $name = cleanInput($_POST['name'] ?? '');
         $category_id = !empty($_POST['category_id']) ? (int)$_POST['category_id'] : null;
         $barcode = cleanInput($_POST['barcode'] ?? '');
-        $expiry_date = !empty($_POST['expiry_date']) ? $_POST['expiry_date'] : null;
+        $expiry_date = (!$isCurtainShopMode && !empty($_POST['expiry_date'])) ? $_POST['expiry_date'] : null;
         // No primary unit system - all units are equal
         $buy_price = (float)($_POST['buy_price'] ?? 0);
         $sell_price = (float)($_POST['sell_price'] ?? 0);
@@ -871,6 +871,7 @@ $csrf_token = Security::generateCSRFToken();
                                         </div>
 
                                         <!-- Expiry Date -->
+                                        <?php if (empty($isCurtainShopMode)): ?>
                                         <div class="col-md-6 mb-3">
                                             <label for="expiry_date" class="form-label">
                                                 <i class="bi bi-calendar-x"></i> بەرواری بەسەرچوون
@@ -878,6 +879,7 @@ $csrf_token = Security::generateCSRFToken();
                                             <input type="date" class="form-control" id="expiry_date" name="expiry_date" 
                                                    value="<?php echo $product['expiry_date']; ?>">
                                         </div>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>
@@ -1170,14 +1172,14 @@ $csrf_token = Security::generateCSRFToken();
                         
                         <div class="mt-3">
                             <?php
-                            $status = getProductStatus($totalStock, $totalMinStock, $product['expiry_date']);
+                            $status = getProductStatus($totalStock, $totalMinStock, empty($isCurtainShopMode) ? $product['expiry_date'] : null);
                             ?>
                             <div class="d-flex align-items-center">
                                 <span class="badge bg-<?php echo $status['class']; ?> me-2">
                                     <?php echo $status['text']; ?>
                                 </span>
                                 
-                                <?php if ($product['expiry_date']): ?>
+                                <?php if (empty($isCurtainShopMode) && $product['expiry_date']): ?>
                                     <small class="text-muted">
                                         بەسەرچوون: <?php echo date('Y/m/d', strtotime($product['expiry_date'])); ?>
                                     </small>

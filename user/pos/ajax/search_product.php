@@ -6,6 +6,7 @@
 require_once '../../../config/config.php';
 require_once '../../../config/security.php';
 require_once '../../../includes/functions.php';
+require_once '../../../includes/business_type_helpers.php';
 
 // تاقیکردنی دەسەڵات
 SessionManager::requireAuth('user');
@@ -23,6 +24,7 @@ if (empty($query)) {
 
 $currentUser = getCurrentUser();
 $userId = $currentUser['id'];
+$isCurtainShopMode = isCurtainShopMode($conn, (int)$userId);
 
 try {
     // گەڕان بە بارکۆد یەکەم جار (لە products.barcode یان product_barcodes.barcode)
@@ -125,8 +127,8 @@ try {
         'special_price' => (float)$product['special_price'],
         'stock_quantity' => (int)$product['stock_quantity'],
         'min_stock' => (int)$product['min_stock'],
-        'expiry_date' => $product['expiry_date'],
-        'is_expired' => (bool)$product['is_expired'],
+        'expiry_date' => $isCurtainShopMode ? null : $product['expiry_date'],
+        'is_expired' => $isCurtainShopMode ? false : (bool)$product['is_expired'],
         'image_path' => $product['image_path'] ?? null,
         'image_url' => product_image_url($product['image_path'] ?? null),
         'created_at' => $product['created_at'],
@@ -141,10 +143,12 @@ try {
     // تاقیکردنەوەی ئاگاداریەکان
     $warnings = [];
     
-    if ($productData['is_expired']) {
-        $warnings[] = 'بەسەرچووە';
-    } elseif ($product['expiry_date'] && strtotime($product['expiry_date']) <= strtotime('+7 days')) {
-        $warnings[] = 'بەم نزیکانە بەسەردەچێت';
+    if (empty($isCurtainShopMode)) {
+        if ($productData['is_expired']) {
+            $warnings[] = 'بەسەرچووە';
+        } elseif ($product['expiry_date'] && strtotime($product['expiry_date']) <= strtotime('+7 days')) {
+            $warnings[] = 'بەم نزیکانە بەسەردەچێت';
+        }
     }
     
     if ($productData['stock_quantity'] <= $productData['min_stock']) {

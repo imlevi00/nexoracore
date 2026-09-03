@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $name = cleanInput($_POST['name'] ?? '');
         $category_id = !empty($_POST['category_id']) ? (int)$_POST['category_id'] : null;
         $barcode = cleanInput($_POST['barcode'] ?? '');
-        $expiry_date = !empty($_POST['expiry_date']) ? $_POST['expiry_date'] : null;
+        $expiry_date = (!$isCurtainShopMode && !empty($_POST['expiry_date'])) ? $_POST['expiry_date'] : null;
         // No primary unit system - all units are equal
         $buy_price = (float)($_POST['buy_price'] ?? 0);
         $sell_price = (float)($_POST['sell_price'] ?? 0);
@@ -575,6 +575,7 @@ include __DIR__ . '/includes/curtain_fabric_size_fields.php';
 </div>
 
                                         <!-- Expiry Date -->
+                                        <?php if (empty($isCurtainShopMode)): ?>
                                         <div class="col-md-6 mb-3">
                                             <label for="expiry_date" class="form-label">
                                                 <i class="bi bi-calendar-x"></i> بەرواری بەسەرچوون
@@ -583,6 +584,7 @@ include __DIR__ . '/includes/curtain_fabric_size_fields.php';
                                                    value="<?php echo $_POST['expiry_date'] ?? ''; ?>">
                                             <div class="form-text">ئەگەر کاڵاکە بەسەر ناچێت، بەتاڵ جێی بهێڵە</div>
                                         </div>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>

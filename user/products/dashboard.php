@@ -17,6 +17,9 @@ $userId = $currentUser['id'];
 $userPermissions = getUserPermissions($userId);
 $isSubUser = isset($currentUser['user_type']) && $currentUser['user_type'] === 'sub';
 
+require_once '../../includes/business_type_helpers.php';
+$isCurtainShopMode = isCurtainShopMode($conn, (int)$userId);
+
 $csrf_token = Security::generateCSRFToken();
 ?>
 
@@ -260,6 +263,7 @@ $csrf_token = Security::generateCSRFToken();
             </div>
             
             <!-- کاڵا بەسەرچووەکان (Expired Products) -->
+            <?php if (empty($isCurtainShopMode)): ?>
             <div class="dashboard-card-wrapper p-2">
                 <a href="<?php echo url('user/products/expired.php'); ?>" class="text-decoration-none">
                     <div class="dashboard-card section-inventory p-4 h-100">
@@ -272,6 +276,7 @@ $csrf_token = Security::generateCSRFToken();
                     </div>
                 </a>
             </div>
+            <?php endif; ?>
             <?php endif; ?>
 
             <?php if (!$isSubUser || (isset($userPermissions['categories']) && $userPermissions['categories'])): ?>

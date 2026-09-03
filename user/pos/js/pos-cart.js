@@ -334,7 +334,7 @@
             if (POS.cart.length === 0) {
                 cartTableBody.innerHTML = `
                     <tr>
-                        <td colspan="7" class="text-center py-5 text-muted">
+                        <td colspan="9" class="text-center py-5 text-muted">
                             <i class="bi bi-cart-x display-4 mb-3"></i>
                             <p>سەبەتە بەتاڵە</p>
                             <p class="small">کاڵاکان زیاد بکە</p>
@@ -354,6 +354,61 @@
             updateTabsDisplay();
         }
 
+        function renderCartFabricSizeField(item, index) {
+            if (!item) return '<span class="text-muted">-</span>';
+            const unitName = (item.unit_name || '').trim();
+            const factor = parseFloat(item.conversion_factor) || 1;
+            const qty = parseFloat(item.quantity) || 1;
+            const isRoll = unitName.includes('تۆپ') || (factor > 1 && !unitName.includes('مەتر') && !unitName.includes('سم'));
+            const isMeter = unitName.includes('مەتر');
+
+            // Total meters calculated for this row
+            let calculatedMeters = Number((qty * factor).toFixed(3)).toString();
+            if (calculatedMeters.endsWith('.000')) calculatedMeters = parseInt(calculatedMeters, 10).toString();
+
+            let extraBadges = [];
+            if (isRoll) {
+                extraBadges.push(`<small class="text-primary fw-bold" style="font-size: 0.72rem;">١ تۆپ = ${factor} مەتر</small>`);
+            }
+
+            if (item.fabric_width || item.fabric_height) {
+                const w = item.fabric_width ? parseFloat(item.fabric_width) : '';
+                const h = item.fabric_height ? parseFloat(item.fabric_height) : '';
+                const u = item.fabric_measure_unit === 'm' ? 'م' : 'سم';
+                let dimText = '';
+                if (w && h) dimText = `قیاس: ${w} × ${h} ${u}`;
+                else if (h) dimText = `بەرزی: ${h} ${u}`;
+                else if (w) dimText = `درێژی: ${w} ${u}`;
+                if (dimText) {
+                    extraBadges.push(`<span class="badge bg-light text-secondary border px-1" style="font-size: 0.7rem;">${dimText}</span>`);
+                }
+            }
+
+            if (item.fabric_color) {
+                extraBadges.push(`<span class="badge bg-secondary-subtle text-secondary-emphasis border px-1" style="font-size: 0.7rem;"><i class="bi bi-palette me-1"></i>${item.fabric_color}</span>`);
+            }
+
+            return `
+                <div class="d-inline-flex flex-column align-items-center">
+                    <div class="input-group input-group-sm" style="width: 105px;">
+                        <input type="number" 
+                               class="form-control form-control-sm text-center fabric-meter-input numpad-target" 
+                               value="${calculatedMeters}" 
+                               min="0.001" step="any" inputmode="decimal"
+                               data-index="${index}"
+                               oninput="updateCartFabricMeters(${index}, this.value, this)"
+                               onchange="updateCartFabricMeters(${index}, this.value, this)"
+                               onblur="finishCartFabricMeters(${index}, this.value, this)"
+                               onfocus="selectAllInputValue(this)"
+                               onclick="selectAllInputValue(this); openNumPad(this, 'قیاسی مەتر')"
+                               style="font-weight: 700;">
+                        <span class="input-group-text bg-body-secondary px-1 small fw-semibold">مەتر</span>
+                    </div>
+                    ${extraBadges.length > 0 ? `<div class="d-flex flex-wrap justify-content-center gap-1 mt-1">${extraBadges.join('')}</div>` : ''}
+                </div>
+            `;
+        }
+
         function createCartTableRow(item, index) {
             const priceTypeNames = {
                 'retail': 'تاک',
@@ -369,31 +424,34 @@
             
             return `
                 <tr class="slide-up" style="background-color: ${((document.documentElement.getAttribute('data-bs-theme') || 'light') === 'dark') ? (index % 2 === 0 ? '#111827' : '#1f2937') : (index % 2 === 0 ? '#ffffff' : '#f5f5f5')};">
-                    <td>${index + 1}</td>
-                    <td class="text-end">
+                    <td class="text-center fw-bold text-muted" style="vertical-align: middle;">${index + 1}</td>
+                    <td class="text-end" style="vertical-align: middle;">
                         <div>
                             <strong>${item.name}</strong>
                             <br><span class="badge ${priceTypeBadges[item.price_type] || 'bg-secondary'} badge-sm">${priceTypeNames[item.price_type] || 'تاک'}</span>
                         </div>
                     </td>
-                    <td class="text-center">
-                        <small class="text-muted">${item.barcode || '-'}</small>
+                    <td class="text-center" style="vertical-align: middle;">
+                        <small class="text-muted fw-semibold">${item.barcode || '-'}</small>
                     </td>
-                    <td class="text-center">
+                    <td class="text-center" style="vertical-align: middle;">
                         ${item.unit_options && item.unit_options.length > 1 ? 
                             `<select class="form-select form-select-sm unit-dropdown" 
                                      onchange="changeCartItemUnit(${index}, this.value)"
                                      style="min-width: 80px;">
-                                ${item.unit_options.map(unit => 
-                                    `<option value="${unit.unit_id}" ${unit.unit_id === item.unit_id ? 'selected' : ''}>
-                                        ${unit.unit_name} ${unit.unit_symbol ? `(${unit.unit_symbol})` : ''}
-                                    </option>`
-                                ).join('')}
-                            </select>` :
-                            `<span class="text-muted">${item.unit_name || 'دانە'}</span>`
+                                 ${item.unit_options.map(unit => 
+                                     `<option value="${unit.unit_id}" ${unit.unit_id === item.unit_id ? 'selected' : ''}>
+                                         ${unit.unit_name} ${unit.unit_symbol ? `(${unit.unit_symbol})` : ''}
+                                     </option>`
+                                 ).join('')}
+                             </select>` :
+                            `<span class="badge bg-body-secondary text-dark border px-2 py-1">${item.unit_name || 'دانە'}</span>`
                         }
                     </td>
-                    <td>
+                    <td class="text-center" style="vertical-align: middle;">
+                        ${renderCartFabricSizeField(item, index)}
+                    </td>
+                    <td class="text-center" style="vertical-align: middle;">
                         ${POS.canEditPrice !== false ? `
                         <input type="number" class="form-control form-control-sm price-input numpad-target"
                                value="${item.price}"
@@ -403,28 +461,30 @@
                                onblur="updatePrice(${index}, this.value, this)"
                                onfocus="selectAllInputValue(this)"
                                onclick="selectAllInputValue(this); openNumPad(this, 'گۆڕینی نرخ')"
-                               style="min-width: 80px; text-align: center;">
+                               style="min-width: 85px; text-align: center; font-weight: 600;">
                         ` : `
                         <input type="number" class="form-control form-control-sm price-input"
                                value="${item.price}" readonly tabindex="-1"
-                               style="min-width: 80px; text-align: center; background-color: #e9ecef; cursor: not-allowed;">
+                               style="min-width: 85px; text-align: center; font-weight: 600; background-color: #e9ecef; cursor: not-allowed;">
                         `}
                     </td>
-                    <td>
-                        <div class="quantity-controls">
+                    <td class="text-center" style="vertical-align: middle;">
+                        <div class="quantity-controls d-inline-flex">
                             <button class="quantity-btn" onclick="updateQuantity(${index}, -1)">
                                 <i class="bi bi-dash"></i>
                             </button>
                             <input type="number" class="quantity-input numpad-target" value="${item.quantity}" 
-                                   min="0.01" step="0.01"
-                                   onclick="openNumPad(this, 'گۆڕینی بڕ')"
-                                   onchange="updateQuantityInput(${index}, this.value)">
+                                   min="0.001" step="any" inputmode="decimal"
+                                   onclick="selectAllInputValue(this); openNumPad(this, 'گۆڕینی بڕ')"
+                                   oninput="updateQuantityInput(${index}, this.value, this)"
+                                   onchange="updateQuantityInput(${index}, this.value, this)"
+                                   style="font-weight: 700;">
                             <button class="quantity-btn" onclick="updateQuantity(${index}, 1)">
                                 <i class="bi bi-plus"></i>
                             </button>
                         </div>
                     </td>
-                    <td>
+                    <td class="text-center" style="vertical-align: middle;">
                         ${POS.canEditTotal !== false ? `
                         <input type="number" class="form-control form-control-sm total-input numpad-target"
                                value="${item.total}"
@@ -434,20 +494,22 @@
                                onblur="updateTotal(${index}, this.value, this)"
                                onfocus="selectAllInputValue(this)"
                                onclick="selectAllInputValue(this); openNumPad(this, 'گۆڕینی کۆی گشتی')"
-                               style="min-width: 90px; text-align: center; font-weight: bold;"
+                               style="min-width: 100px; text-align: center; font-weight: 800; font-size: 1.15rem; color: #1d4ed8; background: #f8fafc; border: 1.5px solid #93c5fd;"
                                ${POS.canViewProfits ? `title="کلیک بکە بۆ بینینی قازانج"
                                onmouseenter="this.style.cursor='pointer'"
                                ondblclick="showItemProfitCard(${index})"` : ''}>
                         ` : `
                         <input type="number" class="form-control form-control-sm total-input"
                                value="${item.total}" readonly tabindex="-1"
-                               style="min-width: 90px; text-align: center; font-weight: bold; background-color: #e9ecef; cursor: not-allowed;"
+                               style="min-width: 100px; text-align: center; font-weight: 800; font-size: 1.15rem; color: #1d4ed8; background-color: #f1f5f9; cursor: not-allowed;"
                                ${POS.canViewProfits ? `title="دووجار کلیک بکە بۆ بینینی قازانج"
                                ondblclick="showItemProfitCard(${index})"` : ''}>
                         `}
                     </td>
-                    <td>
-                        <i class="bi bi-trash delete-btn" onclick="removeFromCart(${index})"></i>
+                    <td class="text-center" style="vertical-align: middle;">
+                        <button type="button" class="btn btn-sm btn-outline-danger border-0 p-1" onclick="removeFromCart(${index})" title="سڕینەوە">
+                            <i class="bi bi-trash fs-5"></i>
+                        </button>
                     </td>
                 </tr>
             `;

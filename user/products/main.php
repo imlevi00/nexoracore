@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * داشبۆردی کاڵاکان - user/products/main.php
  */
@@ -43,12 +43,14 @@ if ($settingsStmt) {
     }
 }
 
+require_once '../../includes/business_type_helpers.php';
+$isCurtainShopMode = isCurtainShopMode($conn, (int)$userId);
+
 // ژماردنی کاڵای کەم، تەواوبوو و بەسەرچوو بۆ نیشاندانی نیشانە (badge) لەسەر کارتەکان
 $lowStockCount = 0;
 $outOfStockCount = 0;
 $expiredCount = 0;
 
-// دەرکردنی کاڵاکانی قەپانی زیرەک وەک لیستی کاڵاکان (index.php)
 $excludeScaleClause = '';
 $scaleCheck = $conn->query("SHOW TABLES LIKE 'scale_products'");
 if ($scaleCheck && $scaleCheck->num_rows > 0) {
@@ -59,8 +61,6 @@ if ($scaleCheck) {
 }
 
 // پێناسەی «تەواوبوو» = هیچ یەکەیەک بڕی بەردەستی > 0 نییە (هەمان لۆجیکی index.php/POS).
-// ئەمە دڵنیایی دەداتەوە کاڵای خاوەن بەردەست بە هەڵە وەک تەواوبوو نەژمێردرێت، بەبێ گرنگیدان
-// بەوەی بڕەکە لە کام یەکەدایە.
 $hasPositiveStockExpr = "EXISTS (
     SELECT 1 FROM product_units pu_pos
     WHERE pu_pos.product_id = p.id AND pu_pos.stock_quantity > 0
@@ -148,11 +148,7 @@ if ($lossStmt = $conn->prepare($lossSql)) {
     $lossStmt->close();
 }
 
-// کاڵا بەسەرچووەکان: بەرواری بەسەرچوونی هەیە، تێپەڕیوە، و بڕی بەردەستی زیاترە لە سفر.
-// دەبێت هەمان مەرجی expired.php بەکاربێت (بڕی بەردەست > 0)، بۆ ئەوەی ژمارەی
-// نیشانەکە (badge) دەقاودەق یەکسان بێت لەگەڵ ئەو کاڵایانەی لە پەڕەی بەسەرچووەکان
-// پیشان دەدرێن. ئەو کاڵایانەی بەسەرچوون بەڵام بڕی بەردەستیان سفرە، لە لیستەکە
-// دەرناکەون، بۆیە نابێت لە ژمارەکەشدا بژمێردرێن.
+// کاڵا بەسەرچووەکان
 $expiredSql = "
     SELECT COUNT(*) AS c
     FROM products p
@@ -219,8 +215,6 @@ $csrf_token = Security::generateCSRFToken();
         <div class="row g-3 mb-4">
             
             <?php if (!$isSubUser || (isset($userPermissions['products']) && $userPermissions['products'])): ?>
-     
-            
             <!-- بەڕێوەبردنی کاڵا (Product Management) -->
             <div class="dashboard-card-wrapper p-2">
                 <a href="<?php echo url('user/products/index.php'); ?>" class="text-decoration-none">
@@ -249,8 +243,8 @@ $csrf_token = Security::generateCSRFToken();
                 </a>
             </div>
 
-                   <!-- کاڵای نوێ (Inventory) -->
-                   <div class="dashboard-card-wrapper p-2">
+            <!-- کاڵای نوێ (Inventory) -->
+            <div class="dashboard-card-wrapper p-2">
                 <a href="<?php echo url('user/products/add.php'); ?>" class="text-decoration-none">
                     <div class="dashboard-card section-inventory p-4 h-100">
                         <div class="text-center text-white">
@@ -263,6 +257,7 @@ $csrf_token = Security::generateCSRFToken();
                 </a>
             </div>
 
+            <?php if (empty($isCurtainShopMode)): ?>
             <div class="dashboard-card-wrapper p-2">
                 <a href="<?php echo url('user/products/scale_settings.php'); ?>" class="text-decoration-none">
                     <div class="dashboard-card section-products p-4 h-100">
@@ -288,6 +283,7 @@ $csrf_token = Security::generateCSRFToken();
                     </div>
                 </a>
             </div>
+            <?php endif; ?>
 
             <div class="dashboard-card-wrapper p-2">
                 <a href="<?php echo url('user/products/custom_fields.php'); ?>" class="text-decoration-none">
@@ -301,8 +297,6 @@ $csrf_token = Security::generateCSRFToken();
                     </div>
                 </a>
             </div>
-
-
             <?php endif; ?>
             
             <?php if (!$isSubUser || (isset($userPermissions['inventory']) && $userPermissions['inventory'])): ?>
@@ -341,6 +335,7 @@ $csrf_token = Security::generateCSRFToken();
             </div>
             
             <!-- کاڵا بەسەرچووەکان (Expired Products) -->
+            <?php if (empty($isCurtainShopMode)): ?>
             <div class="dashboard-card-wrapper p-2">
                 <a href="<?php echo url('user/products/expired.php'); ?>" class="text-decoration-none">
                     <div class="dashboard-card section-inventory p-4 h-100">
@@ -356,6 +351,7 @@ $csrf_token = Security::generateCSRFToken();
                     </div>
                 </a>
             </div>
+            <?php endif; ?>
             
             <!-- کاڵای نرخی کڕین زیاترە (Products with Purchase Price Higher or Equal) -->
             <div class="dashboard-card-wrapper p-2">
@@ -403,7 +399,6 @@ $csrf_token = Security::generateCSRFToken();
                     </div>
                 </a>
             </div>
-
             <?php endif; ?>
             
             <?php if (!$isSubUser || (isset($userPermissions['products']) && $userPermissions['products'])): ?>
@@ -459,5 +454,3 @@ $csrf_token = Security::generateCSRFToken();
 
 </body>
 </html>
-
-

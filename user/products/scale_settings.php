@@ -16,6 +16,12 @@ $userId = (int)$currentUser['id'];
 $userPermissions = getUserPermissions($userId);
 $isSubUser = isset($currentUser['user_type']) && $currentUser['user_type'] === 'sub';
 
+require_once '../../includes/business_type_helpers.php';
+if (isCurtainShopMode($conn, $userId)) {
+    setMessage('سیستەمی دوکانی پەردە بەشی قەپانی زیرەکی نییە.', 'info');
+    redirect(url('user/products/main.php'));
+}
+
 if ($isSubUser && empty($userPermissions['products'])) {
     setMessage('دەسەڵاتی بەڕێوەبردنی کاڵاکانت نییە', 'error');
     redirect(url('user/products/main.php'));
