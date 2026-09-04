@@ -877,12 +877,24 @@ function runSystemHealthCheck() {
  * @return bool
  */
 function cacheData($key, $data, $expiration = 3600) {
+    static $memoryCache = [];
+    $strKey = (string)$key;
+    $memoryCache[$strKey] = [
+        'data' => $data,
+        'expires' => time() + $expiration
+    ];
+
+    if (!defined('ROOT_PATH')) {
+        return true;
+    }
+
     $cacheDir = ROOT_PATH . '/cache';
     if (!is_dir($cacheDir)) {
-        createSecureDirectory($cacheDir);
+        @mkdir($cacheDir, 0777, true);
+        @chmod($cacheDir, 0777);
     }
     
-    $cacheFile = $cacheDir . '/' . md5((string)$key) . '.cache';
+    $cacheFile = $cacheDir . '/' . md5($strKey) . '.cache';
     
     $cacheData = [
         'data' => $data,
@@ -890,7 +902,14 @@ function cacheData($key, $data, $expiration = 3600) {
         'created' => time()
     ];
     
-    return file_put_contents($cacheFile, serialize($cacheData)) !== false;
+    $serialized = serialize($cacheData);
+    $result = @file_put_contents($cacheFile, $serialized, LOCK_EX);
+    if ($result === false && is_dir($cacheDir)) {
+        @chmod($cacheDir, 0777);
+        $result = @file_put_contents($cacheFile, $serialized);
+    }
+    
+    return $result !== false;
 }
 
 /**
@@ -900,14 +919,33 @@ function cacheData($key, $data, $expiration = 3600) {
  * @return mixed
  */
 function getCachedData($key) {
-    $cacheDir = ROOT_PATH . '/cache';
-    $cacheFile = $cacheDir . '/' . md5((string)$key) . '.cache';
+    static $memoryCache = [];
+    $strKey = (string)$key;
     
-    if (!file_exists($cacheFile)) {
+    if (isset($memoryCache[$strKey])) {
+        if (time() <= $memoryCache[$strKey]['expires']) {
+            return $memoryCache[$strKey]['data'];
+        }
+        unset($memoryCache[$strKey]);
+    }
+
+    if (!defined('ROOT_PATH')) {
+        return false;
+    }
+
+    $cacheDir = ROOT_PATH . '/cache';
+    $cacheFile = $cacheDir . '/' . md5($strKey) . '.cache';
+    
+    if (!@file_exists($cacheFile)) {
         return false;
     }
     
-    $cacheData = unserialize(file_get_contents($cacheFile));
+    $content = @file_get_contents($cacheFile);
+    if ($content === false || $content === '') {
+        return false;
+    }
+
+    $cacheData = @unserialize($content);
     if (!is_array($cacheData) || !isset($cacheData['expires'])) {
         return false;
     }
@@ -917,6 +955,11 @@ function getCachedData($key) {
         @unlink($cacheFile);
         return false;
     }
+    
+    $memoryCache[$strKey] = [
+        'data' => $cacheData['data'] ?? false,
+        'expires' => $cacheData['expires']
+    ];
     
     return $cacheData['data'] ?? false;
 }
@@ -928,10 +971,18 @@ function getCachedData($key) {
  * @return bool
  */
 function deleteCachedData($key) {
+    static $memoryCache = [];
+    $strKey = (string)$key;
+    unset($memoryCache[$strKey]);
+
+    if (!defined('ROOT_PATH')) {
+        return true;
+    }
+
     $cacheDir = ROOT_PATH . '/cache';
-    $cacheFile = $cacheDir . '/' . md5((string)$key) . '.cache';
+    $cacheFile = $cacheDir . '/' . md5($strKey) . '.cache';
     
-    if (file_exists($cacheFile)) {
+    if (@file_exists($cacheFile)) {
         return @unlink($cacheFile);
     }
     

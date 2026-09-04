@@ -20,6 +20,7 @@ define('ROOT_PATH', dirname(dirname(__FILE__)));
 define('ASSETS_PATH', rtrim(SITE_URL, '/') . '/assets');
 define('UPLOADS_PATH', ROOT_PATH . '/assets/uploads');
 define('UPLOADS_URL', rtrim(SITE_URL, '/') . '/assets/uploads');
+define('CACHE_PATH', ROOT_PATH . '/cache');
 
 // ڕێکخستنەکانی ئەپلۆد
 define('MAX_FILE_SIZE', 8 * 1024 * 1024); // 8MB
