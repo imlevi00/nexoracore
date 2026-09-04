@@ -11,6 +11,7 @@ require_once '../../includes/permissions.php';
 require_once '../../includes/zanyari_user_settings.php';
 require_once '../../includes/theme_bootstrap.php';
 require_once '../../includes/sale_return_service.php';
+require_once '../../includes/business_type_helpers.php';
 
 // تاقیکردنی داخڵبوون
 if (!isUser()) {
@@ -19,6 +20,7 @@ if (!isUser()) {
 
 $currentUser = getCurrentUser();
 $saleId = (int)($_GET['id'] ?? 0);
+$isCurtainShopMode = isCurtainShopMode($conn, (int)$currentUser['id']);
 
 if (!$saleId) {
     setMessage('ID ی فرۆشتن پێویستە', 'error');
@@ -194,9 +196,355 @@ if (array_key_exists('fields', $_GET)) {
 $receiptA4ItemsFontSize = getReceiptA4ItemsFontSize((int)($currentUser['id'] ?? 0));
 
 $pageTitle = "وەسڵی فرۆشتن #" . $saleId;
+
+// ══════════════════════════════════════════════════
+// وەسڵی تایبەتی دوکانی پەردە (Sebar Home Style)
+// ══════════════════════════════════════════════════
+if ($isCurtainShopMode):
+
+    // Number-to-Kurdish words helper for written total
+    function numberToKurdishWords(float $n): string {
+        $n = (int)round($n);
+        if ($n === 0) return 'سفر';
+        $ones = ['', 'یەک', 'دوو', 'سێ', 'چوار', 'پێنج', 'شەش', 'حەوت', 'هەشت', 'نۆ', 'دە',
+                 'یازدە', 'دوازدە', 'سێزدە', 'چواردە', 'پازدە', 'شازدە', 'حەڤدە', 'هەژدە', 'نۆزدە'];
+        $tens = ['', '', 'بیست', 'سی', 'چل', 'پەنجا', 'شەست', 'حەفتا', 'هەشتا', 'نەوەد'];
+        $hundreds = ['', 'سەد', 'دووسەد', 'سێسەد', 'چوارسەد', 'پێنجسەد', 'شەشسەد', 'حەوتسەد', 'هەشتسەد', 'نۆسەد'];
+        $parts = [];
+        $billions  = (int)floor($n / 1000000000); $n %= 1000000000;
+        $millions  = (int)floor($n / 1000000);    $n %= 1000000;
+        $thousands = (int)floor($n / 1000);       $n %= 1000;
+        $remainder = (int)$n;
+        if ($billions)  $parts[] = ($billions < 20 ? $ones[$billions] . ' ' : '') . 'ملیار';
+        if ($millions)  $parts[] = ($millions  < 20 ? $ones[$millions]  : ($tens[(int)($millions/10)]  . ($millions%10  ? ' و ' . $ones[$millions%10]  : ''))) . ' ملیۆن';
+        if ($thousands) $parts[] = ($thousands < 20 ? $ones[$thousands] : ($tens[(int)($thousands/10)] . ($thousands%10 ? ' و ' . $ones[$thousands%10] : ''))) . ' هەزار';
+        if ($remainder) {
+            $h = (int)floor($remainder / 100); $rem2 = $remainder % 100;
+            $sub = [];
+            if ($h) $sub[] = $hundreds[$h];
+            if ($rem2 < 20 && $rem2 > 0) $sub[] = $ones[$rem2];
+            elseif ($rem2 >= 20) { $sub[] = $tens[(int)($rem2/10)]; if ($rem2%10) $sub[] = $ones[$rem2%10]; }
+            $parts[] = implode(' و ', array_filter($sub));
+        }
+        return implode(' و ', array_filter($parts));
+    }
+
+    $grandTotal = 0;
+    foreach ($items as $it) {
+        $grandTotal += (float)$it['quantity'] * (float)$it['unit_price'];
+    }
+    if (!empty($sale['discount'])) $grandTotal -= (float)$sale['discount'];
+    $grandTotalWritten = numberToKurdishWords($grandTotal) . ' دینار';
+
+    $businessLogo = ($settings && !empty($settings['business_logo'])) ? url('uploads/' . $settings['business_logo']) : '';
+?>
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <?php echo kasher_get_theme_bootstrap_markup(); ?>
+    <title><?php echo $pageTitle . ' - ' . SITE_NAME; ?></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <?php renderPremiumLockStylesheetLink(); ?>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Arial', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #555;
+            padding: 20px;
+            color: #111;
+        }
+        .action-buttons {
+            position: fixed; top: 20px; left: 20px; z-index: 1000;
+            display: flex; gap: 10px;
+        }
+        .action-btn {
+            padding: 10px 22px; border: none; border-radius: 10px;
+            font-weight: 600; cursor: pointer; font-size: 14px;
+            display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,.25);
+        }
+        .btn-print { background: linear-gradient(135deg,#b8860b,#ffd700); color: #fff; }
+        .btn-back  { background: linear-gradient(135deg,#555,#333); color: #fff; }
+
+        /* ══ A4 Sheet ══ */
+        .curtain-a4 {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            background: #fff;
+            box-shadow: 0 20px 50px rgba(0,0,0,.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ══ Header ══ */
+        .sh-header {
+            display: flex;
+            align-items: stretch;
+            background: #1a1a1a;
+            min-height: 100px;
+        }
+        .sh-logo-box {
+            width: 115px; min-width: 115px;
+            display: flex; align-items: center; justify-content: center;
+            padding: 10px;
+            border-left: 3px solid #c8a020;
+        }
+        .sh-logo-box img { max-width: 90px; max-height: 80px; object-fit: contain; }
+        .sh-logo-text {
+            font-size: 44px; font-weight: 900; color: #c8a020;
+            font-style: italic; line-height: 1;
+        }
+        .sh-brand-box {
+            background: #e8a800;
+            flex: 1;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 10px 16px;
+        }
+        .sh-brand-en  { font-size: 28px; font-weight: 900; color: #1a1a1a; letter-spacing: 1px; line-height: 1.1; }
+        .sh-brand-ku  { font-size: 22px; font-weight: 700; color: #1a1a1a; line-height: 1.2; }
+        .sh-brand-sub { font-size: 10px; color: #1a1a1a; margin-top: 4px; opacity: .85; text-align: center; }
+        .sh-brand-curtains { font-size: 11px; color: #1a1a1a; font-weight: 700; letter-spacing: 2px; margin-top: 2px; }
+
+        /* ══ Contact bar ══ */
+        .sh-contact {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 5px 14px;
+            border-top: 2px solid #1a1a1a;
+            border-bottom: 2px solid #1a1a1a;
+            font-size: 12px; font-weight: 600; color: #1a1a1a;
+            direction: rtl;
+            background: #fff;
+        }
+
+        /* ══ Meta row ══ */
+        .sh-meta {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 5px 14px;
+            border-bottom: 2px solid #1a1a1a;
+            font-size: 12px; direction: rtl; background: #fff;
+        }
+        .sh-meta .lbl { font-weight: 600; color: #555; }
+        .sh-meta .val { font-weight: 700; color: #111; margin-right: 4px; }
+
+        /* ══ Table ══ */
+        .sh-table-wrap { flex: 1; }
+        .sh-table {
+            width: 100%; border-collapse: collapse;
+            font-size: 11px; direction: rtl;
+        }
+        .sh-table thead tr { background: #e8a800; color: #1a1a1a; }
+        .sh-table thead th {
+            padding: 6px 4px; text-align: center; font-weight: 700;
+            border: 1px solid #1a1a1a; font-size: 11.5px;
+        }
+        .sh-table tbody td {
+            padding: 3px 3px; text-align: center;
+            border: 1px solid #bbb; height: 22px;
+        }
+        .sh-table tbody tr:nth-child(even) td { background: #f7f7f7; }
+        .sh-table tbody tr.empty-row td { background: #fff; }
+        .sh-table td.col-num { width: 30px; font-weight: 700; color: #555; background: #f3f3f3; }
+        .sh-table td.col-type { width: 16%; text-align: right; padding-right: 5px; }
+        .sh-table td.col-fabric { width: 12%; }
+        .sh-table td.col-height { width: 10%; }
+        .sh-table td.col-meter  { width: 10%; font-weight: 700; }
+        .sh-table td.col-qty    { width: 9%; }
+        .sh-table td.col-price  { width: 12%; }
+        .sh-table td.col-total  { width: 13%; font-weight: 700; }
+
+        /* ══ Summary ══ */
+        .sh-summary {
+            width: 100%; border-collapse: collapse;
+            direction: rtl; font-size: 12px;
+        }
+        .sh-summary td { border: 1px solid #1a1a1a; padding: 6px 10px; height: 28px; }
+        .sh-summary td.lbl {
+            background: #e8a800; font-weight: 700; color: #1a1a1a;
+            width: 175px; text-align: right;
+        }
+        .sh-summary td.val { background: #fff; }
+
+        /* ══ Footer ══ */
+        .sh-footer {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            padding: 10px 16px 14px;
+            border-top: 2px solid #1a1a1a;
+            font-size: 12px; direction: rtl;
+        }
+        .sh-footer .sig-col { text-align: center; }
+        .sh-footer .sig-line { border-bottom: 1.5px solid #333; width: 130px; height: 22px; margin: 4px auto 0; }
+        .sh-footer .tax-reg  { font-weight: 600; color: #333; }
+
+        /* ══ Print ══ */
+        @media print {
+            body { background: #fff !important; padding: 0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .action-buttons { display: none !important; }
+            .curtain-a4 { box-shadow: none !important; margin: 0 !important; min-height: 297mm; }
+            @page { size: A4; margin: 0; }
+        }
+    </style>
+</head>
+<body>
+    <?php if (!$hasA4ReceiptView) {
+        renderPremiumLockInlineOverlay('بینینی و چاپکردنی وەسڵی A4', [
+            'back_url'   => url('user/pos/sales.php'),
+            'back_label' => 'گەڕانەوە بۆ فرۆشتنەکان',
+        ]);
+    } ?>
+    <div class="<?php echo premiumLockContentClass($hasA4ReceiptView); ?>">
+        <div class="action-buttons">
+            <button class="action-btn btn-print" onclick="window.print()">
+                <i class="bi bi-printer"></i> چاپکردن
+            </button>
+            <button class="action-btn btn-back" onclick="window.close()">
+                <i class="bi bi-x-circle"></i> داخستن
+            </button>
+        </div>
+
+        <div class="curtain-a4">
+
+            <!-- ══ HEADER ══ -->
+            <div class="sh-header">
+                <div class="sh-logo-box">
+                    <?php if ($businessLogo): ?>
+                        <img src="<?php echo htmlspecialchars($businessLogo); ?>" alt="Logo">
+                    <?php else: ?>
+                        <div class="sh-logo-text">SH</div>
+                    <?php endif; ?>
+                </div>
+                <div class="sh-brand-box">
+                    <div class="sh-brand-en">SEBAR HOME</div>
+                    <div class="sh-brand-ku">سێیبـەر هۆم</div>
+                    <div class="sh-brand-sub">بۆ دروستکردن و خێبەچکردنی هەموو جۆرە پەردەیەک</div>
+                    <div class="sh-brand-curtains">CURTAINS • BLINDS</div>
+                </div>
+            </div>
+
+            <!-- ══ CONTACT ══ -->
+            <div class="sh-contact">
+                <div>📞 0770 124 1089 - 0770 859 8899</div>
+                <div>📍 سلێمانی / 60 مەتری خوار سوپەرمارکێتی چوێسە</div>
+            </div>
+
+            <!-- ══ META ROW ══ -->
+            <div class="sh-meta">
+                <div>
+                    <span class="lbl">بەروار:</span>
+                    <span class="val"><?php echo $sale['short_date']; ?></span>
+                </div>
+                <div>
+                    <span class="lbl">بەرژنز:</span>
+                    <span class="val">#<?php echo $saleId; ?></span>
+                </div>
+            </div>
+
+            <!-- ══ ITEMS TABLE ══ -->
+            <div class="sh-table-wrap">
+                <table class="sh-table">
+                    <thead>
+                        <tr>
+                            <th style="width:30px;">ژ</th>
+                            <th style="width:16%;">جور</th>
+                            <th style="width:12%;">پاتی</th>
+                            <th style="width:10%;">بەرزی</th>
+                            <th style="width:10%;">مەتر</th>
+                            <th style="width:9%;">دانە</th>
+                            <th style="width:12%;">نرخ</th>
+                            <th style="width:13%;">کۆی گشتی</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+                    $maxRows = 15;
+                    $rowNum  = 1;
+                    foreach ($items as $item):
+                        if ($rowNum > $maxRows) break;
+                        $rawQty    = (float)$item['quantity'];
+                        $unitPrice = (float)$item['unit_price'];
+                        $rowTotal  = $rawQty * $unitPrice;
+                        $fabricType = !empty($item['unit_name'])   ? htmlspecialchars($item['unit_name'])   : '';
+                        $height     = !empty($item['unit_symbol']) ? htmlspecialchars($item['unit_symbol']) : '';
+                        $decim      = ($saleCurrency === 'USD') ? 2 : 0;
+                    ?>
+                        <tr>
+                            <td class="col-num"><?php echo $rowNum++; ?></td>
+                            <td class="col-type"><?php echo htmlspecialchars($item['product_name']); ?></td>
+                            <td class="col-fabric"><?php echo $fabricType; ?></td>
+                            <td class="col-height"><?php echo $height; ?></td>
+                            <td class="col-meter"><?php echo number_format($rawQty, ($rawQty == (int)$rawQty) ? 0 : 2); ?></td>
+                            <td class="col-qty"></td>
+                            <td class="col-price"><?php echo number_format($unitPrice, $decim); ?></td>
+                            <td class="col-total"><?php echo number_format($rowTotal, $decim); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    <?php for ($r = $rowNum; $r <= $maxRows; $r++): ?>
+                        <tr class="empty-row">
+                            <td class="col-num"><?php echo $r; ?></td>
+                            <td class="col-type"></td><td class="col-fabric"></td>
+                            <td class="col-height"></td><td class="col-meter"></td>
+                            <td class="col-qty"></td><td class="col-price"></td>
+                            <td class="col-total"></td>
+                        </tr>
+                    <?php endfor; ?>
+                    </tbody>
+                </table>
+
+                <!-- ══ SUMMARY ══ -->
+                <table class="sh-summary">
+                    <tr>
+                        <td class="lbl">کۆی گشتی بە نووسین</td>
+                        <td class="val"><?php echo $grandTotalWritten; ?></td>
+                    </tr>
+                    <tr>
+                        <td class="lbl">کۆی گشتی بە ژمارە</td>
+                        <td class="val">
+                            <?php
+                            $decim = ($saleCurrency === 'USD') ? 2 : 0;
+                            echo number_format($grandTotal, $decim);
+                            echo $saleCurrency === 'USD' ? ' $' : ' دینار';
+                            ?>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- ══ FOOTER ══ -->
+            <div class="sh-footer">
+                <div>
+                    <i class="bi bi-qr-code" style="font-size:36px;color:#333;"></i>
+                    <?php if ($settings && !empty($settings['receipt_footer'])): ?>
+                        <div style="font-size:9px;color:#777;margin-top:3px;"><?php echo nl2br(htmlspecialchars($settings['receipt_footer'])); ?></div>
+                    <?php endif; ?>
+                </div>
+                <div class="sig-col">
+                    <span style="font-weight:700;font-size:15px;">واژو</span>
+                    <div class="sig-line"></div>
+                </div>
+                <div class="tax-reg">
+                    زمارەی کۆدی ناوی بازرگانی: 9981
+                </div>
+            </div>
+
+        </div><!-- .curtain-a4 -->
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+<?php
+    exit; // وەسڵی دوکانی پەردە تەواوبوو
+endif; // end if ($isCurtainShopMode)
+// ══════════════════════════════════════════════════
+// وەسڵی ئاساییی A4 بۆ جۆری بزنسی تر
+// ══════════════════════════════════════════════════
 ?>
 
 <!DOCTYPE html>
+
 <html lang="ku" dir="rtl">
 <head>
     <meta charset="UTF-8">
