@@ -21,6 +21,10 @@ enforceAuthorizationOrDeny($currentUser, 'expense_credits.edit', [
 requireExpensesModuleAccess();
 $userId = (int)$currentUser['id'];
 
+if (function_exists('ensureExpensesSchemaTables')) {
+    ensureExpensesSchemaTables($conn);
+}
+
 $credit_id = intval($_GET['id'] ?? 0);
 $message = null;
 $wallets = walletGetUserWallets($conn, (int)$userId, true);

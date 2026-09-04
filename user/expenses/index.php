@@ -20,6 +20,10 @@ enforceAuthorizationOrDeny($currentUser, 'expenses.view', [
 requireExpensesModuleAccess();
 $userId = (int)$currentUser['id'];
 
+if (function_exists('ensureExpensesSchemaTables')) {
+    ensureExpensesSchemaTables($conn);
+}
+
 // فیلتەرکردن
 $search = trim($_GET['search'] ?? '');
 $payment_method = trim($_GET['payment_method'] ?? '');

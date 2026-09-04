@@ -1294,4 +1294,168 @@ function getUserExchangeRates($userId) {
     }
 }
 
+/**
+ * دڵنیابوونەوە لە بوون و دروستی خشتەکان و ستوونەکانی بەشی خەرجیەکان و قەرزەکانی
+ * 
+ * @param mysqli|null $conn پەیوەندی داتابەیس
+ * @return void
+ */
+function ensureExpensesSchemaTables($conn = null): void {
+    static $ensured = false;
+    if ($ensured) {
+        return;
+    }
+    
+    if (!($conn instanceof mysqli)) {
+        global $conn;
+    }
+    if (!($conn instanceof mysqli)) {
+        return;
+    }
+    
+    $ensured = true;
+
+    try {
+        // 1. خشتەی expense_types
+        $conn->query("
+            CREATE TABLE IF NOT EXISTS `expense_types` (
+              `id` INT NOT NULL AUTO_INCREMENT,
+              `user_id` INT NOT NULL,
+              `name` VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+              `description` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+              `is_recurring` TINYINT(1) DEFAULT '1',
+              `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              PRIMARY KEY (`id`),
+              KEY `idx_user_id` (`user_id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        ");
+
+        // 2. خشتەی expenses
+        $conn->query("
+            CREATE TABLE IF NOT EXISTS `expenses` (
+              `id` INT NOT NULL AUTO_INCREMENT,
+              `user_id` INT NOT NULL,
+              `expense_type_id` INT DEFAULT NULL,
+              `expense_name` VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+              `amount` DECIMAL(10,3) NOT NULL,
+              `currency` ENUM('IQD','USD') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'IQD',
+              `payment_method` ENUM('cash','credit') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'cash',
+              `is_recurring` TINYINT(1) DEFAULT '0',
+              `has_credit` TINYINT(1) DEFAULT '0',
+              `description` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+              `receipt_number` VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+              `expense_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              PRIMARY KEY (`id`),
+              KEY `idx_user_id` (`user_id`),
+              KEY `idx_expense_type_id` (`expense_type_id`),
+              KEY `idx_expense_date` (`expense_date`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        ");
+
+        // پشکنینی ستوونی currency لە expenses
+        $chk = $conn->query("SHOW COLUMNS FROM `expenses` LIKE 'currency'");
+        if ($chk && $chk->num_rows === 0) {
+            $conn->query("ALTER TABLE `expenses` ADD COLUMN `currency` ENUM('IQD','USD') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'IQD' AFTER `amount`");
+        }
+        if ($chk instanceof mysqli_result) {
+            $chk->close();
+        }
+
+        // 3. خشتەی expense_credits
+        $conn->query("
+            CREATE TABLE IF NOT EXISTS `expense_credits` (
+              `id` INT NOT NULL AUTO_INCREMENT,
+              `user_id` INT NOT NULL,
+              `expense_id` INT NOT NULL,
+              `creditor_name` VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+              `creditor_phone` VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+              `total_amount` DECIMAL(10,3) NOT NULL,
+              `paid_amount` DECIMAL(10,3) DEFAULT '0.000',
+              `remaining_amount` DECIMAL(10,3) NOT NULL,
+              `currency` ENUM('IQD','USD') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'IQD',
+              `due_date` DATE DEFAULT NULL,
+              `payment_terms` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+              `status` ENUM('active','completed','overdue','pending') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
+              `notes` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+              `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+              PRIMARY KEY (`id`),
+              KEY `idx_user_id` (`user_id`),
+              KEY `idx_expense_id` (`expense_id`),
+              KEY `idx_user_status` (`user_id`,`status`),
+              KEY `idx_due_date` (`due_date`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        ");
+
+        // پشکنینی ستوونی currency لە expense_credits
+        $chk = $conn->query("SHOW COLUMNS FROM `expense_credits` LIKE 'currency'");
+        if ($chk && $chk->num_rows === 0) {
+            $conn->query("ALTER TABLE `expense_credits` ADD COLUMN `currency` ENUM('IQD','USD') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'IQD' AFTER `remaining_amount`");
+        }
+        if ($chk instanceof mysqli_result) {
+            $chk->close();
+        }
+
+        // نوێکردنەوەی status enum بۆ زیادکردنی pending
+        $chk = $conn->query("SHOW COLUMNS FROM `expense_credits` LIKE 'status'");
+        if ($chk && ($row = $chk->fetch_assoc())) {
+            $typeStr = (string)($row['Type'] ?? '');
+            if (strpos($typeStr, 'pending') === false) {
+                $conn->query("ALTER TABLE `expense_credits` MODIFY COLUMN `status` ENUM('active','completed','overdue','pending') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active'");
+            }
+        }
+        if ($chk instanceof mysqli_result) {
+            $chk->close();
+        }
+
+        // 4. خشتەی expense_credit_payments
+        $conn->query("
+            CREATE TABLE IF NOT EXISTS `expense_credit_payments` (
+              `id` INT NOT NULL AUTO_INCREMENT,
+              `user_id` INT NOT NULL,
+              `expense_credit_id` INT NOT NULL,
+              `payment_amount` DECIMAL(10,3) NOT NULL,
+              `currency` ENUM('IQD','USD') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'IQD',
+              `payment_method` ENUM('cash','bank_transfer','check','other') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'cash',
+              `wallet_id` INT DEFAULT NULL,
+              `payment_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              `receipt_number` VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+              `notes` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+              `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              PRIMARY KEY (`id`),
+              KEY `idx_user_id` (`user_id`),
+              KEY `idx_expense_credit_id` (`expense_credit_id`),
+              KEY `idx_payment_date` (`payment_date`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        ");
+
+        // پشکنینی ستوونی currency لە expense_credit_payments
+        $chk = $conn->query("SHOW COLUMNS FROM `expense_credit_payments` LIKE 'currency'");
+        if ($chk && $chk->num_rows === 0) {
+            $conn->query("ALTER TABLE `expense_credit_payments` ADD COLUMN `currency` ENUM('IQD','USD') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'IQD' AFTER `payment_amount`");
+        }
+        if ($chk instanceof mysqli_result) {
+            $chk->close();
+        }
+
+        // پشکنینی ستوونی wallet_id لە expense_credit_payments
+        $chk = $conn->query("SHOW COLUMNS FROM `expense_credit_payments` LIKE 'wallet_id'");
+        if ($chk && $chk->num_rows === 0) {
+            $conn->query("ALTER TABLE `expense_credit_payments` ADD COLUMN `wallet_id` INT DEFAULT NULL AFTER `payment_method`");
+        }
+        if ($chk instanceof mysqli_result) {
+            $chk->close();
+        }
+
+        // دڵنیابوونەوە لە دراوی تۆمارەکانی پێشوو
+        $conn->query("UPDATE `expenses` SET `currency` = 'IQD' WHERE `currency` IS NULL OR `currency` = ''");
+        $conn->query("UPDATE `expense_credits` SET `currency` = 'IQD' WHERE `currency` IS NULL OR `currency` = ''");
+        $conn->query("UPDATE `expense_credit_payments` SET `currency` = 'IQD' WHERE `currency` IS NULL OR `currency` = ''");
+
+    } catch (Throwable $e) {
+        error_log('ensureExpensesSchemaTables error: ' . $e->getMessage());
+    }
+}
+
 ?>

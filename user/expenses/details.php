@@ -20,6 +20,10 @@ enforceAuthorizationOrDeny($currentUser, 'expenses.view', [
 requireExpensesModuleAccess();
 $userId = (int)$currentUser['id'];
 
+if (function_exists('ensureExpensesSchemaTables')) {
+    ensureExpensesSchemaTables($conn);
+}
+
 $expense_id = intval($_GET['id'] ?? 0);
 $message = null;
 

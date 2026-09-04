@@ -19,6 +19,10 @@ enforceAuthorizationOrDeny($currentUser, 'expenses.view', [
 ], 'redirect');
 requireExpensesModuleAccess();
 
+if (function_exists('ensureExpensesSchemaTables')) {
+    ensureExpensesSchemaTables($conn);
+}
+
 $userId = (int)$currentUser['id'];
 $isSubUser = isset($currentUser['user_type']) && $currentUser['user_type'] === 'sub';
 

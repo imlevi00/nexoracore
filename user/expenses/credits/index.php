@@ -20,6 +20,10 @@ enforceAuthorizationOrDeny($currentUser, 'expense_credits.view', [
 requireExpensesModuleAccess();
 $userId = (int)$currentUser['id'];
 
+if (function_exists('ensureExpensesSchemaTables')) {
+    ensureExpensesSchemaTables($conn);
+}
+
 // نوێکردنەوەی status بۆ قەرزە درەنگکراوەکان
 $upd_stmt = $conn->prepare("
     UPDATE expense_credits 

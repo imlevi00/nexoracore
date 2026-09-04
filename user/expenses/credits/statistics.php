@@ -20,6 +20,10 @@ enforceAuthorizationOrDeny($currentUser, 'expense_stats.view', [
 requireExpensesModuleAccess();
 $userId = (int)$currentUser['id'];
 
+if (function_exists('ensureExpensesSchemaTables')) {
+    ensureExpensesSchemaTables($conn);
+}
+
 // ماوەی فیلتەر
 $period = $_GET['period'] ?? 'month';
 $custom_from = trim($_GET['custom_from'] ?? '');

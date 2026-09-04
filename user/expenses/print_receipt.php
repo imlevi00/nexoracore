@@ -18,6 +18,10 @@ enforceAuthorizationOrDeny($currentUser, 'expenses.view', [
 ], 'redirect');
 requireExpensesModuleAccess();
 
+if (function_exists('ensureExpensesSchemaTables')) {
+    ensureExpensesSchemaTables($conn);
+}
+
 $expenseId = (int)($_GET['id'] ?? 0);
 if ($expenseId <= 0) {
     setMessage('ناسنامەی خەرجی پێویستە', 'error');
