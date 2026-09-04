@@ -65,13 +65,13 @@ if ($ownOnlySubUserId !== null) {
 $stmt->execute();
 $sale = $stmt->get_result()->fetch_assoc();
 
-// Get sale currency
-$saleCurrency = $sale['currency'] ?? 'IQD';
-
 if (!$sale) {
     setMessage('فرۆشتن نەدۆزرایەوە', 'error');
     redirect(url('user/dashboard.php'));
 }
+
+// Get sale currency
+$saleCurrency = $sale['currency'] ?? 'IQD';
 
 // وەرگرتنی ئایتمەکانی فرۆشتن
 $itemsStmt = $conn->prepare("
@@ -198,11 +198,9 @@ $receiptA4ItemsFontSize = getReceiptA4ItemsFontSize((int)($currentUser['id'] ?? 
 $pageTitle = "وەسڵی فرۆشتن #" . $saleId;
 
 // ══════════════════════════════════════════════════
-// وەسڵی تایبەتی دوکانی پەردە (Sebar Home Style)
+// یارمەتیدەر: ژمارە بە کوردی بنووسە (بۆ وەسڵی دوکانی پەردە)
 // ══════════════════════════════════════════════════
-if ($isCurtainShopMode):
-
-    // Number-to-Kurdish words helper for written total
+if (!function_exists('numberToKurdishWords')) {
     function numberToKurdishWords(float $n): string {
         $n = (int)round($n);
         if ($n === 0) return 'سفر';
@@ -223,11 +221,17 @@ if ($isCurtainShopMode):
             $sub = [];
             if ($h) $sub[] = $hundreds[$h];
             if ($rem2 < 20 && $rem2 > 0) $sub[] = $ones[$rem2];
-            elseif ($rem2 >= 20) { $sub[] = $tens[(int)($rem2/10)]; if ($rem2%10) $sub[] = $ones[$rem2%10]; }
+            elseif ($rem2 >= 20) { $sub[] = $tens[(int)($rem2/10)]; if ($rem2 % 10) $sub[] = $ones[$rem2 % 10]; }
             $parts[] = implode(' و ', array_filter($sub));
         }
         return implode(' و ', array_filter($parts));
     }
+}
+
+// ══════════════════════════════════════════════════
+// وەسڵی تایبەتی دوکانی پەردە (Sebar Home Style)
+// ══════════════════════════════════════════════════
+if ($isCurtainShopMode):
 
     $grandTotal = 0;
     foreach ($items as $it) {
