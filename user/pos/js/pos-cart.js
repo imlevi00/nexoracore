@@ -110,6 +110,20 @@
                 POS.cart[existingIndex].stock = parseFloat(productData.stock_quantity);
             } else {
                 const roundedPrice = roundPriceByCurrency(price, POS.currentCurrency);
+                
+                // Calculate initial quantity based on fabric dimensions (square meters) if applicable
+                let initialQty = quantity;
+                if (productData.fabric_width && productData.fabric_height) {
+                    const w = parseFloat(productData.fabric_width);
+                    const h = parseFloat(productData.fabric_height);
+                    if (!isNaN(w) && !isNaN(h) && w > 0 && h > 0) {
+                        const isCm = productData.fabric_measure_unit === 'cm';
+                        const wMeters = isCm ? w / 100 : w;
+                        const hMeters = isCm ? h / 100 : h;
+                        initialQty = Number((wMeters * hMeters * quantity).toFixed(3));
+                    }
+                }
+                
                 POS.cart.push({
                     id: product.id,
                     name: product.name,
@@ -118,8 +132,8 @@
                     buy_price: getConvertedBuyPrice(productData),
                     wholesale_price: parseFloat(productData.wholesale_price) || 0,
                     special_price: parseFloat(productData.special_price) || 0,
-                    quantity: quantity,
-                    total: roundPriceByCurrency(quantity * roundedPrice, POS.currentCurrency),
+                    quantity: initialQty,
+                    total: roundPriceByCurrency(initialQty * roundedPrice, POS.currentCurrency),
                     stock: parseFloat(productData.stock_quantity),
                     price_type: priceType, // Use actual price type applied
                     selected_price_type: POS.currentPriceType, // Keep track of what user selected
@@ -127,7 +141,10 @@
                     unit_name: unitData ? unitData.unit_name : 'دانە',
                     unit_symbol: unitData ? unitData.unit_symbol : '',
                     unit_options: product.units && product.units.length > 1 ? product.units : null,
-                    currency: POS.currentCurrency || 'IQD' // Add current currency to cart item
+                    currency: POS.currentCurrency || 'IQD', // Add current currency to cart item
+                    fabric_width: productData.fabric_width || null,
+                    fabric_height: productData.fabric_height || null,
+                    fabric_measure_unit: productData.fabric_measure_unit || null
                 });
             }
             

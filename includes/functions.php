@@ -877,26 +877,12 @@ function runSystemHealthCheck() {
  * @return bool
  */
 function cacheData($key, $data, $expiration = 3600) {
-    static $memoryCache = [];
-    $strKey = (string)$key;
-    $memoryCache[$strKey] = [
-        'data' => $data,
-        'expires' => time() + $expiration
-    ];
-
-    if (!defined('ROOT_PATH')) {
-        return true;
-    }
-
     $cacheDir = ROOT_PATH . '/cache';
     if (!is_dir($cacheDir)) {
         @mkdir($cacheDir, 0777, true);
-        @chmod($cacheDir, 0777);
-    }
     
     $cacheFile = $cacheDir . '/' . md5($strKey) . '.cache';
     
-    $cacheData = [
         'data' => $data,
         'expires' => time() + $expiration,
         'created' => time()
@@ -905,14 +891,6 @@ function cacheData($key, $data, $expiration = 3600) {
     $serialized = serialize($cacheData);
     $result = @file_put_contents($cacheFile, $serialized, LOCK_EX);
     if ($result === false && is_dir($cacheDir)) {
-        @chmod($cacheDir, 0777);
-        $result = @file_put_contents($cacheFile, $serialized);
-    }
-    
-    return $result !== false;
-}
-
-/**
  * وەرگرتنی داتا لە کاش
  * 
  * @param string $key
@@ -922,36 +900,14 @@ function getCachedData($key) {
     static $memoryCache = [];
     $strKey = (string)$key;
     
-    if (isset($memoryCache[$strKey])) {
-        if (time() <= $memoryCache[$strKey]['expires']) {
-            return $memoryCache[$strKey]['data'];
-        }
-        unset($memoryCache[$strKey]);
-    }
-
-    if (!defined('ROOT_PATH')) {
-        return false;
-    }
-
-    $cacheDir = ROOT_PATH . '/cache';
-    $cacheFile = $cacheDir . '/' . md5($strKey) . '.cache';
-    
     if (!@file_exists($cacheFile)) {
         return false;
-    }
     
     $content = @file_get_contents($cacheFile);
-    if ($content === false || $content === '') {
         return false;
     }
 
     $cacheData = @unserialize($content);
-    if (!is_array($cacheData) || !isset($cacheData['expires'])) {
-        return false;
-    }
-    
-    // تاقیکردنی expiration
-    if (time() > $cacheData['expires']) {
         @unlink($cacheFile);
         return false;
     }
@@ -962,11 +918,6 @@ function getCachedData($key) {
     ];
     
     return $cacheData['data'] ?? false;
-}
-
-/**
- * سڕینەوەی کاشی تایبەت
- * 
  * @param string $key
  * @return bool
  */
@@ -977,20 +928,10 @@ function deleteCachedData($key) {
 
     if (!defined('ROOT_PATH')) {
         return true;
-    }
-
-    $cacheDir = ROOT_PATH . '/cache';
-    $cacheFile = $cacheDir . '/' . md5($strKey) . '.cache';
-    
-    if (@file_exists($cacheFile)) {
-        return @unlink($cacheFile);
-    }
     
     return true;
-}
 
 /**
- * Currency Exchange Functions
  */
 
 /**

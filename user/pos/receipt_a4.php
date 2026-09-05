@@ -79,7 +79,10 @@ $itemsStmt = $conn->prepare("
            COALESCE(si.currency, 'IQD') as currency,
            COALESCE(p.name, si.product_name) as product_name,
            p.barcode as barcode,
-           p.image_path as product_image_path
+           p.image_path as product_image_path,
+           p.fabric_width as product_fabric_width,
+           p.fabric_height as product_fabric_height,
+           p.fabric_measure_unit
     FROM sale_items si
     LEFT JOIN products p ON si.product_id = p.id
     WHERE si.sale_id = ?
@@ -278,111 +281,234 @@ if ($isCurtainShopMode):
             width: 210mm;
             min-height: 297mm;
             margin: 0 auto;
-            background: #fff;
+            background: #f7f3ed; /* slight beige tint like the image */
             box-shadow: 0 20px 50px rgba(0,0,0,.5);
             display: flex;
             flex-direction: column;
+            position: relative;
         }
 
         /* ══ Header ══ */
-        .sh-header {
+        .sh-header-center {
             display: flex;
-            align-items: stretch;
-            background: #1a1a1a;
-            min-height: 100px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 10px 10px;
         }
-        .sh-logo-box {
-            width: 115px; min-width: 115px;
-            display: flex; align-items: center; justify-content: center;
-            padding: 10px;
-            border-left: 3px solid #c8a020;
+        .sh-logo-text-center {
+            font-size: 70px;
+            font-family: 'Times New Roman', Times, serif;
+            color: #b89759; /* Gold */
+            line-height: 1;
+            margin-bottom: -5px;
         }
-        .sh-logo-box img { max-width: 90px; max-height: 80px; object-fit: contain; }
-        .sh-logo-text {
-            font-size: 44px; font-weight: 900; color: #c8a020;
-            font-style: italic; line-height: 1;
+        .sh-brand-en-center {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            letter-spacing: 1px;
+            margin-bottom: 0px;
         }
-        .sh-brand-box {
-            background: #e8a800;
-            flex: 1;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            padding: 10px 16px;
+        .sh-brand-ku-center {
+            font-size: 26px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
         }
-        .sh-brand-en  { font-size: 28px; font-weight: 900; color: #1a1a1a; letter-spacing: 1px; line-height: 1.1; }
-        .sh-brand-ku  { font-size: 22px; font-weight: 700; color: #1a1a1a; line-height: 1.2; }
-        .sh-brand-sub { font-size: 10px; color: #1a1a1a; margin-top: 4px; opacity: .85; text-align: center; }
-        .sh-brand-curtains { font-size: 11px; color: #1a1a1a; font-weight: 700; letter-spacing: 2px; margin-top: 2px; }
+        .sh-brand-sub-center {
+            font-size: 13px;
+            color: #333;
+            font-weight: 700;
+        }
 
         /* ══ Contact bar ══ */
-        .sh-contact {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 5px 14px;
-            border-top: 2px solid #1a1a1a;
-            border-bottom: 2px solid #1a1a1a;
-            font-size: 12px; font-weight: 600; color: #1a1a1a;
-            direction: rtl;
-            background: #fff;
+        .sh-contact-bar {
+            background-color: #b89759;
+            color: #000;
+            text-align: center;
+            padding: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 15px;
         }
 
         /* ══ Meta row ══ */
-        .sh-meta {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 5px 14px;
-            border-bottom: 2px solid #1a1a1a;
-            font-size: 12px; direction: rtl; background: #fff;
+        .sh-meta-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 35px;
+            margin-bottom: 10px;
+            font-weight: 700;
+            font-size: 14px;
         }
-        .sh-meta .lbl { font-weight: 600; color: #555; }
-        .sh-meta .val { font-weight: 700; color: #111; margin-right: 4px; }
+        .sh-meta-left {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            direction: rtl;
+        }
+        .sh-meta-right {
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            direction: ltr; /* To align left side text properly */
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
         /* ══ Table ══ */
-        .sh-table-wrap { flex: 1; }
+        .sh-table-container {
+            padding: 0 25px;
+            position: relative;
+            flex: 1;
+        }
+        .sh-table-bg-logo {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.07;
+            font-size: 280px;
+            font-family: 'Times New Roman', Times, serif;
+            color: #b89759;
+            z-index: 0;
+            pointer-events: none;
+        }
         .sh-table {
-            width: 100%; border-collapse: collapse;
-            font-size: 11px; direction: rtl;
+            width: 100%;
+            border-collapse: collapse;
+            border: 2px solid #333;
+            z-index: 1;
+            position: relative;
+            font-size: 12px;
+            direction: rtl;
         }
-        .sh-table thead tr { background: #e8a800; color: #1a1a1a; }
-        .sh-table thead th {
-            padding: 6px 4px; text-align: center; font-weight: 700;
-            border: 1px solid #1a1a1a; font-size: 11.5px;
+        .sh-table th, .sh-table td {
+            border: 1px solid #333;
+            text-align: center;
+            padding: 6px 3px;
         }
-        .sh-table tbody td {
-            padding: 3px 3px; text-align: center;
-            border: 1px solid #bbb; height: 22px;
+        .sh-table th {
+            background-color: #333;
+            color: #fff;
+            font-weight: 600;
+            font-size: 11px;
         }
-        .sh-table tbody tr:nth-child(even) td { background: #f7f7f7; }
-        .sh-table tbody tr.empty-row td { background: #fff; }
-        .sh-table td.col-num { width: 30px; font-weight: 700; color: #555; background: #f3f3f3; }
-        .sh-table td.col-type { width: 16%; text-align: right; padding-right: 5px; }
-        .sh-table td.col-fabric { width: 12%; }
-        .sh-table td.col-height { width: 10%; }
-        .sh-table td.col-meter  { width: 10%; font-weight: 700; }
-        .sh-table td.col-qty    { width: 9%; }
-        .sh-table td.col-price  { width: 12%; }
-        .sh-table td.col-total  { width: 13%; font-weight: 700; }
+        .sh-table th small {
+            display: block;
+            font-size: 10px;
+            font-weight: normal;
+        }
+        .sh-table td {
+            height: 25px;
+            font-weight: 600;
+        }
 
         /* ══ Summary ══ */
-        .sh-summary {
-            width: 100%; border-collapse: collapse;
-            direction: rtl; font-size: 12px;
+        .sh-summary-container {
+            padding: 15px 25px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            direction: rtl;
         }
-        .sh-summary td { border: 1px solid #1a1a1a; padding: 6px 10px; height: 28px; }
-        .sh-summary td.lbl {
-            background: #e8a800; font-weight: 700; color: #1a1a1a;
-            width: 175px; text-align: right;
+        .sh-summary-box {
+            width: 55%;
+            font-weight: 700;
+            font-size: 13px;
+            line-height: 1.8;
+            margin-bottom: 10px;
         }
-        .sh-summary td.val { background: #fff; }
+        .sh-summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        .sh-summary-label {
+            white-space: nowrap;
+        }
+        .sh-summary-dots {
+            flex-grow: 1;
+            border-bottom: 2px dotted #333;
+            position: relative;
+            top: -6px;
+            margin: 0 10px;
+        }
+        .sh-summary-value {
+            white-space: nowrap;
+        }
+        
+        .sh-total-words-row {
+            width: 100%;
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            border: 2px solid #333;
+            border-radius: 6px;
+            padding: 8px 15px;
+            margin-bottom: 15px;
+            direction: rtl;
+        }
+        .sh-total-words-label {
+            white-space: nowrap;
+        }
+        .sh-total-words-dots {
+            flex-grow: 1;
+            border-bottom: 2px dotted #333;
+            position: relative;
+            top: -6px;
+            margin: 0 15px;
+        }
 
         /* ══ Footer ══ */
-        .sh-footer {
-            display: flex; justify-content: space-between; align-items: flex-end;
-            padding: 10px 16px 14px;
-            border-top: 2px solid #1a1a1a;
-            font-size: 12px; direction: rtl;
+        .sh-footer-layout {
+            padding: 0 25px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            direction: rtl;
         }
-        .sh-footer .sig-col { text-align: center; }
-        .sh-footer .sig-line { border-bottom: 1.5px solid #333; width: 130px; height: 22px; margin: 4px auto 0; }
-        .sh-footer .tax-reg  { font-weight: 600; color: #333; }
+        .sh-sig-box {
+            text-align: center;
+            font-weight: 700;
+            font-size: 13px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        .sh-notes-box {
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 10px 15px 5px;
+            width: 50%;
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 1.6;
+            background: #fff;
+        }
+        .sh-notes-title {
+            margin-bottom: 2px;
+        }
+        .sh-notes-list {
+            list-style-type: disc;
+            padding-right: 20px;
+            margin: 0;
+            margin-bottom: 5px;
+        }
+        .sh-notes-date {
+            margin-top: 5px;
+            text-align: left;
+            direction: ltr;
+        }
 
         /* ══ Print ══ */
         @media print {
@@ -413,124 +539,165 @@ if ($isCurtainShopMode):
         <div class="curtain-a4">
 
             <!-- ══ HEADER ══ -->
-            <div class="sh-header">
-                <div class="sh-logo-box">
-                    <?php if ($businessLogo): ?>
-                        <img src="<?php echo htmlspecialchars($businessLogo); ?>" alt="Logo">
-                    <?php else: ?>
-                        <div class="sh-logo-text">SH</div>
-                    <?php endif; ?>
-                </div>
-                <div class="sh-brand-box">
-                    <div class="sh-brand-en">SEBAR HOME</div>
-                    <div class="sh-brand-ku">سێیبـەر هۆم</div>
-                    <div class="sh-brand-sub">بۆ دروستکردن و خێبەچکردنی هەموو جۆرە پەردەیەک</div>
-                    <div class="sh-brand-curtains">CURTAINS • BLINDS</div>
-                </div>
+            <div class="sh-header-center">
+                <?php if ($businessLogo): ?>
+                    <img src="<?php echo htmlspecialchars($businessLogo); ?>" alt="Logo" style="max-height: 80px; margin-bottom: 10px;">
+                <?php else: ?>
+                    <div class="sh-logo-text-center">SH</div>
+                <?php endif; ?>
+                <div class="sh-brand-en-center">SEBAR HOME</div>
+                <div class="sh-brand-ku-center">سێیبـەر هۆم</div>
+                <div class="sh-brand-sub-center">بۆ دوورین و دیزاینکردنی هەموو جۆرە پەردەیەک (Curtains & Blinds)</div>
             </div>
 
             <!-- ══ CONTACT ══ -->
-            <div class="sh-contact">
-                <div>📞 0770 124 1089 - 0770 859 8899</div>
-                <div>📍 سلێمانی / 60 مەتری خوار سوپەرمارکێتی چوێسە</div>
+            <div class="sh-contact-bar">
+                ناونیشان: سلێمانی - ٦٠ مەتری خوار سوپەرمارکێتی چوێسە &nbsp;&nbsp;&nbsp;&nbsp; تەلەفۆن: 1089 124 0770 - 9988 958 0770
             </div>
 
             <!-- ══ META ROW ══ -->
-            <div class="sh-meta">
-                <div>
-                    <span class="lbl">بەروار:</span>
-                    <span class="val"><?php echo $sale['short_date']; ?></span>
+            <div class="sh-meta-row">
+                <div class="sh-meta-left">
+                    <div class="meta-item">
+                        <span>تاريخ Invoice:</span>
+                        <span style="font-weight:normal;"><?php echo $sale['short_date']; ?></span>
+                    </div>
+                    <div class="meta-item">
+                        <span>ناوی کڕیار:</span>
+                        <span style="font-weight:normal;"><?php echo htmlspecialchars($sale['customer_name'] ?? ''); ?></span>
+                    </div>
                 </div>
-                <div>
-                    <span class="lbl">بەرژنز:</span>
-                    <span class="val">#<?php echo $saleId; ?></span>
+                <div class="sh-meta-right">
+                    <div class="meta-item">
+                        <span style="font-weight:normal;">/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/</span>
+                        <span>بەروار</span>
+                    </div>
+                    <div class="meta-item">
+                        <span style="font-weight:normal;">/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/</span>
+                        <span>سلێمانی</span>
+                    </div>
                 </div>
             </div>
 
             <!-- ══ ITEMS TABLE ══ -->
-            <div class="sh-table-wrap">
+            <div class="sh-table-container">
+                <div class="sh-table-bg-logo">SH</div>
                 <table class="sh-table">
                     <thead>
                         <tr>
-                            <th style="width:30px;">ژ</th>
-                            <th style="width:16%;">جور</th>
-                            <th style="width:12%;">پاتی</th>
-                            <th style="width:10%;">بەرزی</th>
-                            <th style="width:10%;">مەتر</th>
-                            <th style="width:9%;">دانە</th>
-                            <th style="width:12%;">نرخ</th>
-                            <th style="width:13%;">کۆی گشتی</th>
+                            <th style="width:4%;">ژ<br><small>No.</small></th>
+                            <th style="width:14%;">شوێن / ژوور<br><small>Location/Room</small></th>
+                            <th style="width:24%;">جۆری قوماش / مۆدێل<br><small>Fabric Type/Model</small></th>
+                            <th style="width:9%;">پانی (م)<br><small>Width (m)</small></th>
+                            <th style="width:9%;">بەرزی (م)<br><small>Height (m)</small></th>
+                            <th style="width:12%;">بڕی قوماش (مەترچوارگۆشە)<br><small>Fabric Qty (m)</small></th>
+                            <th style="width:12%;">نرخ<br><small>Unit Price</small></th>
+                            <th style="width:16%;">کۆی گشتی<br><small>Total</small></th>
                         </tr>
                     </thead>
                     <tbody>
                     <?php
-                    $maxRows = 15;
+                    $maxRows = 10;
                     $rowNum  = 1;
+                    $subTotal = 0;
                     foreach ($items as $item):
                         if ($rowNum > $maxRows) break;
                         $rawQty    = (float)$item['quantity'];
                         $unitPrice = (float)$item['unit_price'];
                         $rowTotal  = $rawQty * $unitPrice;
-                        $fabricType = !empty($item['unit_name'])   ? htmlspecialchars($item['unit_name'])   : '';
-                        $height     = !empty($item['unit_symbol']) ? htmlspecialchars($item['unit_symbol']) : '';
+                        $subTotal += $rowTotal;
+                        $fabricType = htmlspecialchars($item['product_name']);
+                        
+                        $unitSym = !empty($item['fabric_measure_unit']) ? htmlspecialchars($item['fabric_measure_unit']) : (!empty($item['unit_symbol']) ? htmlspecialchars($item['unit_symbol']) : 'm');
+                        
+                        $wVal = isset($item['product_fabric_width']) ? (float)$item['product_fabric_width'] : (isset($item['width']) ? (float)$item['width'] : 0);
+                        $hVal = isset($item['product_fabric_height']) ? (float)$item['product_fabric_height'] : (isset($item['height']) ? (float)$item['height'] : 0);
+                        
+                        $widthStr  = $wVal > 0 ? rtrim(rtrim(number_format($wVal, 2), '0'), '.') . ' ' . $unitSym : '';
+                        $heightStr = $hVal > 0 ? rtrim(rtrim(number_format($hVal, 2), '0'), '.') . ' ' . $unitSym : '';
+                        
                         $decim      = ($saleCurrency === 'USD') ? 2 : 0;
                     ?>
                         <tr>
-                            <td class="col-num"><?php echo $rowNum++; ?></td>
-                            <td class="col-type"><?php echo htmlspecialchars($item['product_name']); ?></td>
-                            <td class="col-fabric"><?php echo $fabricType; ?></td>
-                            <td class="col-height"><?php echo $height; ?></td>
-                            <td class="col-meter"><?php echo number_format($rawQty, ($rawQty == (int)$rawQty) ? 0 : 2); ?></td>
-                            <td class="col-qty"></td>
-                            <td class="col-price"><?php echo number_format($unitPrice, $decim); ?></td>
-                            <td class="col-total"><?php echo number_format($rowTotal, $decim); ?></td>
+                            <td><?php echo $rowNum++; ?></td>
+                            <td></td>
+                            <td><?php echo $fabricType; ?></td>
+                            <td dir="ltr" style="text-align:center;"><?php echo $widthStr; ?></td>
+                            <td dir="ltr" style="text-align:center;"><?php echo $heightStr; ?></td>
+                            <td><?php echo number_format($rawQty, ($rawQty == (int)$rawQty) ? 0 : 2); ?></td>
+                            <td><?php echo number_format($unitPrice, $decim); ?></td>
+                            <td><?php echo number_format($rowTotal, $decim); ?></td>
                         </tr>
                     <?php endforeach; ?>
                     <?php for ($r = $rowNum; $r <= $maxRows; $r++): ?>
-                        <tr class="empty-row">
-                            <td class="col-num"><?php echo $r; ?></td>
-                            <td class="col-type"></td><td class="col-fabric"></td>
-                            <td class="col-height"></td><td class="col-meter"></td>
-                            <td class="col-qty"></td><td class="col-price"></td>
-                            <td class="col-total"></td>
+                        <tr>
+                            <td><?php echo $r; ?></td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
                         </tr>
                     <?php endfor; ?>
                     </tbody>
                 </table>
+            </div>
 
-                <!-- ══ SUMMARY ══ -->
-                <table class="sh-summary">
-                    <tr>
-                        <td class="lbl">کۆی گشتی بە نووسین</td>
-                        <td class="val"><?php echo $grandTotalWritten; ?></td>
-                    </tr>
-                    <tr>
-                        <td class="lbl">کۆی گشتی بە ژمارە</td>
-                        <td class="val">
-                            <?php
-                            $decim = ($saleCurrency === 'USD') ? 2 : 0;
-                            echo number_format($grandTotal, $decim);
-                            echo $saleCurrency === 'USD' ? ' $' : ' دینار';
-                            ?>
-                        </td>
-                    </tr>
-                </table>
+            <!-- ══ SUMMARY ══ -->
+            <div class="sh-summary-container">
+                <?php
+                    $discount = (float)($sale['discount'] ?? 0);
+                    $grandTotal = $subTotal - $discount;
+                    $deposit = (float)$paidReceivedAmount;
+                    $balance = $grandTotal - $deposit;
+                    $decim = ($saleCurrency === 'USD') ? 2 : 0;
+                ?>
+                <div class="sh-summary-box">
+                    <div class="sh-summary-row">
+                        <span class="sh-summary-label">کۆی گشتی (Subtotal):</span>
+                        <div class="sh-summary-dots"></div>
+                        <span class="sh-summary-value"><?php echo number_format($subTotal, $decim); ?></span>
+                    </div>
+                    <div class="sh-summary-row">
+                        <span class="sh-summary-label">داشکاندن (Discount):</span>
+                        <div class="sh-summary-dots"></div>
+                        <span class="sh-summary-value"><?php echo number_format($discount, $decim); ?></span>
+                    </div>
+                    <div class="sh-summary-row">
+                        <span class="sh-summary-label">پێشەکی (Deposit):</span>
+                        <div class="sh-summary-dots"></div>
+                        <span class="sh-summary-value"><?php echo number_format($deposit, $decim); ?></span>
+                    </div>
+                    <div class="sh-summary-row">
+                        <span class="sh-summary-label">بڕی ماوە (Balance):</span>
+                        <div class="sh-summary-dots"></div>
+                        <span class="sh-summary-value"><?php echo number_format($balance, $decim); ?></span>
+                    </div>
+                </div>
+                
+                <div class="sh-total-words-row">
+                    <span class="sh-total-words-label">کۆی گشتی بە نووسین:</span>
+                    <div class="sh-total-words-dots"></div>
+                    <span class="sh-total-words-value"><?php echo $grandTotalWritten; ?></span>
+                </div>
             </div>
 
             <!-- ══ FOOTER ══ -->
-            <div class="sh-footer">
-                <div>
-                    <i class="bi bi-qr-code" style="font-size:36px;color:#333;"></i>
-                    <?php if ($settings && !empty($settings['receipt_footer'])): ?>
-                        <div style="font-size:9px;color:#777;margin-top:3px;"><?php echo nl2br(htmlspecialchars($settings['receipt_footer'])); ?></div>
-                    <?php endif; ?>
+            <div class="sh-footer-layout">
+                <div class="sh-sig-box">
+                    <span>ئیمزای کڕیار<br><small style="font-weight:normal">(Customer Signature)</small></span>
                 </div>
-                <div class="sig-col">
-                    <span style="font-weight:700;font-size:15px;">واژو</span>
-                    <div class="sig-line"></div>
+                <div class="sh-sig-box">
+                    <span>واژۆی دوکان<br><small style="font-weight:normal">(Shop Signature)</small></span>
                 </div>
-                <div class="tax-reg">
-                    زمارەی کۆدی ناوی بازرگانی: 9981
+                
+                <div class="sh-notes-box">
+                    <div class="sh-notes-title">دەرهات:</div>
+                    <ul class="sh-notes-list">
+                        <li>دوورین و دیزاینکردنی هەموو پەردەیەک</li>
+                        <li>جۆری قوماش / مۆدێل بە هەموو جۆرە پەردەی سەقفێک</li>
+                        <li>پێشەکی قوماش / سەقفێک</li>
+                        <li>بڕی ماوە تەنها بە پارە</li>
+                    </ul>
+                    <div class="sh-notes-date">
+                        .......................................... Date for installation/pickup
+                    </div>
                 </div>
             </div>
 
