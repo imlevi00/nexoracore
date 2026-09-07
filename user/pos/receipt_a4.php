@@ -214,10 +214,15 @@ if (!function_exists('numberToKurdishWords')) {
         $parts = [];
         $billions  = (int)floor($n / 1000000000); $n %= 1000000000;
         $millions  = (int)floor($n / 1000000);    $n %= 1000000;
+        $hundredThousands = (int)floor($n / 100000); $n %= 100000;
         $thousands = (int)floor($n / 1000);       $n %= 1000;
         $remainder = (int)$n;
         if ($billions)  $parts[] = ($billions < 20 ? $ones[$billions] . ' ' : '') . 'ملیار';
         if ($millions)  $parts[] = ($millions  < 20 ? $ones[$millions]  : ($tens[(int)($millions/10)]  . ($millions%10  ? ' و ' . $ones[$millions%10]  : ''))) . ' ملیۆن';
+        if ($hundredThousands) {
+            $hundredThousandsText = ($hundredThousands < 20 ? $ones[$hundredThousands] : ($tens[(int)($hundredThousands/10)] . ($hundredThousands % 10 ? ' و ' . $ones[$hundredThousands % 10] : '')));
+            $parts[] = $hundredThousandsText . ' سەد هەزار';
+        }
         if ($thousands) $parts[] = ($thousands < 20 ? $ones[$thousands] : ($tens[(int)($thousands/10)] . ($thousands%10 ? ' و ' . $ones[$thousands%10] : ''))) . ' هەزار';
         if ($remainder) {
             $h = (int)floor($remainder / 100); $rem2 = $remainder % 100;
@@ -238,10 +243,37 @@ if ($isCurtainShopMode):
 
     $grandTotal = 0;
     foreach ($items as $it) {
-        $grandTotal += (float)$it['quantity'] * (float)$it['unit_price'];
+        $itQty   = (float)$it['quantity'];
+        $itPrice = (float)$it['unit_price'];
+        $itW     = isset($it['product_fabric_width'])  ? (float)$it['product_fabric_width']  : 0;
+        $itH     = isset($it['product_fabric_height']) ? (float)$it['product_fabric_height'] : 0;
+        $itUnit  = !empty($it['fabric_measure_unit']) ? $it['fabric_measure_unit'] : '';
+        if ($itW > 0 && $itH > 0) {
+            $isCm = (strtolower($itUnit) === 'cm');
+            $itW  = $isCm ? $itW / 100 : $itW;
+            $itH  = $isCm ? $itH / 100 : $itH;
+            $itSqm = round($itW * $itH, 4);
+        } else {
+            $itSqm = $itQty;
+        }
+        $grandTotal += $itSqm * $itPrice;
     }
     if (!empty($sale['discount'])) $grandTotal -= (float)$sale['discount'];
-    $grandTotalWritten = numberToKurdishWords($grandTotal) . ' دینار';
+
+    // دراوی وەسڵ
+    $receiptCurrency = $saleCurrency ?? 'IQD';
+    if ($receiptCurrency === 'USD') {
+        // بۆ دۆلار: بخشەکان جیا بنووسە
+        $dollars = (int)floor($grandTotal);
+        $cents   = (int)round(($grandTotal - $dollars) * 100);
+        $writtenParts = [];
+        if ($dollars > 0) $writtenParts[] = numberToKurdishWords($dollars) . ' دۆلار';
+        if ($cents > 0)   $writtenParts[] = numberToKurdishWords($cents)   . ' سەنت';
+        $grandTotalWritten = implode(' و ', $writtenParts) ?: 'سفر';
+    } else {
+        // بۆ دینار: تەنها ژمارەی تەواو
+        $grandTotalWritten = numberToKurdishWords((int)round($grandTotal)) . ' دینار';
+    }
 
     $businessLogo = ($settings && !empty($settings['business_logo'])) ? url('uploads/' . $settings['business_logo']) : '';
 ?>
@@ -450,22 +482,42 @@ if ($isCurtainShopMode):
             font-weight: 700;
             font-size: 14px;
             display: flex;
-            justify-content: space-between;
+            align-items: center;
             border: 2px solid #333;
             border-radius: 6px;
-            padding: 8px 15px;
+            padding: 6px 15px;
             margin-bottom: 15px;
             direction: rtl;
+            gap: 10px;
         }
         .sh-total-words-label {
             white-space: nowrap;
+            flex-shrink: 0;
         }
         .sh-total-words-dots {
             flex-grow: 1;
-            border-bottom: 2px dotted #333;
             position: relative;
-            top: -6px;
-            margin: 0 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 24px;
+        }
+        /* نوقتەکان وەک پس‌زمینە */
+        .sh-total-words-dots::before {
+            content: '';
+            position: absolute;
+            left: 0; right: 0;
+            bottom: 4px;
+            border-bottom: 2px dotted #333;
+        }
+        .sh-total-words-value {
+            position: relative;
+            z-index: 1;
+            background: transparent;
+            padding: 0 6px;
+            white-space: nowrap;
+            font-size: 15px;
+            color: #b89759;
         }
 
         /* ══ Footer ══ */
@@ -559,7 +611,7 @@ if ($isCurtainShopMode):
             <div class="sh-meta-row">
                 <div class="sh-meta-left">
                     <div class="meta-item">
-                        <span>تاريخ Invoice:</span>
+                        <span>بەروار:</span>
                         <span style="font-weight:normal;"><?php echo $sale['short_date']; ?></span>
                     </div>
                     <div class="meta-item">
@@ -569,12 +621,12 @@ if ($isCurtainShopMode):
                 </div>
                 <div class="sh-meta-right">
                     <div class="meta-item">
-                        <span style="font-weight:normal;">/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/</span>
-                        <span>بەروار</span>
+                        <span>ژمارەی وەسڵ:</span>
+                        <span style="font-weight:normal;"><?php echo $saleId; ?></span>
                     </div>
                     <div class="meta-item">
-                        <span style="font-weight:normal;">/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/</span>
-                        <span>سلێمانی</span>
+                        <span>ناونیشانی کڕیار:</span>
+                        <span style="font-weight:normal;"><?php echo htmlspecialchars($sale['customer_address'] ?? '', ENT_QUOTES, 'UTF-8'); ?></span>
                     </div>
                 </div>
             </div>
@@ -604,18 +656,30 @@ if ($isCurtainShopMode):
                         if ($rowNum > $maxRows) break;
                         $rawQty    = (float)$item['quantity'];
                         $unitPrice = (float)$item['unit_price'];
-                        $rowTotal  = $rawQty * $unitPrice;
-                        $subTotal += $rowTotal;
                         $fabricType = htmlspecialchars($item['product_name']);
                         
                         $unitSym = !empty($item['fabric_measure_unit']) ? htmlspecialchars($item['fabric_measure_unit']) : (!empty($item['unit_symbol']) ? htmlspecialchars($item['unit_symbol']) : 'm');
                         
-                        $wVal = isset($item['product_fabric_width']) ? (float)$item['product_fabric_width'] : (isset($item['width']) ? (float)$item['width'] : 0);
-                        $hVal = isset($item['product_fabric_height']) ? (float)$item['product_fabric_height'] : (isset($item['height']) ? (float)$item['height'] : 0);
+                        $wVal = isset($item['product_fabric_width']) ? (float)$item['product_fabric_width'] : 0;
+                        $hVal = isset($item['product_fabric_height']) ? (float)$item['product_fabric_height'] : 0;
                         
                         $widthStr  = $wVal > 0 ? rtrim(rtrim(number_format($wVal, 2), '0'), '.') . ' ' . $unitSym : '';
                         $heightStr = $hVal > 0 ? rtrim(rtrim(number_format($hVal, 2), '0'), '.') . ' ' . $unitSym : '';
                         
+                        // مەترچوارگۆشە = پانی × بەرزی
+                        if ($wVal > 0 && $hVal > 0) {
+                            $isCm = (strtolower($unitSym) === 'cm' || $unitSym === 'سم');
+                            $wMeters = $isCm ? $wVal / 100 : $wVal;
+                            $hMeters = $isCm ? $hVal / 100 : $hVal;
+                            $sqm = round($wMeters * $hMeters, 4);
+                        } else {
+                            $sqm = $rawQty;
+                        }
+                        
+                        $rowTotal  = $sqm * $unitPrice;
+                        $subTotal += $rowTotal;
+                        
+                        $sqmDisplay = number_format($sqm, ($sqm == (int)$sqm) ? 0 : 2);
                         $decim      = ($saleCurrency === 'USD') ? 2 : 0;
                     ?>
                         <tr>
@@ -624,7 +688,7 @@ if ($isCurtainShopMode):
                             <td><?php echo $fabricType; ?></td>
                             <td dir="ltr" style="text-align:center;"><?php echo $widthStr; ?></td>
                             <td dir="ltr" style="text-align:center;"><?php echo $heightStr; ?></td>
-                            <td><?php echo number_format($rawQty, ($rawQty == (int)$rawQty) ? 0 : 2); ?></td>
+                            <td style="text-align:center;"><?php echo $sqmDisplay; ?></td>
                             <td><?php echo number_format($unitPrice, $decim); ?></td>
                             <td><?php echo number_format($rowTotal, $decim); ?></td>
                         </tr>
@@ -673,8 +737,9 @@ if ($isCurtainShopMode):
                 
                 <div class="sh-total-words-row">
                     <span class="sh-total-words-label">کۆی گشتی بە نووسین:</span>
-                    <div class="sh-total-words-dots"></div>
-                    <span class="sh-total-words-value"><?php echo $grandTotalWritten; ?></span>
+                    <div class="sh-total-words-dots">
+                        <span class="sh-total-words-value"><?php echo $grandTotalWritten; ?></span>
+                    </div>
                 </div>
             </div>
 
