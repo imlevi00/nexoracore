@@ -488,7 +488,7 @@ include '../../includes/header.php';
                             <hr>
                             <small class="text-muted">
                                 چاپکراوە لە: <?php echo date('Y-m-d H:i:s'); ?> | 
-                                سیستەمی NexoraCore - AmirTechOne.com
+                                سیستەمی NexoraCore
                             </small>
                         </div>
                     </div>
