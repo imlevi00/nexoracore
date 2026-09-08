@@ -712,29 +712,6 @@ if ($isCurtainShopMode):
                     $balance = $grandTotal - $deposit;
                     $decim = ($saleCurrency === 'USD') ? 2 : 0;
                 ?>
-                <div class="sh-summary-box">
-                    <div class="sh-summary-row">
-                        <span class="sh-summary-label">کۆی گشتی (Subtotal):</span>
-                        <div class="sh-summary-dots"></div>
-                        <span class="sh-summary-value"><?php echo number_format($subTotal, $decim); ?></span>
-                    </div>
-                    <div class="sh-summary-row">
-                        <span class="sh-summary-label">داشکاندن (Discount):</span>
-                        <div class="sh-summary-dots"></div>
-                        <span class="sh-summary-value"><?php echo number_format($discount, $decim); ?></span>
-                    </div>
-                    <div class="sh-summary-row">
-                        <span class="sh-summary-label">پێشەکی (Deposit):</span>
-                        <div class="sh-summary-dots"></div>
-                        <span class="sh-summary-value"><?php echo number_format($deposit, $decim); ?></span>
-                    </div>
-                    <div class="sh-summary-row">
-                        <span class="sh-summary-label">بڕی ماوە (Balance):</span>
-                        <div class="sh-summary-dots"></div>
-                        <span class="sh-summary-value"><?php echo number_format($balance, $decim); ?></span>
-                    </div>
-                </div>
-                
                 <div class="sh-total-words-row">
                     <span class="sh-total-words-label">کۆی گشتی بە نووسین:</span>
                     <div class="sh-total-words-dots">
@@ -755,10 +732,10 @@ if ($isCurtainShopMode):
                 <div class="sh-notes-box">
                     <div class="sh-notes-title">دەرهات:</div>
                     <ul class="sh-notes-list">
-                        <li>دوورین و دیزاینکردنی هەموو پەردەیەک</li>
-                        <li>جۆری قوماش / مۆدێل بە هەموو جۆرە پەردەی سەقفێک</li>
-                        <li>پێشەکی قوماش / سەقفێک</li>
-                        <li>بڕی ماوە تەنها بە پارە</li>
+                        <li>>کۆی گشتی (Subtotal): <?php echo number_format($subtotal, $decim); ?></li>
+                        <li>داشکاندن (Discount): <?php echo number_format($discount, $decim); ?></li>
+                        <li>پێشەکی (Deposit): <?php echo number_format($deposit, $decim); ?></li>
+                        <li>بڕی ماوە (Balance): <?php echo number_format($balance, $decim); ?></li>
                     </ul>
                     <div class="sh-notes-date">
                         .......................................... Date for installation/pickup
