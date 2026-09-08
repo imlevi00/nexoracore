@@ -649,7 +649,7 @@ if ($isCurtainShopMode):
                     </thead>
                     <tbody>
                     <?php
-                    $maxRows = 10;
+                    $maxRows = 15; // ژمارەی هێڵەکان بۆ نیشاندان
                     $rowNum  = 1;
                     $subTotal = 0;
                     foreach ($items as $item):
@@ -732,10 +732,10 @@ if ($isCurtainShopMode):
                 <div class="sh-notes-box">
                     <div class="sh-notes-title">دەرهات:</div>
                     <ul class="sh-notes-list">
-                        <li>>کۆی گشتی (Subtotal): <?php echo number_format($subtotal, $decim); ?></li>
-                        <li>داشکاندن (Discount): <?php echo number_format($discount, $decim); ?></li>
-                        <li>پێشەکی (Deposit): <?php echo number_format($deposit, $decim); ?></li>
-                        <li>بڕی ماوە (Balance): <?php echo number_format($balance, $decim); ?></li>
+                        <li>  کۆی گشتی (Subtotal):<?php echo number_format($subtotal, $decim); ?></li>
+                        <li>  داشکاندن (Discount):<?php echo number_format($discount, $decim); ?></li>
+                        <li>  پێشەکی (Deposit):<</li>
+                        <li>  بڕی ماوە (Balance):</li>
                     </ul>
                     <div class="sh-notes-date">
                         .......................................... Date for installation/pickup
