@@ -310,39 +310,74 @@ if ($isCurtainShopMode):
             position: relative;
         }
 
-        /* ══ Header ══ */
-        .sh-header-center {
+        /* ══ Header — two-column layout ══ */
+        .sh-header-wrap {
+            display: flex;
+            flex-direction: row-reverse; /* RTL: logo block is visually on left */
+            justify-content: space-between;
+            align-items: stretch;        /* هەردوو ستوون هەمان بەرزی */
+            padding: 12px 25px 8px;
+            direction: rtl;
+            min-height: 110px;
+        }
+
+        /* === Left column: logo + branding === */
+        .sh-brand-block {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 15px 10px 10px;
+            align-items: flex-start;
+            justify-content: center;     /* ناوەڕاستی ستوونی چەپ */
+            direction: ltr;
+            min-width: 45%;
         }
-        .sh-logo-text-center {
-            font-size: 70px;
+        .sh-logo-text {
+            font-size: 60px;
             font-family: 'Times New Roman', Times, serif;
-            color: #b89759; /* Gold */
+            color: #b89759;
             line-height: 1;
-            margin-bottom: -5px;
+            margin-bottom: -4px;
         }
-        .sh-brand-en-center {
+        .sh-brand-en {
             font-family: 'Times New Roman', Times, serif;
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 700;
             color: #333;
             letter-spacing: 1px;
-            margin-bottom: 0px;
         }
-        .sh-brand-ku-center {
-            font-size: 26px;
+        .sh-brand-ku {
+            font-size: 20px;
             font-weight: 700;
             color: #333;
-            margin-bottom: 5px;
         }
-        .sh-brand-sub-center {
+        .sh-brand-sub {
+            font-size: 11.5px;
+            color: #555;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        /* === Right column: meta info evenly spaced === */
+        .sh-meta-block {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            direction: rtl;
             font-size: 13px;
-            color: #333;
             font-weight: 700;
+            padding: 4px 0;
+        }
+        .sh-meta-block .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+        .sh-meta-block .meta-item span:first-child {
+            color: #b89759;
+        }
+        .sh-meta-block .meta-item span:last-child {
+            font-weight: 500;
+            color: #222;
         }
 
         /* ══ Contact bar ══ */
@@ -353,37 +388,11 @@ if ($isCurtainShopMode):
             padding: 6px;
             font-size: 13px;
             font-weight: 700;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
-        /* ══ Meta row ══ */
-        .sh-meta-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 0 35px;
-            margin-bottom: 10px;
-            font-weight: 700;
-            font-size: 14px;
-        }
-        .sh-meta-left {
-            text-align: right;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            direction: rtl;
-        }
-        .sh-meta-right {
-            text-align: left;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            direction: ltr; /* To align left side text properly */
-        }
-        .meta-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        /* ══ Meta row (OLD — kept for backward compat, not used) ══ */
+        .sh-meta-row { display: none; }
 
         /* ══ Table ══ */
         .sh-table-container {
@@ -580,45 +589,46 @@ if ($isCurtainShopMode):
 
         <div class="curtain-a4">
 
-            <!-- ══ HEADER ══ -->
-            <div class="sh-header-center">
-                <?php if ($businessLogo): ?>
-                    <img src="<?php echo htmlspecialchars($businessLogo); ?>" alt="Logo" style="max-height: 80px; margin-bottom: 10px;">
-                <?php else: ?>
-                    <div class="sh-logo-text-center">SH</div>
-                <?php endif; ?>
-                <div class="sh-brand-en-center">SEBAR HOME</div>
-                <div class="sh-brand-ku-center">سێیبـەر هۆم</div>
-                <div class="sh-brand-sub-center">بۆ دوورین و دیزاینکردنی هەموو جۆرە پەردەیەک (Curtains & Blinds)</div>
-            </div>
+            <!-- ══ HEADER (logo left, meta right) ══ -->
+            <div class="sh-header-wrap">
+
+                <!-- چەپ: لۆگۆ و ناوی دوکان -->
+                <div class="sh-brand-block">
+                    <?php if ($businessLogo): ?>
+                        <img src="<?php echo htmlspecialchars($businessLogo); ?>" alt="Logo" style="max-height:65px; margin-bottom:4px;">
+                    <?php else: ?>
+                        <div class="sh-logo-text">SH</div>
+                    <?php endif; ?>
+                    <div class="sh-brand-en">SEBAR HOME</div>
+                    <div class="sh-brand-ku">سێیبـەر هۆم</div>
+                    <div class="sh-brand-sub">بۆ دوورین و دیزاینکردنی هەموو جۆرە پەردەیەک (Curtains &amp; Blinds)</div>
+                </div>
+
+                <!-- ڕاست: بەروار، ناوی کڕیار، ژمارەی وەسڵ، ناونیشان -->
+                <div class="sh-meta-block">
+                    <div class="meta-item">
+                        <span>بەروار:</span>
+                        <span><?php echo $sale['short_date']; ?></span>
+                    </div>
+                    <div class="meta-item">
+                        <span>ژمارەی وەسڵ:</span>
+                        <span><?php echo $saleId; ?></span>
+                    </div>
+                    <div class="meta-item">
+                        <span>ناوی کڕیار:</span>
+                        <span><?php echo htmlspecialchars($sale['customer_name'] ?? ''); ?></span>
+                    </div>
+                    <div class="meta-item">
+                        <span>ناونیشانی کڕیار:</span>
+                        <span><?php echo htmlspecialchars($sale['customer_address'] ?? '', ENT_QUOTES, 'UTF-8'); ?></span>
+                    </div>
+                </div>
+
+            </div><!-- /.sh-header-wrap -->
 
             <!-- ══ CONTACT ══ -->
             <div class="sh-contact-bar">
                 ناونیشان: سلێمانی - ٦٠ مەتری خوار سوپەرمارکێتی چوێسە &nbsp;&nbsp;&nbsp;&nbsp; تەلەفۆن: 1089 124 0770 - 9988 958 0770
-            </div>
-
-            <!-- ══ META ROW ══ -->
-            <div class="sh-meta-row">
-                <div class="sh-meta-left">
-                    <div class="meta-item">
-                        <span>بەروار:</span>
-                        <span style="font-weight:normal;"><?php echo $sale['short_date']; ?></span>
-                    </div>
-                    <div class="meta-item">
-                        <span>ناوی کڕیار:</span>
-                        <span style="font-weight:normal;"><?php echo htmlspecialchars($sale['customer_name'] ?? ''); ?></span>
-                    </div>
-                </div>
-                <div class="sh-meta-right">
-                    <div class="meta-item">
-                        <span>ژمارەی وەسڵ:</span>
-                        <span style="font-weight:normal;"><?php echo $saleId; ?></span>
-                    </div>
-                    <div class="meta-item">
-                        <span>ناونیشانی کڕیار:</span>
-                        <span style="font-weight:normal;"><?php echo htmlspecialchars($sale['customer_address'] ?? '', ENT_QUOTES, 'UTF-8'); ?></span>
-                    </div>
-                </div>
             </div>
 
             <!-- ══ ITEMS TABLE ══ -->
