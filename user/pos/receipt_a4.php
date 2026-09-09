@@ -633,7 +633,7 @@ if ($isCurtainShopMode):
                             <th style="width:9%;">پانی (م)<br><small>Width (m)</small></th>
                             <th style="width:9%;">بەرزی (م)<br><small>Height (m)</small></th>
                             <th style="width:12%;">بڕی قوماش (مەترچوارگۆشە)<br><small>Fabric Qty (m)</small></th>
-                            <th style="width:12%;">نرخی مەترێک<br><small>Unit Price</small></th>
+                            <th style="width:12%;">نرخ<br><small>Unit Price</small></th>
                             <th style="width:16%;">کۆی گشتی<br><small>Total</small></th>
                         </tr>
                     </thead>
