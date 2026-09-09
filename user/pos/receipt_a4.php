@@ -313,20 +313,18 @@ if ($isCurtainShopMode):
         /* ══ Header — two-column layout ══ */
         .sh-header-wrap {
             display: flex;
-            flex-direction: row-reverse; /* RTL: logo block is visually on left */
+            flex-direction: row-reverse; /* RTL: logo (left in visual) = flex-end */
             justify-content: space-between;
-            align-items: stretch;        /* هەردوو ستوون هەمان بەرزی */
+            align-items: center;
             padding: 12px 25px 8px;
             direction: rtl;
-            min-height: 110px;
         }
 
         /* === Left column: logo + branding === */
         .sh-brand-block {
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
-            justify-content: center;     /* ناوەڕاستی ستوونی چەپ */
+            align-items: flex-start; /* visually left because dir=ltr override */
             direction: ltr;
             min-width: 45%;
         }
@@ -356,28 +354,27 @@ if ($isCurtainShopMode):
             margin-top: 2px;
         }
 
-        /* === Right column: meta info evenly spaced === */
+        /* === Right column: meta grid — label|value perfectly aligned === */
         .sh-meta-block {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
             direction: rtl;
             font-size: 13px;
             font-weight: 700;
-            padding: 4px 0;
-        }
-        .sh-meta-block .meta-item {
-            display: flex;
+            display: grid;
+            grid-template-columns: auto auto;
+            column-gap: 8px;
+            row-gap: 3px;
             align-items: center;
-            gap: 8px;
-            white-space: nowrap;
+            justify-items: start;
         }
-        .sh-meta-block .meta-item span:first-child {
+        .sh-meta-block .meta-label {
             color: #b89759;
+            white-space: nowrap;
+            justify-self: end;
         }
-        .sh-meta-block .meta-item span:last-child {
+        .sh-meta-block .meta-value {
             font-weight: 500;
             color: #222;
+            white-space: nowrap;
         }
 
         /* ══ Contact bar ══ */
@@ -606,22 +603,20 @@ if ($isCurtainShopMode):
 
                 <!-- ڕاست: بەروار، ناوی کڕیار، ژمارەی وەسڵ، ناونیشان -->
                 <div class="sh-meta-block">
-                    <div class="meta-item">
-                        <span>بەروار:</span>
-                        <span><?php echo $sale['short_date']; ?></span>
-                    </div>
-                    <div class="meta-item">
-                        <span>ژمارەی وەسڵ:</span>
-                        <span><?php echo $saleId; ?></span>
-                    </div>
-                    <div class="meta-item">
-                        <span>ناوی کڕیار:</span>
-                        <span><?php echo htmlspecialchars($sale['customer_name'] ?? ''); ?></span>
-                    </div>
-                    <div class="meta-item">
-                        <span>ناونیشانی کڕیار:</span>
-                        <span><?php echo htmlspecialchars($sale['customer_address'] ?? '', ENT_QUOTES, 'UTF-8'); ?></span>
-                    </div>
+                    <span class="meta-label">بەروار:</span>
+                    <span class="meta-value"><?php echo $sale['short_date']; ?></span>
+
+                    <span class="meta-label">ژمارەی وەسڵ:</span>
+                    <span class="meta-value"><?php echo $saleId; ?></span>
+
+                    <span class="meta-label">ناوی کڕیار:</span>
+                    <span class="meta-value"><?php echo htmlspecialchars($sale['customer_name'] ?? ''); ?></span>
+
+                    <span class="meta-label">ناونیشانی کڕیار:</span>
+                    <span class="meta-value"><?php echo htmlspecialchars($sale['customer_address'] ?? '', ENT_QUOTES, 'UTF-8'); ?></span>
+
+                    <span class="meta-label">تەلەفۆنی کڕیار:</span>
+                    <span class="meta-value"><?php echo htmlspecialchars($sale['customer_phone'] ?? ''); ?></span>
                 </div>
 
             </div><!-- /.sh-header-wrap -->
