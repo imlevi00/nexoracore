@@ -245,18 +245,8 @@ if ($isCurtainShopMode):
     foreach ($items as $it) {
         $itQty   = (float)$it['quantity'];
         $itPrice = (float)$it['unit_price'];
-        $itW     = isset($it['product_fabric_width'])  ? (float)$it['product_fabric_width']  : 0;
-        $itH     = isset($it['product_fabric_height']) ? (float)$it['product_fabric_height'] : 0;
-        $itUnit  = !empty($it['fabric_measure_unit']) ? $it['fabric_measure_unit'] : '';
-        if ($itW > 0 && $itH > 0) {
-            $isCm = (strtolower($itUnit) === 'cm');
-            $itW  = $isCm ? $itW / 100 : $itW;
-            $itH  = $isCm ? $itH / 100 : $itH;
-            $itSqm = round($itW * $itH, 4);
-        } else {
-            $itSqm = $itQty;
-        }
-        $grandTotal += $itSqm * $itPrice;
+        // م² = هەمان قیاسی سەبەتە (itQty)
+        $grandTotal += $itQty * $itPrice;
     }
     if (!empty($sale['discount'])) $grandTotal -= (float)$sale['discount'];
 
@@ -643,43 +633,52 @@ if ($isCurtainShopMode):
                             <th style="width:9%;">پانی (م)<br><small>Width (m)</small></th>
                             <th style="width:9%;">بەرزی (م)<br><small>Height (m)</small></th>
                             <th style="width:12%;">بڕی قوماش (مەترچوارگۆشە)<br><small>Fabric Qty (m)</small></th>
-                            <th style="width:12%;">نرخ<br><small>Unit Price</small></th>
+                            <th style="width:12%;">نرخی مەترێک<br><small>Unit Price</small></th>
                             <th style="width:16%;">کۆی گشتی<br><small>Total</small></th>
                         </tr>
                     </thead>
                     <tbody>
                     <?php
-                    $maxRows = 15; // ژمارەی هێڵەکان بۆ نیشاندان
+                    $maxRows = 15;
                     $rowNum  = 1;
                     $subTotal = 0;
                     foreach ($items as $item):
                         if ($rowNum > $maxRows) break;
-                        $rawQty    = (float)$item['quantity'];
+                        $rawQty    = (float)$item['quantity' ];
                         $unitPrice = (float)$item['unit_price'];
                         $fabricType = htmlspecialchars($item['product_name']);
                         
                         $unitSym = !empty($item['fabric_measure_unit']) ? htmlspecialchars($item['fabric_measure_unit']) : (!empty($item['unit_symbol']) ? htmlspecialchars($item['unit_symbol']) : 'm');
                         
-                        $wVal = isset($item['product_fabric_width']) ? (float)$item['product_fabric_width'] : 0;
-                        $hVal = isset($item['product_fabric_height']) ? (float)$item['product_fabric_height'] : 0;
+                        // پێوانەی کاڵا لە خشتەی products
+                        $wBase = isset($item['product_fabric_width'])  ? (float)$item['product_fabric_width']  : 0;
+                        $hBase = isset($item['product_fabric_height']) ? (float)$item['product_fabric_height'] : 0;
                         
-                        $widthStr  = $wVal > 0 ? rtrim(rtrim(number_format($wVal, 2), '0'), '.') . ' ' . $unitSym : '';
-                        $heightStr = $hVal > 0 ? rtrim(rtrim(number_format($hVal, 2), '0'), '.') . ' ' . $unitSym : '';
+                        $isCm   = (strtolower($unitSym) === 'cm' || $unitSym === 'سم');
+                        $wBaseM = $isCm ? $wBase / 100 : $wBase;
+                        $hBaseM = $isCm ? $hBase / 100 : $hBase;
                         
-                        // مەترچوارگۆشە = پانی × بەرزی
-                        if ($wVal > 0 && $hVal > 0) {
-                            $isCm = (strtolower($unitSym) === 'cm' || $unitSym === 'سم');
-                            $wMeters = $isCm ? $wVal / 100 : $wVal;
-                            $hMeters = $isCm ? $hVal / 100 : $hVal;
-                            $sqm = round($wMeters * $hMeters, 4);
+                        if ($wBase > 0 && $hBase > 0) {
+                            // پانی و بەرزی پیشاندراو = پێوانەی کاڵا × بڕ (زانیاریی)
+                            $wDisplay = $wBaseM * $rawQty;
+                            $hDisplay = $hBaseM * $rawQty;
+                            
+                            $displayUnit = $isCm ? 'cm' : 'm';
+                            $displayW    = $isCm ? $wDisplay * 100 : $wDisplay;
+                            $displayH    = $isCm ? $hDisplay * 100 : $hDisplay;
+                            $widthStr    = rtrim(rtrim(number_format($displayW, 2), '0'), '.') . ' ' . $displayUnit;
+                            $heightStr   = rtrim(rtrim(number_format($displayH, 2), '0'), '.') . ' ' . $displayUnit;
                         } else {
-                            $sqm = $rawQty;
+                            $widthStr  = '';
+                            $heightStr = '';
                         }
                         
+                        // م² = هەمان قیاسی سەبەتە (rawQty)  →  کۆ = rawQty × نرخ
+                        $sqm     = $rawQty;
                         $rowTotal  = $sqm * $unitPrice;
                         $subTotal += $rowTotal;
                         
-                        $sqmDisplay = number_format($sqm, ($sqm == (int)$sqm) ? 0 : 2);
+                        $sqmDisplay = rtrim(rtrim(number_format($sqm, 4), '0'), '.');
                         $decim      = ($saleCurrency === 'USD') ? 2 : 0;
                     ?>
                         <tr>
@@ -734,7 +733,7 @@ if ($isCurtainShopMode):
                     <ul class="sh-notes-list">
                         <li>  کۆی گشتی (Subtotal):<?php echo number_format($subtotal, $decim); ?></li>
                         <li>  داشکاندن (Discount):<?php echo number_format($discount, $decim); ?></li>
-                        <li>  پێشەکی (Deposit):<</li>
+                        <li>  پێشەکی (Deposit):</li>
                         <li>  بڕی ماوە (Balance):</li>
                     </ul>
                     <div class="sh-notes-date">
