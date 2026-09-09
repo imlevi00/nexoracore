@@ -392,7 +392,7 @@
                                 <th style="width: 20%; text-align: right;">ناوی کاڵا</th>
                                 <th style="width: 10%; text-align: center;">بارکۆد</th>
                                 <th style="width: 8%; text-align: center;">یەکە</th>
-                                <th style="width: 13%; text-align: center;">قیاس (مەتر)</th>
+                                <th style="width: 13%; text-align: center;">قیاس (مەترچوارگۆشە)</th>
                                 <th style="width: 11%; text-align: center;">نرخ</th>
                                 <th style="width: 13%; text-align: center;">بڕ</th>
                                 <th style="width: 16%; text-align: center;">کۆی نرخ</th>
