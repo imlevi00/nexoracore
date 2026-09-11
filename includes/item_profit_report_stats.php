@@ -246,20 +246,26 @@ if (!function_exists('fetchItemProfitReturnsAggregatesByProduct')) {
             $colCheck = $conn->query("SHOW COLUMNS FROM returns LIKE 'sale_id'");
             $returnsHasSaleId = ($colCheck && $colCheck->num_rows > 0);
         }
-        $currencyExpr = $returnsHasSaleId
-            ? "COALESCE((SELECT s2.currency FROM sales s2 WHERE s2.id = r.sale_id LIMIT 1), 'IQD')"
+
+        // بۆ چارەسەرکردنی only_full_group_by: LEFT JOIN بەکاردەهێنین لەجیاتی correlated subquery
+        $currencySelect = $returnsHasSaleId
+            ? "COALESCE(s_orig.currency, 'IQD')"
             : "'IQD'";
+        $currencyJoin = $returnsHasSaleId
+            ? "LEFT JOIN sales s_orig ON s_orig.id = r.sale_id"
+            : "";
 
         $sql = "
             SELECT
                 ri.product_id,
-                $currencyExpr AS currency,
+                $currencySelect AS currency,
                 MAX(ri.product_name) AS product_name,
                 COALESCE(SUM(ri.quantity), 0) AS qty,
                 COALESCE(SUM(ri.total_price), 0) AS revenue,
                 COALESCE(SUM($returnLineCogs), 0) AS cogs
             FROM return_items ri
             INNER JOIN returns r ON ri.return_id = r.id
+            $currencyJoin
             LEFT JOIN product_units pu ON (ri.product_id = pu.product_id AND ri.unit_id = pu.unit_id)
             WHERE r.user_id = ?
             AND DATE(r.return_date) BETWEEN ? AND ?
@@ -293,7 +299,7 @@ if (!function_exists('fetchItemProfitReturnsAggregatesByProduct')) {
             }
         }
 
-        $sql .= " GROUP BY ri.product_id, $currencyExpr";
+        $sql .= " GROUP BY ri.product_id, $currencySelect";
 
         $stmt = $conn->prepare($sql);
         if (!$stmt) {
