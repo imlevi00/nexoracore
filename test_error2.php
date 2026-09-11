@@ -92,3 +92,4 @@ try {
 } catch (\Throwable $e) {
     echo "ERROR: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine();
 }
+
