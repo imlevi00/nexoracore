@@ -1,6 +1,6 @@
 <?php
 /**
- * بەشی سەرەکی دەربارەی ئێمە و سیستەم - user/aboutsystem/main.php
+ * پەیوەندیمان پێوە بکە - user/aboutsystem/contact.php
  */
 
 require_once '../../config/config.php';
@@ -13,10 +13,6 @@ SessionManager::requireAuth('user');
 $currentUser = getCurrentUser();
 $userId = $currentUser['id'];
 
-// وەرگرتنی دەسەڵاتەکان
-$userPermissions = getUserPermissions($userId);
-$isSubUser = isset($currentUser['user_type']) && $currentUser['user_type'] === 'sub';
-
 $csrf_token = Security::generateCSRFToken();
 ?>
 
@@ -25,8 +21,8 @@ $csrf_token = Security::generateCSRFToken();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>دەربارەی ئێمە و سیستەم - <?php echo SITE_NAME; ?></title>
-    <meta name="theme-color" content="#0d6efd">
+    <title>پەیوەندیمان پێوە بکە - <?php echo SITE_NAME; ?></title>
+    <meta name="theme-color" content="#4f46e5">
     
     <!-- CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -37,16 +33,11 @@ $csrf_token = Security::generateCSRFToken();
     <style>
         :root {
             --contact-brand: #4f46e5;
-            --contact-brand-dark: #3730a3;
             --contact-surface: #ffffff;
             --contact-surface-soft: #f8fafc;
             --contact-border: rgba(148, 163, 184, 0.25);
             --contact-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.06), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
             --contact-shadow-hover: 0 20px 30px -10px rgba(79, 70, 229, 0.15);
-        }
-
-        .section-contact-card {
-            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
         }
 
         .contact-main-wrapper {
@@ -64,30 +55,6 @@ $csrf_token = Security::generateCSRFToken();
             padding: 2.5rem 2rem;
             position: relative;
             overflow: hidden;
-        }
-
-        .contact-hero-banner::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -20%;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-        }
-
-        .contact-hero-banner::after {
-            content: '';
-            position: absolute;
-            bottom: -30%;
-            right: -10%;
-            width: 250px;
-            height: 250px;
-            background: radial-gradient(circle, rgba(99,102,241,0.3) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
         }
 
         .contact-channel-card {
@@ -252,95 +219,50 @@ $csrf_token = Security::generateCSRFToken();
         }
     </style>
 </head>
-<body class="aboutsystem-module-page aboutsystem-hub-page bg-body-secondary">
+<body class="aboutsystem-module-page bg-body-secondary">
 
     <!-- Navigation -->
     <?php include_once '../../includes/navigation.php'; ?>
 
     <!-- Main Content -->
-    <div class="container-fluid py-4 hub-page-content">
+    <div class="container py-4">
         
         <!-- Page Header -->
         <div class="row mb-4">
             <div class="col-12">
                 <div class="d-flex justify-content-between align-items-center hub-page-header flex-wrap gap-2">
                     <div>
+                        <nav class="small text-muted mb-2" aria-label="breadcrumb">
+                            <a href="<?php echo url('user/dashboard/index.php'); ?>" class="text-decoration-none text-muted">
+                                <i class="bi bi-speedometer2"></i> داشبۆرد
+                            </a>
+                            <span class="mx-2">/</span>
+                            <a href="<?php echo url('user/aboutsystem/main.php'); ?>" class="text-decoration-none text-muted">
+                                دەربارەی ئێمە و سیستەم
+                            </a>
+                            <span class="mx-2">/</span>
+                            <span class="text-primary fw-medium">پەیوەندیمان پێوە بکە</span>
+                        </nav>
                         <h2 class="mb-1">
-                            <i class="bi bi-info-circle text-primary"></i>
-                            دەربارەی ئێمە و سیستەم
+                            <i class="bi bi-headset text-primary"></i>
+                            پەیوەندیمان پێوە بکە
                         </h2>
-                        <p class="text-muted mb-0">زانیاری پڕۆژە، تایبەتمەندییەکان و پاڵپشتی تەکنیکی</p>
+                        <p class="text-muted mb-0">تیمی پاڵپشتی، خزمەتگوزاری کڕیاران و تۆڕە کۆمەڵایەتییەکان</p>
                     </div>
-                    <a href="<?php echo url('user/dashboard/index.php'); ?>" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-right"></i> گەڕانەوە بۆ داشبۆرد
-                    </a>
+                    <div class="d-flex gap-2">
+                        <a href="<?php echo url('user/aboutsystem/main.php'); ?>" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-right"></i> دەربارەی سیستەم
+                        </a>
+                        <a href="<?php echo url('user/dashboard/index.php'); ?>" class="btn btn-outline-primary">
+                            <i class="bi bi-speedometer2"></i> داشبۆرد
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- About System Cards -->
-        <div class="row g-3 mb-4">
-            
-            <!-- دەربارەی ئێمە -->
-            <div class="dashboard-card-wrapper">
-                <a href="<?php echo url('user/about/index.php'); ?>" class="text-decoration-none">
-                    <div class="dashboard-card section-about p-4 h-100">
-                        <div class="text-center text-white">
-                            <div class="card-icon mx-auto mb-3">
-                                <i class="bi bi-info-circle"></i>
-                            </div>
-                            <h6 class="mb-0">دەربارەی ئێمە</h6>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <!-- پەیوەندیمان پێوە بکە -->
-            <div class="dashboard-card-wrapper">
-                <a href="#contact-section" class="text-decoration-none" onclick="document.getElementById('contact-section')?.scrollIntoView({behavior: 'smooth'}); return false;">
-                    <div class="dashboard-card section-contact-card p-4 h-100">
-                        <div class="text-center text-white">
-                            <div class="card-icon mx-auto mb-3">
-                                <i class="bi bi-headset"></i>
-                            </div>
-                            <h6 class="mb-0">پەیوەندیمان پێوە بکە</h6>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <!-- پاڵپشتی -->
-            <div class="dashboard-card-wrapper">
-                <a href="<?php echo url('user/support/index.php'); ?>" class="text-decoration-none">
-                    <div class="dashboard-card section-support p-4 h-100">
-                        <div class="text-center text-white">
-                            <div class="card-icon mx-auto mb-3">
-                                <i class="bi bi-heart-fill"></i>
-                            </div>
-                            <h6 class="mb-0">پاڵپشتی</h6>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <!-- پرسیار و وەڵامە باوەکان -->
-            <div class="dashboard-card-wrapper">
-                <a href="<?php echo url('questions_and_answers.html'); ?>" target="_blank" class="text-decoration-none">
-                    <div class="dashboard-card section-faq p-4 h-100">
-                        <div class="text-center text-white">
-                            <div class="card-icon mx-auto mb-3">
-                                <i class="bi bi-question-circle"></i>
-                            </div>
-                            <h6 class="mb-0">پرسیار و وەڵامە باوەکان</h6>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            
-        </div>
-
-        <!-- بەشی تازە: پەیوەندیمان پێوە بکە -->
-        <div class="row" id="contact-section">
+        <!-- بەشی سەرەکی پەیوەندی -->
+        <div class="row">
             <div class="col-12">
                 <div class="contact-main-wrapper mb-4">
                     
@@ -353,7 +275,7 @@ $csrf_token = Security::generateCSRFToken();
                                 </span>
                                 <h3 class="fw-bold mb-2">پەیوەندیمان پێوە بکە</h3>
                                 <p class="mb-0 text-white-50" style="font-size: 1.05rem; line-height: 1.8;">
-                                    ئێمە لە تیمی <strong>کاشێری ئای (NexoraCore)</strong> پابەندین بە پێشکەشکردنی زیرەکترین و باشترین چارەسەرەکانی بەڕێوەبردنی خاڵی فرۆشتن (POS)، ژمێریاری، کۆگا و چاودێری بازرگانی. بۆ هەر پرسیارێک، ڕاهێنانی ستاف، داواکاری نوێکردنەوە یان پاڵپشتی تەکنیکی، دەتوانن لە ڕێگەی تەلەفۆن، واتسئەپ، یان تۆڕە کۆمەڵایەتییەکانمانەوە پەیوەندیمان پێوە بکەن. هەمیشە ئامادەی خزمەتکردنتانین.
+                                    ئێمە لە تیمی <strong>کاشێری نێکسۆرا کۆر (NexoraCore)</strong> پابەندین بە پێشکەشکردنی زیرەکترین و باشترین چارەسەرەکانی بەڕێوەبردنی خاڵی فرۆشتن (POS)، ژمێریاری، کۆگا و چاودێری بازرگانی. بۆ هەر پرسیارێک، ڕاهێنانی ستاف، داواکاری نوێکردنەوە یان پاڵپشتی تەکنیکی، دەتوانن لە ڕێگەی تەلەفۆن، واتسئەپ، یان تۆڕە کۆمەڵایەتییەکانمانەوە پەیوەندیمان پێوە بکەن. هەمیشە ئامادەی خزمەتکردنتانین.
                                 </p>
                             </div>
                             <div class="col-12 col-lg-4 text-lg-start">
@@ -491,7 +413,7 @@ $csrf_token = Security::generateCSRFToken();
                                                         <span>ئینستاگرام (Instagram)</span>
                                                         <span class="badge bg-white text-dark small px-2 py-1">فۆڵۆمان بکە</span>
                                                     </div>
-                                                    <small class="text-white-50 font-monospace" dir="ltr">@kasheryai1</small>
+                                                    <small class="text-white-50 font-monospace" dir="ltr">@zher.zhmerr</small>
                                                 </div>
                                                 <div>
                                                     <i class="bi bi-arrow-left-circle fs-4"></i>
@@ -508,7 +430,7 @@ $csrf_token = Security::generateCSRFToken();
                                                         <span>فەیسبووک (Facebook)</span>
                                                         <span class="badge bg-white text-dark small px-2 py-1">پەڕەی فەرمی</span>
                                                     </div>
-                                                    <small class="text-white-50">KasheryAi Official</small>
+                                                    <small class="text-white-50">NexoraCore</small>
                                                 </div>
                                                 <div>
                                                     <i class="bi bi-arrow-left-circle fs-4"></i>
@@ -520,7 +442,7 @@ $csrf_token = Security::generateCSRFToken();
 
                                     <div class="mt-4 pt-3 border-top text-muted small d-flex align-items-center gap-2">
                                         <i class="bi bi-check-circle-fill text-success"></i>
-                                        <span>ئەکاونتە فەرمییەکانی کاشێری ئای (KasheryAi)</span>
+                                        <span>ئەکاونتە فەرمییەکانی کاشێری نێکسۆرا کۆر (NexoraCore)</span>
                                     </div>
                                 </div>
                             </div>
@@ -583,3 +505,4 @@ $csrf_token = Security::generateCSRFToken();
 
 </body>
 </html>
+
