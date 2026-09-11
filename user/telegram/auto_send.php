@@ -6,8 +6,8 @@
  * ئەم فایلە دەبێت لە دوای لۆگین بانگهێشت بکرێت
  */
 
-require_once '../../config/config.php';
-require_once 'telegram_helper.php';
+require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/telegram_helper.php';
 
 /**
  * پشکنین و ناردنی ڕاپۆرتی ئۆتۆماتیک

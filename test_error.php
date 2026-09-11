@@ -17,78 +17,14 @@ $database = new Database();
 $conn = $database->connect();
 
 $userId = 1;
-$isSubUser = false;
-$currentUser = ['id' => 1, 'user_type' => 'main'];
-
-try {
-    $today = date('Y-m-d');
-    $fromDate = $today;
-    $toDate = $today;
-    $searchQ = '';
-    $filterFieldId = 0;
-    $filterOptionId = 0;
-    $sortBy = 'qty';
-    $sortDir = 'desc';
-    $page = 1;
-    $perPage = 50;
-    $activeTab = 'products';
-    $effectiveSubUserId = null;
-    $productIdsFilter = null;
-
-    $recognizeDebtRevenueAtSale = getRecognizeCustomerDebtRevenueAtSale($userId);
-
-    $dataSignature = getReportsDataSignature($conn, (int)$userId, $effectiveSubUserId);
-    $cacheKey = sha1(implode('|', [
-        'item_profit_report_v3_multicurrency',
-        (string)$userId,
-        $fromDate,
-        $toDate,
-        (string)($effectiveSubUserId ?? 0),
-        $searchQ,
-        (string)$filterFieldId,
-        (string)$filterOptionId,
-        $sortBy,
-        $sortDir,
-        (string)$page,
-        $activeTab,
-        $dataSignature,
-    ]));
-
-    $cached = loadItemProfitReportCached($cacheKey, 3600);
-    if (is_array($cached) && isset($cached['productReport'], $cached['optionRows'])) {
-        $productReport = $cached['productReport'];
-        $optionRows = $cached['optionRows'];
-    } else {
-        $productReport = fetchItemProfitByProduct(
-            $conn,
-            $userId,
-            $fromDate,
-            $toDate,
-            $effectiveSubUserId,
-            $searchQ,
-            $productIdsFilter,
-            $sortBy,
-            $sortDir,
-            $page,
-            $perPage
-        );
-        $optionRows = fetchItemProfitByCustomFieldOptions(
-            $conn,
-            $userId,
-            $fromDate,
-            $toDate,
-            $effectiveSubUserId,
-            $searchQ,
-            $filterFieldId > 0 ? $filterFieldId : 0
-        );
-        saveItemProfitReportCached($cacheKey, [
-            'productReport' => $productReport,
-            'optionRows' => $optionRows,
-        ]);
-        cleanupStaleReportsCache(getReportsCacheDir() . DIRECTORY_SEPARATOR . $cacheKey . '.json');
+$res = $conn->query("SELECT * FROM system_settings");
+if ($res) {
+    echo "<pre>";
+    while ($row = $res->fetch_assoc()) {
+        print_r($row);
     }
-
-    echo "SUCCESS! No fatal errors.";
-} catch (\Throwable $e) {
-    echo "ERROR: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine();
+    echo "</pre>";
+} else {
+    echo "Query failed: " . $conn->error;
 }
+

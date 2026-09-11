@@ -16,13 +16,28 @@ enforceAuthorizationOrDeny($currentUser, 'telegram.view', [
     'route' => '/user/telegram/index.php',
     'request_method' => $_SERVER['REQUEST_METHOD'] ?? 'GET'
 ], 'redirect');
-$userId = $currentUser['id'];
+$userId = (int)$currentUser['id'];
+$isMainUser = !isset($currentUser['user_type']) || $currentUser['user_type'] === 'main';
 
 $success = '';
 $error = '';
 
+// دڵنیابوونەوە لە هەبوونی خشتەی system_settings
+$conn->query("CREATE TABLE IF NOT EXISTS system_settings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    setting_key VARCHAR(100) NOT NULL UNIQUE,
+    setting_value TEXT NULL,
+    description TEXT NULL,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+// چالاککردنی سیستەمی تیلیگرام بۆ سەرجەم بەکارهێنەران (ئەگەر لە داتابەیس دانەمەزرابوو یان ناچالاک بوو)
+$conn->query("INSERT INTO system_settings (setting_key, setting_value, description) 
+              VALUES ('telegram_enabled', '1', 'دۆخی چالاکبوونی سیستەمی تیلیگرام') 
+              ON DUPLICATE KEY UPDATE setting_value = '1'");
+
 $telegramSettings = [];
-$result = $conn->query("SELECT setting_key, setting_value FROM system_settings WHERE setting_key IN ('telegram_bot_link', 'telegram_enabled')");
+$result = $conn->query("SELECT setting_key, setting_value FROM system_settings WHERE setting_key IN ('telegram_bot_link', 'telegram_enabled', 'telegram_bot_token')");
 if ($result) {
     while ($row = $result->fetch_assoc()) {
         $telegramSettings[$row['setting_key']] = $row['setting_value'];
@@ -31,6 +46,10 @@ if ($result) {
 
 $telegramEnabled = isset($telegramSettings['telegram_enabled']) && $telegramSettings['telegram_enabled'] == '1';
 $botLink = $telegramSettings['telegram_bot_link'] ?? '';
+$botToken = $telegramSettings['telegram_bot_token'] ?? '';
+if (empty($botToken) && function_exists('kasher_secret')) {
+    $botToken = kasher_secret('telegram_bot_token', 'TELEGRAM_BOT_TOKEN') ?: kasher_secret('nrx_bot_token', 'NRX_BOT_TOKEN');
+}
 
 $stmt = $conn->prepare("SELECT telegram_id, telegram_last_sent FROM users WHERE id = ?");
 $stmt->bind_param("i", $userId);
@@ -49,6 +68,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!Security::validateCSRFToken($_POST['csrf_token'] ?? '')) {
         $error = 'نادروستی ئامنیەتی. دووبارە هەوڵ بدەرەوە';
+    }
+
+    elseif ($isMainUser && $action === 'admin_save_settings') {
+        $newEnabled = isset($_POST['telegram_enabled']) && $_POST['telegram_enabled'] === '1' ? '1' : '0';
+        $newBotToken = trim($_POST['telegram_bot_token'] ?? '');
+        $newBotLink = trim($_POST['telegram_bot_link'] ?? '');
+
+        if (!empty($newBotLink) && !preg_match('#^https?://#i', $newBotLink)) {
+            $newBotLink = 'https://t.me/' . ltrim($newBotLink, '@');
+        }
+
+        $stmt = $conn->prepare("INSERT INTO system_settings (setting_key, setting_value, description) VALUES ('telegram_enabled', ?, 'دۆخی چالاکبوونی سیستەمی تیلیگرام') ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)");
+        $stmt->bind_param('s', $newEnabled);
+        $stmt->execute();
+        $stmt->close();
+
+        $stmt = $conn->prepare("INSERT INTO system_settings (setting_key, setting_value, description) VALUES ('telegram_bot_token', ?, 'تۆکنی بۆتی تیلیگرام') ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)");
+        $stmt->bind_param('s', $newBotToken);
+        $stmt->execute();
+        $stmt->close();
+
+        $stmt = $conn->prepare("INSERT INTO system_settings (setting_key, setting_value, description) VALUES ('telegram_bot_link', ?, 'لینکی بۆتی تیلیگرام') ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)");
+        $stmt->bind_param('s', $newBotLink);
+        $stmt->execute();
+        $stmt->close();
+
+        $telegramEnabled = ($newEnabled === '1');
+        $botToken = $newBotToken;
+        $botLink = $newBotLink;
+        $success = 'ڕێکخستنەکانی بۆتی تیلیگرام بە سەرکەوتوویی پاشەکەوت کران';
+    }
+
+    elseif ($isMainUser && $action === 'admin_test_bot') {
+        $tokenToTest = trim($_POST['telegram_bot_token'] ?? $botToken);
+        if (empty($tokenToTest)) {
+            $error = 'تکایە سەرەتا تۆکنی بۆت داخڵ بکە';
+        } else {
+            $testRes = TelegramHelper::testBotToken($tokenToTest);
+            if (!empty($testRes['ok'])) {
+                $botInfo = $testRes['result'];
+                $botName = $botInfo['first_name'] ?? '';
+                $botUser = $botInfo['username'] ?? '';
+                $success = "🎉 پەیوەندی سەرکەوتوو بوو! ناوی بۆت: {$botName} (@{$botUser})";
+
+                if (!empty($botUser)) {
+                    $autoLink = 'https://t.me/' . $botUser;
+                    $stmt = $conn->prepare("INSERT INTO system_settings (setting_key, setting_value, description) VALUES ('telegram_bot_link', ?, 'لینکی بۆتی تیلیگرام') ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)");
+                    $stmt->bind_param('s', $autoLink);
+                    $stmt->execute();
+                    $stmt->close();
+                    $botLink = $autoLink;
+                }
+            } else {
+                $error = 'نەتوانرا پەیوەندی بە بۆتەوە بکرێت: ' . ($testRes['error'] ?? 'تۆکنەکە نادروستە');
+            }
+        }
+    }
+
+    elseif ($action === 'find_bot_chats') {
+        $telegram = new TelegramHelper();
+        $recentSenders = $telegram->getRecentBotSenders();
+        if (empty($recentSenders)) {
+            $error = 'هیچ نامەیەک نەدۆزرایەوە! تکایە لەناو بەرنامەی تیلیگرام بچۆ ناو بۆتەکەتان و دوگمەی Start داگرە، پاشان دووبارە کلیک لێرە بکەرەوە.';
+        } else {
+            $success = 'ئایدی(یەکان) دۆزرانەوە! کلیک لەسەر ئایدیەکەت بکە لە خوارەوە بۆ دانانی.';
+        }
     }
 
     elseif ($action === 'update_telegram_id') {
@@ -87,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 TelegramHelper::logTelegramSend($userId, 'test_message', $telegramId, 'success');
                 $recentLogs = TelegramHelper::getRecentUserLogs($userId, 10);
             } else {
-                $error = 'نەتوانرا پەیام بنێردرێت. تکایە ئایدی تیلیگرامەکەت بپشکنەرەوە';
+                $error = 'نەتوانرا پەیام بنێردرێت: ' . ($result['error'] ?? 'تکایە ئایدی و تۆکنی بۆت بپشکنەرەوە');
                 TelegramHelper::logTelegramSend($userId, 'test_message', $telegramId, 'failed', $result['error'] ?? 'Unknown error');
             }
         }
@@ -264,9 +349,93 @@ $botUsername = $botLink ? '@' . str_replace('https://t.me/', '', $botLink) : 'ب
                 <i class="bi bi-exclamation-triangle me-2"></i>
                 سیستەمی تیلیگرام لەلایەن بەڕێوەبەرەوە ناچالاکە. تکایە پەیوەندی بە بەڕێوەبەرەوە بکە.
             </div>
+        <?php elseif ($isMainUser && empty($botToken)): ?>
+            <div class="alert alert-info border-info-subtle mb-4 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div>
+                    <i class="bi bi-info-circle-fill me-2 text-info"></i>
+                    <strong>سیستەمی تیلیگرام چالاکە!</strong> بۆ ئەوەی بۆتەکە بتوانێت پەیام و باک ئەپ بنێرێت، تکایە تۆکنی بۆتەکەت کە لە <a href="https://t.me/BotFather" target="_blank" class="fw-bold text-decoration-underline text-info-emphasis">@BotFather</a> وەرتگرتووە لە بەشی ڕێکخستنی بەڕێوەبەر دابنێ.
+                </div>
+                <a href="#admin-telegram-settings" class="btn btn-sm btn-info text-white">
+                    <i class="bi bi-arrow-down-circle me-1"></i> دانانی تۆکنی بۆت
+                </a>
+            </div>
         <?php endif; ?>
 
         <div class="row g-4">
+
+            <!-- ڕێکخستنەکانی بۆتی تیلیگرام - تایبەت بە بەڕێوەبەر -->
+            <?php if ($isMainUser): ?>
+            <div class="col-12" id="admin-telegram-settings">
+                <div class="settings-card card p-4 shadow-sm border-primary-subtle" style="background: var(--surface-1);">
+                    <div class="settings-card-header-accent d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="settings-icon section-security" style="width:48px;height:48px;font-size:22px;">
+                                <i class="bi bi-robot"></i>
+                            </div>
+                            <div>
+                                <h4 class="mb-1 d-flex align-items-center gap-2">
+                                    ڕێکخستنەکانی بۆتی تیلیگرام
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle fs-6 fw-normal">تایبەت بە بەڕێوەبەر</span>
+                                </h4>
+                                <p class="text-muted small mb-0">دیاریکردنی تۆکنی بۆت، لینکی فەرمی و چالاککردن بۆ هەموو یوزەرەکان</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge rounded-pill <?php echo !empty($botToken) ? 'text-bg-success' : 'text-bg-warning'; ?> px-3 py-2">
+                                <i class="bi <?php echo !empty($botToken) ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill'; ?> me-1"></i>
+                                <?php echo !empty($botToken) ? 'تۆکنی بۆت دانراوە' : 'تۆکنی بۆت دیاری نەکراوە'; ?>
+                            </span>
+                        </div>
+                    </div>
+
+                    <form method="POST" class="mt-3">
+                        <input type="hidden" name="action" value="admin_save_settings">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
+
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label for="telegram_bot_token" class="form-label fw-bold small">
+                                    <i class="bi bi-key-fill text-primary me-1"></i> تۆکنی بۆتی تیلیگرام (Bot Token)
+                                </label>
+                                <input type="text" class="form-control text-start font-monospace" id="telegram_bot_token" 
+                                       name="telegram_bot_token" value="<?php echo htmlspecialchars($botToken); ?>" 
+                                       placeholder="نموونە: 1234567890:ABCdefGHIjklMNOpqrSTUvwxYZ" dir="ltr" autocomplete="off">
+                                <div class="form-text small">تۆکنەکەت لە <a href="https://t.me/BotFather" target="_blank" rel="noopener" class="text-decoration-underline">@BotFather</a> وەربگرە بە دروستکردنی بۆتێک.</div>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="telegram_bot_link" class="form-label fw-bold small">
+                                    <i class="bi bi-link-45deg text-primary me-1"></i> لینکی بۆت یان یوزەرنەیم (Bot Link / Username)
+                                </label>
+                                <input type="text" class="form-control text-start" id="telegram_bot_link" 
+                                       name="telegram_bot_link" value="<?php echo htmlspecialchars($botLink); ?>" 
+                                       placeholder="نموونە: https://t.me/MyStoreBot یان @MyStoreBot" dir="ltr" autocomplete="off">
+                                <div class="form-text small">بۆ ئەوەی بەکارهێنەران دەستبەجێ لەناو ڕێنماییەکانەوە بۆتەکە بکەنەوە.</div>
+                            </div>
+
+                            <div class="col-12 d-flex flex-wrap align-items-center justify-content-between gap-3 pt-2">
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="telegram_enabled_switch" 
+                                           name="telegram_enabled" value="1" <?php echo $telegramEnabled ? 'checked' : ''; ?>>
+                                    <label class="form-check-label fw-bold small" for="telegram_enabled_switch">
+                                        چالاککردنی سیستەمی تیلیگرام بۆ سەرجەم بەکارهێنەران
+                                    </label>
+                                </div>
+
+                                <div class="d-flex gap-2">
+                                    <button type="submit" name="action" value="admin_test_bot" class="btn btn-outline-info">
+                                        <i class="bi bi-plug-fill me-1"></i> پشکنینی پەیوەندی بۆت
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-check2-circle me-1"></i> پاشەکەوتکردنی ڕێکخستنی بۆت
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <?php endif; ?>
 
             <!-- پەیوەندی تیلیگرام و ڕێنمایی -->
             <div class="col-12 col-lg-6">
@@ -288,7 +457,15 @@ $botUsername = $botLink ? '@' . str_replace('https://t.me/', '', $botLink) : 'ب
                         <div class="d-flex flex-column gap-2 small">
                             <div class="d-flex align-items-center gap-2">
                                 <span class="tg-step-badge">١</span>
-                                <span>لە تیلیگرام بگەڕێ بۆ: <strong class="text-primary"><?php echo htmlspecialchars($botUsername); ?></strong></span>
+                                <span>لە تیلیگرام بگەڕێ بۆ: 
+                                <?php if (!empty($botLink)): ?>
+                                    <a href="<?php echo htmlspecialchars($botLink); ?>" target="_blank" rel="noopener noreferrer" class="fw-bold text-primary text-decoration-none">
+                                        <?php echo htmlspecialchars($botUsername); ?> <i class="bi bi-box-arrow-up-right small"></i>
+                                    </a>
+                                <?php else: ?>
+                                    <strong class="text-primary"><?php echo htmlspecialchars($botUsername); ?></strong>
+                                <?php endif; ?>
+                                </span>
                             </div>
                             <div class="d-flex align-items-center gap-2">
                                 <span class="tg-step-badge">٢</span>
@@ -296,23 +473,51 @@ $botUsername = $botLink ? '@' . str_replace('https://t.me/', '', $botLink) : 'ب
                             </div>
                             <div class="d-flex align-items-center gap-2">
                                 <span class="tg-step-badge">٣</span>
-                                <span>فەرمانی <code class="px-2 py-1 rounded bg-body-tertiary">/id</code> بنێرە تا ئایدی تایبەتت پێبدات.</span>
+                                <span>فەرمانی <code class="px-2 py-1 rounded bg-body-tertiary">/start</code> بنێرە تا بۆتەکە بناسرێتەوە.</span>
                             </div>
                             <div class="d-flex align-items-center gap-2">
                                 <span class="tg-step-badge">٤</span>
-                                <span>ئایدیەکە لە خوارەوە بنووسە و پاشەکەوتی بکە.</span>
+                                <span>ئایدیەکەت بنووسە یان کلیک لەسەر «وەرگرتنی ئایدی لە دوایین پەیامەکان» بکە.</span>
                             </div>
                         </div>
+
+                        <div class="mt-3 p-2 rounded bg-danger-subtle text-danger border border-danger-subtle small">
+                            <i class="bi bi-shield-exclamation me-1"></i>
+                            <strong>تێبینی زۆر گرنگ:</strong> تیلیگرام ڕێگە نادات بۆت نامە بنێرێت تا ئەو کاتەی بەکارهێنەر لەناو بۆتەکە دوگمەی <strong>Start</strong> دانەگرێت (دەنا هەڵەی 403 دەدات).
+                        </div>
                     </div>
+
+                    <?php if (!empty($recentSenders)): ?>
+                    <div class="p-3 border rounded-3 bg-body-tertiary mb-3">
+                        <div class="small fw-bold text-success mb-2">
+                            <i class="bi bi-check-circle-fill me-1"></i> کلیک لەسەر ناوت بکە بۆ دانانی ئایدیەکەت بە ئۆتۆماتیک:
+                        </div>
+                        <div class="d-flex flex-wrap gap-2">
+                            <?php foreach ($recentSenders as $s): ?>
+                            <button type="button" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1" 
+                                    onclick="document.getElementById('telegram_id').value='<?php echo htmlspecialchars($s['chat_id']); ?>';">
+                                <i class="bi bi-person-fill"></i>
+                                <span><?php echo htmlspecialchars($s['name']); ?></span>
+                                <span class="badge bg-primary text-white font-monospace"><?php echo htmlspecialchars($s['chat_id']); ?></span>
+                            </button>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <?php endif; ?>
 
                     <form method="POST" class="mb-0">
                         <input type="hidden" name="action" value="update_telegram_id">
                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
 
                         <div class="mb-3">
-                            <label for="telegram_id" class="form-label fw-bold">
-                                <i class="bi bi-person-badge"></i> ئایدی تیلیگرام (Chat ID)
-                            </label>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label for="telegram_id" class="form-label fw-bold mb-0">
+                                    <i class="bi bi-person-badge"></i> ئایدی تیلیگرام (Chat ID)
+                                </label>
+                                <button type="submit" form="find-id-form" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 0.8rem;">
+                                    <i class="bi bi-search me-1"></i> دۆزینەوەی ئایدی لە بۆت
+                                </button>
+                            </div>
                             <input type="text" class="form-control form-control-lg text-start" id="telegram_id"
                                    name="telegram_id" value="<?php echo htmlspecialchars($telegramId); ?>"
                                    placeholder="نموونە: 123456789"
@@ -320,7 +525,7 @@ $botUsername = $botLink ? '@' . str_replace('https://t.me/', '', $botLink) : 'ب
                                    autocomplete="off"
                                    dir="ltr"
                                    <?php echo !$telegramEnabled ? 'disabled' : ''; ?>>
-                            <div class="form-text">تەنها ژمارەی Chat ID داخڵ بکە</div>
+                            <div class="form-text">نموونە: 123456789 (تەنها ژمارەی Chat ID)</div>
                         </div>
 
                         <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
@@ -334,6 +539,11 @@ $botUsername = $botLink ? '@' . str_replace('https://t.me/', '', $botLink) : 'ب
                             </button>
                             <?php endif; ?>
                         </div>
+                    </form>
+
+                    <form method="POST" id="find-id-form" class="d-none">
+                        <input type="hidden" name="action" value="find_bot_chats">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
                     </form>
 
                     <?php if (!empty($telegramId) && $telegramEnabled): ?>

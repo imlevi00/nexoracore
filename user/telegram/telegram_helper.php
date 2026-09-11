@@ -18,13 +18,30 @@ class TelegramHelper {
     }
     
     /**
-     * وەرگرتنی تۆکنی بۆت لە دات اتابەیس
+     * وەرگرتنی تۆکنی بۆت لە داتابەیس یان نهێنییەکان
      */
     private function getBotToken() {
         global $conn;
-        $result = $conn->query("SELECT setting_value FROM system_settings WHERE setting_key = 'telegram_bot_token'");
-        if ($result && $row = $result->fetch_assoc()) {
-            return $row['setting_value'];
+        if ($conn instanceof mysqli) {
+            $result = $conn->query("SELECT setting_value FROM system_settings WHERE setting_key = 'telegram_bot_token'");
+            if ($result && $row = $result->fetch_assoc()) {
+                if (!empty($row['setting_value'])) {
+                    return trim($row['setting_value']);
+                }
+            }
+        }
+        if (function_exists('kasher_secret')) {
+            $token = kasher_secret('telegram_bot_token', 'TELEGRAM_BOT_TOKEN');
+            if (!empty($token)) {
+                return trim($token);
+            }
+            $token = kasher_secret('nrx_bot_token', 'NRX_BOT_TOKEN');
+            if (!empty($token)) {
+                return trim($token);
+            }
+        }
+        if (defined('TELEGRAM_BOT_TOKEN') && !empty(TELEGRAM_BOT_TOKEN)) {
+            return trim(TELEGRAM_BOT_TOKEN);
         }
         return '';
     }
@@ -34,11 +51,39 @@ class TelegramHelper {
      */
     public static function isEnabled() {
         global $conn;
-        $result = $conn->query("SELECT setting_value FROM system_settings WHERE setting_key = 'telegram_enabled'");
-        if ($result && $row = $result->fetch_assoc()) {
-            return $row['setting_value'] == '1';
+        if ($conn instanceof mysqli) {
+            $result = $conn->query("SELECT setting_value FROM system_settings WHERE setting_key = 'telegram_enabled'");
+            if ($result && $row = $result->fetch_assoc()) {
+                return $row['setting_value'] === '1' || $row['setting_value'] === 1;
+            }
         }
-        return false;
+        return true; // ئەگەر دیاری نەکرابێت بە بنەڕەت با چالاک بێت
+    }
+
+    /**
+     * پشکنینی دروستی تۆکنی بۆت لەگەڵ سێرڤەری تلیگرام
+     */
+    public static function testBotToken($token) {
+        $token = trim((string)$token);
+        if (empty($token)) {
+            return ['ok' => false, 'error' => 'تۆکنی بۆت بەتاڵە'];
+        }
+        $ch = curl_init("https://api.telegram.org/bot{$token}/getMe");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($response) {
+            $json = json_decode($response, true);
+            if (is_array($json) && !empty($json['ok'])) {
+                return ['ok' => true, 'result' => $json['result']];
+            }
+            return ['ok' => false, 'error' => $json['description'] ?? "هەڵە لە وەڵامی تلیگرام (HTTP $httpCode)"];
+        }
+        return ['ok' => false, 'error' => 'نەتوانرا پەیوەندی بە سێرڤەری تلیگرامەوە بکرێت'];
     }
     
     /**
@@ -100,15 +145,22 @@ class TelegramHelper {
         
         if ($httpCode == 200) {
             $result = json_decode($response, true);
+            if (isset($result['ok']) && $result['ok']) {
+                return [
+                    'success' => true,
+                    'response' => $result
+                ];
+            }
             return [
-                'success' => isset($result['ok']) && $result['ok'],
+                'success' => false,
+                'error' => self::formatTelegramError($httpCode, $result),
                 'response' => $result
             ];
         }
         
         return [
             'success' => false,
-            'error' => 'هەڵەی HTTP: ' . $httpCode,
+            'error' => self::formatTelegramError($httpCode, $response),
             'response' => $response
         ];
     }
@@ -132,17 +184,111 @@ class TelegramHelper {
         
         if ($httpCode == 200) {
             $result = json_decode($response, true);
+            if (isset($result['ok']) && $result['ok']) {
+                return [
+                    'success' => true,
+                    'response' => $result
+                ];
+            }
             return [
-                'success' => isset($result['ok']) && $result['ok'],
+                'success' => false,
+                'error' => self::formatTelegramError($httpCode, $result),
                 'response' => $result
             ];
         }
         
         return [
             'success' => false,
-            'error' => 'هەڵەی HTTP: ' . $httpCode,
+            'error' => self::formatTelegramError($httpCode, $response),
             'response' => $response
         ];
+    }
+
+    /**
+     * وەرگێڕان و شیکردنەوەی هەڵەکانی تیلیگرام بە کوردی
+     */
+    public static function formatTelegramError($httpCode, $response) {
+        $desc = '';
+        if (!empty($response)) {
+            $json = is_array($response) ? $response : json_decode($response, true);
+            if (is_array($json) && !empty($json['description'])) {
+                $desc = $json['description'];
+            }
+        }
+
+        if ($httpCode == 403) {
+            if (stripos($desc, "bot can't send messages to bots") !== false || stripos($desc, "can't send messages to bots") !== false) {
+                return 'ئایدی هەڵە دانراوە! تۆ ئایدی بۆتت لە خانەی (ئایدی تیلیگرام) داناوە نەک ئایدی ئەکاونتی کەسی خۆت! تیلیگرام ڕێگە نادات بۆت نامە بۆ بۆت بنێرێت. تکایە لە خوارەوە کلیک لەسەر «دۆزینەوەی ئایدی لە بۆت» بکە یان لە ڕێگەی @userinfobot ئایدی شەخسی خۆت وەربگرە و داینێ.';
+            }
+            if (stripos($desc, "bot can't initiate conversation") !== false) {
+                return 'بۆتەکە ناتوانێت پەیام بنێرێت چونکە هێشتا دوگمەی Start ـت لەناو بۆتەکە دانەگرتووە. تکایە سەرەتا لە تیلیگرام بچۆ ناو بۆتەکە و Start داگرە، پاشان دووبارە هەوڵ بدەرەوە.';
+            }
+            if (stripos($desc, "blocked by the user") !== false) {
+                return 'بۆتەکە لەلایەن ئەم ئەکاونتەوە بلۆک کراوە (Blocked). تکایە بچۆ ناو بۆتەکە لە تیلیگرام و Unblock ـی بکە.';
+            }
+            if (stripos($desc, "user is deactivated") !== false) {
+                return 'ئەم ئەکاونتەی تیلیگرام ناچالاک کراوە.';
+            }
+            return 'هەڵەی 403: بۆتەکە مۆڵەتی ناردنی نامەی نییە تاوەکو سەرەتا بەکارهێنەر لەناو بۆتەکە دوگمەی Start دانەگرێت. (' . (!empty($desc) ? $desc : 'Forbidden') . ')';
+        }
+
+        if ($httpCode == 400) {
+            if (stripos($desc, "chat not found") !== false) {
+                return 'ئایدی تیلیگرام (Chat ID) هەڵەیە یان نەدۆزرایەوە. تکایە دڵنیاببەوە کە ئایدیەکەت دروستە و پێشتر لەناو بۆتەکە Start ـت داگرتووە.';
+            }
+            return 'هەڵەی 400: ' . (!empty($desc) ? $desc : 'داواکاری نادروست');
+        }
+
+        if ($httpCode == 401) {
+            return 'تۆکنی بۆتی تیلیگرام (Bot Token) نادروستە یان بەسەرچووە. تکایە تۆکنی دروست لە بەشی ڕێکخستنی بەڕێوەبەر دابنێ.';
+        }
+
+        return 'هەڵەی HTTP: ' . $httpCode . (!empty($desc) ? ' (' . $desc . ')' : '');
+    }
+
+    /**
+     * وەرگرتنی دوایین ئەو کەسانەی لە تیلیگرام پەیوەندییان بە بۆتەوە کردووە (بۆ ئاسانکاری دۆزینەوەی Chat ID)
+     */
+    public function getRecentBotSenders() {
+        if (empty($this->botToken)) {
+            return [];
+        }
+        $url = $this->apiUrl . 'getUpdates?limit=25';
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 8);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        $res = curl_exec($ch);
+        curl_close($ch);
+
+        $senders = [];
+        if ($res) {
+            $json = json_decode($res, true);
+            if (!empty($json['ok']) && !empty($json['result'])) {
+                foreach (array_reverse($json['result']) as $up) {
+                    $msg = $up['message'] ?? $up['callback_query']['message'] ?? null;
+                    if ($msg && !empty($msg['chat']['id'])) {
+                        $cId = (string)$msg['chat']['id'];
+                        if (!isset($senders[$cId])) {
+                            $from = $msg['from'] ?? $msg['chat'];
+                            $name = trim(($from['first_name'] ?? '') . ' ' . ($from['last_name'] ?? ''));
+                            if (empty($name)) {
+                                $name = $from['username'] ?? 'بەکارهێنەر';
+                            }
+                            $username = $from['username'] ?? '';
+                            $senders[$cId] = [
+                                'chat_id' => $cId,
+                                'name' => $name,
+                                'username' => $username,
+                                'text' => $msg['text'] ?? '',
+                                'date' => !empty($msg['date']) ? date('Y-m-d H:i', $msg['date']) : ''
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+        return array_values($senders);
     }
 
     /**
